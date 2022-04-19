@@ -3,7 +3,7 @@ Check RSS feed for today's show. If available, download
 audio file, convert to our format, and transfer to destination(s).
 If not available, send notification.
 
-This is for daily shows with a date.
+This is for daily shows with a date. EG WSJ-042022
 
 © Nashville Public Library
 © Ben Weddle is to blame for this code. Anyone is free to use it.
@@ -27,9 +27,9 @@ import urllib.request
 
 show = 'Some Cool TL Program' #name of show. for notifications
 show_abbr = 'SomeProgram' #filename of show without date (do not include the dash!)
-url = "http://somesite.org/someprogram.xml" #source rss feed
+url = "http://somesite.org/somerssfeed.xml" #source rss feed
 
-# these are for checking whether the length of the file is outside of a range. decimal numbers are permitted.
+# these are for checking whether the length of the file is outside of a range. decimal numbers are OK.
 # Used for notifications only.
 check_max_length = 0
 check_min_length = 0
@@ -64,8 +64,8 @@ def convert_copy():
     check_length() #check file length before deleting file from current directory
     shutil.copy(f'{filename}', f'{production_pc}\{filename}')
     shutil.copy(f'{filename}', f'{onair_pc}\{filename}')
-    os.remove('input.mp3') #remove original file from this folder
-    os.remove(f'{filename}') #remove converted file from this folder
+    os.remove('input.mp3') #remove original file from current directory
+    os.remove(f'{filename}') #remove converted file from current directory
 
 def remove_old_files():
     '''delete yesterday's files from destinations. 
@@ -98,6 +98,7 @@ def send_mail(message, subject):
     mail = smtplib.SMTP(host=mail_server)
     mail.send_message(format)
     mail.quit()
+    #TODO: explain why we're sending mail this way
 
 def send_sms(message):
     '''send sms via twilio'''
@@ -132,7 +133,7 @@ def check_file_exists():
         os.system('cls')
         print(to_send) #get user's attention!
         print()
-        input('(press enter to close this window)') #force user to acknowledge with pop-up window
+        input('(press enter to close this window)') #force user to acknowledge
 
 def check_length():
     '''check length of converted file with ffprobe. if too long or short, send notification'''
@@ -203,4 +204,4 @@ Please check and download manually!\n\n\
     os.system('cls')
     print(to_send)
     print()
-    input('(press enter to close this window)') #force user to acknowledge with pop-up window
+    input('(press enter to close this window)') #force user to acknowledge
