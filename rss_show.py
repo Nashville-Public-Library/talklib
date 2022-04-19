@@ -25,13 +25,14 @@ import urllib.request
 
 #-----change these for each new program-----
 
-show = 'New York Times' #for notifications
-show_abbr = 'NYT' #filename without date (do not include the dash!)
-url = "http://wireready.org/tic/nytimes.rss" #source rss feed
+show = 'Some Cool TL Program' #name of show. for notifications
+show_abbr = 'SomeProgram' #filename of show without date (do not include the dash!)
+url = "http://somesite.org/someprogram.xml" #source rss feed
 
-# these are for checking whether the length of the file is outside of a range. Used for notifications only.
-check_max_length = 59
-check_min_length = 55
+# these are for checking whether the length of the file is outside of a range. decimal numbers are permitted.
+# Used for notifications only.
+check_max_length = 0
+check_min_length = 0
 
 '''
 *****----------SHOULD NOT NEED TO CHANGE ANYTHING BELOW THIS LINE----------*****
