@@ -68,7 +68,7 @@ def convert_copy():
     os.remove(f'{filename}') #remove converted file from this folder
 
 def remove_old_files():
-    '''delete yesterday's files from desntinations. 
+    '''delete yesterday's files from destinations. 
     OK to use glob wildcards since there should only ever be one file'''
     for old_file in glob.glob(f'{production_pc}\{show_abbr}*.wav'):
         os.remove(old_file)

@@ -2,16 +2,22 @@
 
 Various scripts to parse RSS feeds and download their audio files
 
-dependencies include:
+What you need:
+
+**Python 3.10.1+**
+
 **ffmpeg**
 
 **ffprobe**
 
 **wget**
 
-We're also using **Twilio** for SMS notifications. Install via PIP and set environement variables.
+These need to be installed and added to the PATH.
+Also, set the environment variables as shown in the scripts, or change these manually.
+For TL, it's best to use environment variables.
 
-The other modules are all in core Python.
+We're also using **Twilio** for SMS notifications. Install via PIP.
+Credentials can be retrieved via the Twilio dashboard.
 
 -----
 rss_show is for daily shows with a date
