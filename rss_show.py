@@ -29,8 +29,8 @@ show = 'Some Cool TL Program' #name of show. for notifications
 show_abbr = 'SomeProgram' #filename of show without date (do not include the dash!)
 url = "http://somesite.org/somerssfeed.xml" #source rss feed
 
-# these are for checking whether the length of the file is outside of a range. decimal numbers are OK.
-# Used for notifications only.
+# these are for checking whether the length (in minutes!) of the file is outside of a range.
+# decimal numbers are OK.
 check_max_length = 0
 check_min_length = 0
 
