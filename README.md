@@ -6,18 +6,18 @@ What you need:
 
 **Python 3.10.1+**
 
-**ffmpeg**
+**FFmpeg**
 
-**ffprobe**
+**FFprobe**
 
-**wget**
+**Wget**
 
 These need to be installed and added to the PATH.
 Also, set the environment variables as shown in the scripts, or change these manually.
 For TL, it's best to use environment variables.
 
 We're also using **Twilio** for SMS notifications. Install via PIP.
-Credentials can be retrieved via the Twilio dashboard.
+Credentials can be retrieved by logging in to the Twilio dashboard.
 
 -----
 rss_show is for daily shows with a date
