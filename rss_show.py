@@ -25,38 +25,29 @@ import urllib.request
 
 #-----change these for each new program-----
 
-show = 'Some Cool TL Program' #name of show. for notifications
-show_abbr = 'SomeProgram' #filename of show without date (do not include the dash!)
-url = "http://somesite.org/somerssfeed.xml" #source rss feed
+show = 'Some Cool TL Program' #name of show.
+show_abbr = 'SomeProgram' #filename of show without date (do not include the dash!). EG NYT
+url = "http://somesite.org/somerssfeed.xml" #source RSS feed
 
 # these are for checking whether the length (in minutes!) of the file is outside of a range.
 # decimal numbers are OK.
-check_max_length = 0
-check_min_length = 0
+check_if_above = 0
+check_if_below = 0
 
 '''
 *****----------SHOULD NOT NEED TO CHANGE ANYTHING BELOW THIS LINE----------*****
 '''
 
-# these are defined in the PC's environement variables
+# these are defined in the PC's environement variables.
 # If you need to change them, change them there, not here!
-mail_server = os.environ["mail_server_external"] #IP of mail server
-syslog_server = os.environ["syslog_server"] #IP of PC with syslog server software
 production_pc = os.environ["ProductionPC"]
 onair_pc = os.environ["OnAirPC"]
-twilio_sid = os.environ['twilio_sid']
-twilio_token = os.environ['twilio_token']
-twilio_from = os.environ['twilio_from']
-twilio_to = os.environ['twilio_to']
 
-short_day = datetime.now().strftime('%a')
-weekend = ['Sat', 'Sun']
-date = datetime.now().strftime("%m%d%y") #used in filename of converted file
-date_for_email = datetime.now().strftime("%m-%d-%y")
-time_for_email = datetime.now().strftime('%H:%M:%S')
+timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
 
 def convert_copy():
     '''download file, convert with ffmpeg, check length, copy to destinations, remove files from this folder'''
+    date = datetime.now().strftime("%m%d%y")
     global filename
     filename = (f"{show_abbr}-{date}.wav")
     subprocess.run(f'wget -q -O input.mp3 {download}') #using wget because urlretrive is getting a 403 denied error
@@ -77,7 +68,7 @@ def remove_old_files():
 
 def syslog():
     '''send message to syslog server'''
-    host = syslog_server
+    host = os.environ["syslog_server"] #IP of PC with syslog server software
     port = int('514')
 
     my_logger = logging.getLogger('MyLogger')
@@ -89,6 +80,7 @@ def syslog():
 
 def send_mail(message, subject):
     '''send email to TL gmail account via relay address'''
+    mail_server = os.environ["mail_server_external"] #IP of mail server
     format = EmailMessage()
     format.set_content(message)
     format['Subject'] = f'{subject}: {show}'
@@ -102,8 +94,12 @@ def send_mail(message, subject):
 
 def send_sms(message):
     '''send sms via twilio'''
-    client = Client(twilio_sid, twilio_token)
+    twilio_sid = os.environ['twilio_sid']
+    twilio_token = os.environ['twilio_token']
+    twilio_from = os.environ['twilio_from']
+    twilio_to = os.environ['twilio_to']
 
+    client = Client(twilio_sid, twilio_token)
     message = client.messages.create(
                         body = message,
                         from_= twilio_from,
@@ -113,7 +109,9 @@ def send_sms(message):
 
 def notify(message, subject):
     '''if today is on a weekend, send sms and email. if not, send email only'''
-    if short_day in weekend:
+    today_short = datetime.now().strftime('%a')
+    weekend = ['Sat', 'Sun']
+    if today_short in weekend:
         send_sms(message)
         send_mail(message, subject)
     else:
@@ -126,9 +124,9 @@ def check_file_exists():
         syslog()
     except: #if file doesn't exist, send notification
         to_send = (f"There was a problem with {show}.\n\n\
-    It looks like the file either wasn't converted or didn't transfer correctly. \
-    Please check manually! \n\n\
-    {time_for_email} on {date_for_email}")
+It looks like the file either wasn't converted or didn't transfer correctly. \
+Please check manually! \n\n\
+    {timestamp}")
         notify(message=to_send, subject='Error')
         os.system('cls')
         print(to_send) #get user's attention!
@@ -143,15 +141,15 @@ def check_length():
     duration = duration/60
     duration = round(duration, 2)
     
-    if duration > check_max_length:
+    if duration > check_if_above:
         to_send = (f"Today's {show} is {duration} minutes long! \
-Please check manually and make edits to bring it below {check_max_length} minutes.\n\n\
-{time_for_email} on {date_for_email}")
+Please check manually and make edits to bring it below {check_if_above} minutes.\n\n\
+{timestamp}")
         notify(message=to_send, subject='Check Length')
-    elif duration < check_min_length:
+    elif duration < check_if_below:
         to_send = (f"Today's {show} is only {duration} minutes long! \
 This is unusual and could indicate a problem with the file. Please check manually!\n\n\
-{time_for_email} on {date_for_email}")
+{timestamp}")
         notify(message=to_send, subject='Check Length')
     else: pass
 
@@ -165,12 +163,13 @@ def check_feed():
     global feed_updated
     feed_updated = False
     for t in root.findall('channel'):
+        today_short = datetime.now().strftime('%a')
         item = t.find('item') #'find' only returns the first match!
         pub_date = item.find('pubDate').text
         global download
         download = item.find('enclosure').attrib
         download = download.get('url')
-        if short_day in pub_date:
+        if today_short in pub_date:
             feed_updated = True
 
 def check_feed_loop():
@@ -187,7 +186,6 @@ def check_feed_loop():
 
 #BEGIN
 print(f"I'm working on {show}. Just a moment...")
-
 check_feed_loop()
 
 # if feed is updated, continue. if not, send notification.
@@ -199,7 +197,7 @@ else:
     to_send = (f"There was a problem with {show}. \n\n\
 It looks like today's file hasn't yet been posted. \
 Please check and download manually!\n\n\
-{time_for_email} on {date_for_email}")
+{timestamp}")
     notify(message=to_send, subject='Error')
     os.system('cls')
     print(to_send)
