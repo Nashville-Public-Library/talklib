@@ -38,7 +38,7 @@ check_if_below = 0
 *****----------SHOULD NOT NEED TO CHANGE ANYTHING BELOW THIS LINE----------*****
 '''
 
-# these are defined in the PC's environement variables.
+# destination folders. these are defined in the PC's environement variables.
 # If you need to change them, change them there, not here!
 production_pc = os.environ["ProductionPC"]
 onair_pc = os.environ["OnAirPC"]
