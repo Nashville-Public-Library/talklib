@@ -38,8 +38,7 @@ production_pc = os.environ["ProductionPC"] #Production PC
 onair_pc = os.environ["OnAirPC"] #OnAir PC
 
 short_day = datetime.now().strftime('%a') #used to match pubdate in rss feed, and other purposes.
-date_for_email = datetime.now().strftime("%m-%d-%y")
-time_for_email = datetime.now().strftime('%H:%M:%S')
+timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
 
 def convert_copy():
     '''download file, convert with ffmpeg, check length, copy to destinations, remove files from this folder'''
@@ -117,7 +116,7 @@ def check_file_exists():
         to_send = (f"There was a problem with {show}.\n\n\
     It looks like the file either wasn't converted or didn't transfer correctly. \
     Please check manually! \n\n\
-    {time_for_email} on {date_for_email}")
+    {timestamp}")
         notify(message=to_send, subject='Error')
         os.system('cls')
         print(to_send) #get user's attention!
@@ -135,12 +134,12 @@ def check_length():
     if duration > 2.01:
         to_send = (f"Today's {show} is {duration} minutes long! \
 Please check manually and make edits to bring it below 59 minutes.\n\n\
-{time_for_email} on {date_for_email}")
+{timestamp}")
         notify(message=to_send, subject='Check Length')
     elif duration < 1.99:
         to_send = (f"Today's {show} is only {duration} minutes long! \
 This is unusual and could indicate a problem with the file. Please check manually!\n\n\
-{time_for_email} on {date_for_email}")
+{timestamp}")
         notify(message=to_send, subject='Check Length')
     else: pass
 
@@ -174,7 +173,6 @@ def check_feed_loop():
             time.sleep(1)
             i = i+1
 
-
 #BEGIN
 print(f"I'm working on {show}. Just a moment...")
 check_feed_loop()
@@ -188,7 +186,7 @@ else:
     to_send = (f"There was a problem with {show}. \n\n\
 It looks like today's file hasn't yet been posted. \
 Please check and download manually! Yesterday's file will remain.\n\n\
-{time_for_email} on {date_for_email}")
+{timestamp}")
     notify(message=to_send, subject='Error')
     os.system('cls')
     print(to_send)
