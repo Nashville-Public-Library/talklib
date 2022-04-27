@@ -22,6 +22,7 @@ from email.message import EmailMessage
 import time
 from twilio.rest import Client
 import urllib.request
+import requests
 
 #-----change these for each new program-----
 
@@ -167,17 +168,17 @@ This is unusual and could indicate a problem with the file. Please check manuall
 
 def get_feed():
     '''check if today's file has been uploaded'''
-    header = {'User-Agent': 'Darth Vader'} #requests are denied unless user agent is sent
-    req = urllib.request.Request(url, None, header)
-    html = urllib.request.urlopen(req)
-    html = html.read()
-    root = ET.fromstring(html)
+    header = {'User-Agent': 'Darth Vader'} #may not be completely necessary
+    rssfeed = requests.get(url, params=header)
+    rssfeed = rssfeed.text
+    rssfeed = ET.fromstring(rssfeed)
+    root = rssfeed
     return root
 
 def check_feed_updated():
     root = get_feed()
     for t in root.findall('channel'):
-        item = t.find('item') #'find' only returns the first match!
+        item = t.find('item') #'find' returns ONLY the first match!
         pub_date = item.find('pubDate').text
         if short_day in pub_date:
             feed_updated = True
@@ -186,7 +187,7 @@ def check_feed_updated():
 def get_audio_url():
     root = get_feed()
     for t in root.findall('channel'):
-        item = t.find('item') #'find' only returns the first match!
+        item = t.find('item') #'find' returns ONLY the first match!
         audio_url = item.find('enclosure').attrib
         audio_url = audio_url.get('url')
         return audio_url
