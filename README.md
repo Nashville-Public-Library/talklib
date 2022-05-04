@@ -20,12 +20,12 @@ We're also using **Twilio** for SMS notifications. Install via PIP.
 Credentials can be retrieved by logging in to the Twilio dashboard.
 
 -----
-##rss_show 
+## rss_show 
 
 for daily, full shows with a date
 
 -----
-##rss_segment 
+## rss_segment 
 
 for daily, short segments without a date
  
