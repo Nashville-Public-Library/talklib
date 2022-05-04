@@ -21,38 +21,50 @@ import smtplib
 from email.message import EmailMessage
 import time
 from twilio.rest import Client
-import urllib.request
 import requests
 
 #-----change these for each new program-----
 
 show = 'Some Cool TL Segment' # for notifications
 output_file = 'NameOfSegment.wav' #name of file
-url = "http://somesite.org/somesegment.xml" #source rss feed
+url = 'https://somesite.org/somefeed.xml' #source rss feed
 
 # these are for checking whether the length (in minutes!) of the file is outside of a range.
+# used for notification only
 # decimal numbers are OK.
 check_if_above = 0
 check_if_below = 0
 
-#*****----------SHOULD NOT NEED TO CHANGE ANYTHING BELOW THIS LINE----------*****
+'''
+    -------------------------------------------------------------------------------
+        ----------SHOULD NOT NEED TO CHANGE ANYTHING BELOW THIS LINE----------
+    -------------------------------------------------------------------------------
+'''
 
 # these are defined in the PC's environement variables.
 # If you need to change them, change them there, not here!
 production_pc = os.environ["ProductionPC"] #Production PC
 onair_pc = os.environ["OnAirPC"] #OnAir PC
 
-short_day = datetime.now().strftime('%a') #used to match pubdate in rss feed, and other purposes.
+short_day = datetime.now().strftime('%a')
 timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
 
-def convert_copy(input):
-    '''convert with ffmpeg, check length, copy to destinations, remove files from this folder'''
+def convert(input):
+    '''convert with ffmpeg and call check length function'''
     subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-21 -y {output_file}')
-    check_length() #check file length before deleting file from current directory
-    shutil.copy(f'{output_file}', f'{production_pc}\{output_file}')
-    shutil.copy(f'{output_file}', f'{onair_pc}\{output_file}')
-    os.remove('input.mp3') #remove original file from current directory
-    os.remove(f'{output_file}') #remove converted file from current directory
+    check_length() #call this before removing the files
+    copy(original_file=input, converted_file=output_file)
+
+def copy(original_file, converted_file):
+    '''TODO explain'''
+    shutil.copy(f'{converted_file}', f'{production_pc}\{converted_file}')
+    shutil.copy(f'{converted_file}', f'{onair_pc}\{converted_file}')
+    remove(file_to_delete=converted_file)
+    remove(file_to_delete=original_file)
+
+def remove(file_to_delete):
+    '''TODO explain'''
+    os.remove(file_to_delete) #remove original file from current directory
 
 def download_file():
     '''download audio file from rss feed'''
@@ -62,12 +74,13 @@ def download_file():
     check_downloaded_file(input_file=input_file)
 
 def check_downloaded_file(input_file):
+    '''TODO explain'''
     filesize = os.path.getsize(input_file)
     is_not_empty = False
     i = 0
     while i < 3:
         if filesize > 0:
-            convert_copy(input=input_file)
+            convert(input=input_file)
             is_not_empty = True
             break
         else:
@@ -77,7 +90,8 @@ def check_downloaded_file(input_file):
         pass
     else:
         to_send = (f"There was a problem with {show}.\n\n\
-It looks like the downloaded file is empty. Please check manually! \n\n\
+It looks like the downloaded file is empty. Please check manually! \
+Yesterday's file will remain. \n\n\
 {timestamp}")
         notify(message=to_send , subject='Error')        
 
@@ -123,6 +137,7 @@ def send_sms(message):
     message.sid
 
 def notify(message, subject):
+    '''TODO: explain'''
     weekend = ['Sat', 'Sun']
     if short_day in weekend:
         send_sms(message=message) 
@@ -168,26 +183,27 @@ This is unusual and could indicate a problem with the file. Please check manuall
 
 def get_feed():
     '''check if today's file has been uploaded'''
-    header = {'User-Agent': 'Darth Vader'} #may not be completely necessary
-    rssfeed = requests.get(url, params=header)
+    header = {'User-Agent': 'Darth Vader'} #usually helpful to identify yourself
+    rssfeed = requests.get(url, headers=header)
     rssfeed = rssfeed.text
     rssfeed = ET.fromstring(rssfeed)
-    root = rssfeed
-    return root
+    return rssfeed
 
 def check_feed_updated():
+    '''TODO explain'''
     root = get_feed()
     for t in root.findall('channel'):
-        item = t.find('item') #'find' returns ONLY the first match!
+        item = t.find('item') #'find' only returns the first match!
         pub_date = item.find('pubDate').text
         if short_day in pub_date:
             feed_updated = True
             return feed_updated
 
 def get_audio_url():
+    '''TODO: explain'''
     root = get_feed()
     for t in root.findall('channel'):
-        item = t.find('item') #'find' returns ONLY the first match!
+        item = t.find('item') #'find' only returns the first match!
         audio_url = item.find('enclosure').attrib
         audio_url = audio_url.get('url')
         return audio_url
@@ -206,8 +222,8 @@ def check_feed_loop():
 
 #BEGIN
 print(f"I'm working on {show}. Just a moment...")
-feed_updated = check_feed_loop()
-if feed_updated == True:
+
+if check_feed_loop() == True:
     download_file()
     check_file_transferred()
 else:
@@ -219,4 +235,4 @@ Please check and download manually! Yesterday's file will remain.\n\n\
     os.system('cls')
     print(to_send)
     print()
-    input('(press enter to close this window)') #force user to acknowledge by closing window
+    input('(press enter to close this window)') #force user to acknowledge
