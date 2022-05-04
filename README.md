@@ -4,13 +4,13 @@ Various scripts to parse RSS feeds and download their audio files
 
 What you need:
 
-**Python 3.10.1+**
+- **Python 3.10.1+**
 
-**FFmpeg**
+- **FFmpeg**
 
-**FFprobe**
+- **FFprobe**
 
-**Wget**
+- **Wget**
 
 These need to be installed and added to the PATH.
 Also, set the environment variables as shown in the scripts, or change these manually.
