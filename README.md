@@ -20,10 +20,9 @@ For EITHER of these scripts, here's What you need:
 
 These need to be installed and added to the PATH.
 Also, set the environment variables as shown in the scripts, or change these manually.
-For TL, it's best to use environment variables.
 
 We're also using **Twilio** for SMS notifications. Install via PIP.
-Credentials can be retrieved by logging in to the Twilio dashboard.
+Credentials can be retrieved at https://www.twilio.com/login
 Comment out or delete the relevant code if you don't want to use it.
 
 -----
