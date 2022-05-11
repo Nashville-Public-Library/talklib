@@ -24,6 +24,14 @@ Credentials can be retrieved by logging in to the Twilio dashboard.
 
 for daily, full shows with a date
 
+This will check the RSS feed and, if the newest entry has a pub date matching today's date,
+it will download the linked audio file, convert it to TL format via FFmpeg, and transfer the file
+to the destination directory(ies). It also runs some checks/tests along the way. See source for more info.
+
+
+Do not use zero for the check_if_above & below variables unless you want a notifcation each time you run it.
+To disable the, comment out the check_length function call.
+
 -----
 ## rss_segment 
 
