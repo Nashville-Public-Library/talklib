@@ -25,15 +25,15 @@ import requests
 
 #-----change these for each new program-----
 
-show = 'Some Cool TL Segment' # for notifications
-output_file = 'NameOfSegment.wav' #name of file
+show = 'Some Segment' # for notifications
+output_file = 'SomeSegment.wav' #name of file WITH .wav extension
 url = 'https://somesite.org/somefeed.xml' #source rss feed
 
 # these are for checking whether the length (in minutes!) of the file is outside of a range.
 # used for notification only
 # decimal numbers are OK.
-check_if_above = 0
-check_if_below = 0
+check_if_above = 0.0
+check_if_below = 0.0
 
 '''
     -------------------------------------------------------------------------------
@@ -43,31 +43,41 @@ check_if_below = 0
 
 # these are defined in the PC's environement variables.
 # If you need to change them, change them there, not here!
-production_pc = os.environ["ProductionPC"] #Production PC
-onair_pc = os.environ["OnAirPC"] #OnAir PC
+
+destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]
+
+fromEmail = os.environ['fromEmail'] #where should emails appear to come from?
+toEmail = os.environ['toEmail'] #where should email notifications go?
 
 short_day = datetime.now().strftime('%a')
 timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
 
 def convert(input):
-    '''convert with ffmpeg and call check length function'''
+    '''convert file with ffmpeg and call check length and copy functions'''
+    syslog(message=f'Attempting to convert {show}.')
     subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-21 -y {output_file}')
     check_length() #call this before removing the files
     copy(original_file=input, converted_file=output_file)
 
 def copy(original_file, converted_file):
     '''TODO explain'''
-    shutil.copy(f'{converted_file}', f'{production_pc}\{converted_file}')
-    shutil.copy(f'{converted_file}', f'{onair_pc}\{converted_file}')
+    syslog(message=f'Attempting to copy {show} to destinations...')
+    numberOfDestinations = len(destinations)
+    numberOfDestinations = numberOfDestinations -1
+    while numberOfDestinations >= 0:
+        shutil.copy(converted_file, destinations[numberOfDestinations])
+        numberOfDestinations = numberOfDestinations-1
     remove(file_to_delete=converted_file)
     remove(file_to_delete=original_file)
 
 def remove(file_to_delete):
     '''TODO explain'''
+    syslog(message=f'{show}: Deleting {file_to_delete}...')
     os.remove(file_to_delete) #remove original file from current directory
 
 def download_file():
     '''download audio file from rss feed'''
+    syslog(message=f'{show}: Attempting to download audio file.')
     download = get_audio_url()
     input_file = 'input.mp3' #name the file we download
     subprocess.run(f'wget -q -O {input_file} {download}') #using wget because urlretrive is getting a 403 denied error
@@ -80,10 +90,12 @@ def check_downloaded_file(input_file):
     i = 0
     while i < 3:
         if filesize > 0:
+            syslog(message=f'{show} is not empty. Continuing...')
             convert(input=input_file)
             is_not_empty = True
             break
         else:
+            syslog(message=f'{show} is empty. Will download again. Attempt # {i}.')
             download_file()
             i = i+1
     if is_not_empty == True:
@@ -95,7 +107,7 @@ Yesterday's file will remain. \n\n\
 {timestamp}")
         notify(message=to_send , subject='Error')        
 
-def syslog():
+def syslog(message):
     '''send message to syslog server'''
     host = os.environ["syslog_server"] #IP of PC with syslog server software
     port = int('514')
@@ -105,7 +117,8 @@ def syslog():
     handler = SysLogHandler(address = (host, port))
     my_logger.addHandler(handler)
 
-    my_logger.info(f'{show} was successfully processed. All is well.')
+    my_logger.info(message)
+    my_logger.removeHandler(handler) #don't forget this after you send the message!
 
 def send_mail(message, subject):
     '''send email to TL gmail account via relay address'''
@@ -113,8 +126,8 @@ def send_mail(message, subject):
     format = EmailMessage()
     format.set_content(message)
     format['Subject'] = f'{subject}: {show}'
-    format['From'] = "ben.weddle@nashville.gov"
-    format['To'] = "nashvilletalkinglibrary@nashville.gov"
+    format['From'] = fromEmail
+    format['To'] = toEmail
 
     mail = smtplib.SMTP(host=mail_server)
     mail.send_message(format)
@@ -142,15 +155,21 @@ def notify(message, subject):
     if short_day in weekend:
         send_sms(message=message) 
         send_mail(message=message, subject=subject)
+        syslog(message=message)
     else:
         send_mail(message=message, subject=subject)
+        syslog(message=message)
 
 def check_file_transferred():
     '''check if file transferred to OnAir PC'''
-    try: #if file exists, send syslog message
-        os.path.isfile(f'{onair_pc}\{output_file}')
-        syslog()
-    except: #if file doesn't exist, send notification
+    try:
+        numberOfDestinations = len(destinations)
+        numberOfDestinations = numberOfDestinations -1
+        while numberOfDestinations >= 0:
+            os.path.isfile(f'{destinations[numberOfDestinations]}\{output_file}')
+            numberOfDestinations = numberOfDestinations-1
+            syslog(message=f'{show} arrived at {destinations[numberOfDestinations]}. All Done')
+    except:
         to_send = (f"There was a problem with {show}.\n\n\
 It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually! \n\n\
@@ -179,7 +198,8 @@ Please check manually and make edits to bring it below {check_if_above} minutes.
 This is unusual and could indicate a problem with the file. Please check manually!\n\n\
 {timestamp}")
         notify(message=to_send, subject='Check Length')
-    else: pass
+    else:
+        syslog(message=f'{show} is {duration} minute(s). Continuing...')
 
 def get_feed():
     '''check if today's file has been uploaded'''
@@ -196,8 +216,8 @@ def check_feed_updated():
         item = t.find('item') #'find' only returns the first match!
         pub_date = item.find('pubDate').text
         if short_day in pub_date:
-            feed_updated = True
-            return feed_updated
+            syslog(message=f'The feed for {show} is updated. Continuing...')
+            return True
 
 def get_audio_url():
     '''TODO: explain'''
@@ -206,6 +226,7 @@ def get_audio_url():
         item = t.find('item') #'find' only returns the first match!
         audio_url = item.find('enclosure').attrib
         audio_url = audio_url.get('url')
+        syslog(message=f'{show}: Audio URL is: {audio_url}')
         return audio_url
 
 def check_feed_loop():
@@ -213,15 +234,18 @@ def check_feed_loop():
     It's being cached, or something...? So we are checking it 3 times, for good measure.'''
     i = 0
     while i < 3:
+        syslog(message=f'{show}: Attempt {i} to check feed.')
         feed_updated = check_feed_updated()
         if feed_updated == True:
             return feed_updated
-        else: 
+        else:
             time.sleep(1)
             i = i+1
 
 #BEGIN
-print(f"I'm working on {show}. Just a moment...")
+toSend = (f"I'm working on {show}. Just a moment...")
+print(toSend)
+syslog(message=toSend)
 
 if check_feed_loop() == True:
     download_file()
