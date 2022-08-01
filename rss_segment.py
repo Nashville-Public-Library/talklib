@@ -305,8 +305,8 @@ if __name__ == "__main__":
         download_file()
     else:
         to_send = (f"There was a problem with {show}. \n\n\
-    It looks like today's file hasn't yet been posted. \
-    Please check and download manually! Yesterday's file will remain.\n\n\
+It looks like today's file hasn't yet been posted. \
+Please check and download manually! Yesterday's file will remain.\n\n\
     {timestamp}")
         notify(message=to_send, subject='Error')
         os.system('cls')
