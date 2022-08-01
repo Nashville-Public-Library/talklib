@@ -8,9 +8,7 @@ to the destination(s). It also runs some checks/tests along the way. See source 
 
 You can leave the check_if_above & below variables at zero, but that will cause notifcations each time you run it.
 
-For EITHER of these scripts, here's What you need:
-
-- **Python 3.10.1+**
+For EITHER of these scripts, you will need Python 3.10.1+ AND Windows binaries for the following installed on the PC and added to the PATH:
 
 - **FFmpeg**
 
@@ -18,12 +16,13 @@ For EITHER of these scripts, here's What you need:
 
 - **Wget**
 
-These need to be installed and added to the PATH.
 Also, set the environment variables as shown in the scripts, or change these manually.
 
 We're also using **Twilio** for SMS notifications. Install via PIP.
 Credentials can be retrieved at https://www.twilio.com/login
 Comment out or delete the relevant code if you don't want to use it.
+
+*An obvious improvement to these scripts would be to download the audio files in a more "Pythonic" fashion, IE not using Wget.*
 
 -----
 ## rss_show 
