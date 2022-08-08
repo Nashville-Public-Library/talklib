@@ -101,33 +101,34 @@ Let's go through what each of these are for
 `WP.show_filename` (required)
 - the filename of the program
 - note that it does NOT include a trailing dash `-` OR the file extension `.wav`. use the base name only
-- enclose in quotes (single or double, Python doesn't care)
+- enclose in quotes
 
 `WP.url` (required)
 - link to the RSS feed
 - ensure there is not a trailing forward slash `/` at the end of the link
     - correct: 'https://somesite.org//wpfeed.rss'
     - incorrect: 'https://somesite.org//wpfeed.rss/'
-- enclose in quotes (single or double, Python doesn't care)
+- enclose in quotes
 
 `WP.remove_yesterday` (optional)
 - whether or not you want to remove yesterday's files (if any exists)
 - if set to `True`, it will delete any file matching the show_filename attribute you set.
 - the default is `False`. 
-- `True` & `False` are boolean values and must be capitalized
 
 `WP.include_date` (optional)
 - whether or not you want to include today's date in the filename
 - if set to `True`, the date will be appended as such: `WP-MMDDYY.wav`
+- if not set, or set to `False`, the resulting filename will be: `WP.wav`
 - Generally, for TL programs, if it is a daily show, like the New York Times, etc., you need the date in the filename, as this is what WireReady will match.
 - the default is `False`
-- `True` & `False` are boolean values and must be capitalized
 
 `WP.check_if_above` and `WP.check_if_below` (optional)
 - these are for checking whether the length of the program (**in minutes!**) falls outside a range
 - used strictly for notification purposes
+- decimal numbers are OK.
 - if these are not set, the checks will not be run
-- the are "int" values; do not enclose in quotes
+- do not enclose in quotes
+- again, these values are in MINUTES
 
 `WP.run()`
 - starts running the script with the attributes you set
