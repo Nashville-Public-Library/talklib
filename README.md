@@ -36,5 +36,29 @@ It also uses a number of environment variables. Make sure to set all of these on
 
 ---
 
+## About WireReady
+
+Before we begin, a general note:
+
+### We run most of our Python scripts via WireReady (WR)
+- The "Run" command in WR defaults to running from a different directory AND a different drive letter. This causes confusion.
+- WR also does not run `.py` files by default. 
+- For these reasons and more, we do not run `.py` files directly from WR.
+- Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file). 
+- The batch script ensures we CD to the correct directory.
+- Ensure the Batch & Python scripts are in the same directory.
+
+A sample `.bat` file (`Example.bat`) is inlcuded in this repo. Here is what an example directory structure should look like:
+````
+D:\wireready
+    \Washington Post
+        \WP.bat
+        \WP.py
+````
+You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
+
+----
+
 ## Usage
- 
+
+
