@@ -6,7 +6,6 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
-from ast import excepthandler
 import xml.etree.ElementTree as ET
 import subprocess
 from datetime import datetime
@@ -32,14 +31,16 @@ timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
 class TLShow:
     '''TODO write something here'''
     def __init__(
-        self, show=None, show_filename=None, url=None, include_date=False,
-        remove_yesterday=False, is_local=False, local_file=None,
+        self, show=None, show_filename=None, url=None, is_permalink=False, breakaway=None,
+        include_date=False, remove_yesterday=False, is_local=False, local_file=None,
         remove_source=False, check_if_above=0, check_if_below=0, notifications=True
         ):
 
         self.show = show
         self.show_filename = show_filename
         self.url = url
+        self.is_permalink = is_permalink
+        self.breakaway = breakaway
         self.include_date = include_date
         self.remove_yesterday = remove_yesterday
         self.is_local = is_local
@@ -58,7 +59,10 @@ class TLShow:
         else:
             outputFile = (f'{self.show_filename}.wav')
         TLShow.syslog(self, message=f'{self.show}: Converting to TL format.')
-        subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-21 -y {outputFile}')
+        if self.breakaway:
+            pass
+        else:
+            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-21 -y {outputFile}')
         if self.check_if_below or self.check_if_above != 0:
             TLShow.check_length(self, fileToCheck=outputFile) # call this before removing the files
         else:
@@ -110,8 +114,11 @@ class TLShow:
 
 
     def download_file(self):
-        '''download audio file from rss feed'''
-        download = TLShow.get_audio_url(self)
+        '''download audio file from rss feed or permalink'''
+        if self.is_permalink:
+            download = self.url
+        else:
+            download = TLShow.get_audio_url(self)
         TLShow.syslog(self, message=f'{self.show}: Attempting to download audio file.')
         input_file = 'input.mp3'  # name the file we download
         # using wget because urlretrive is getting a 403 denied error
@@ -208,7 +215,7 @@ class TLShow:
 
 
     def check_file_transferred(self, fileToCheck):
-        '''check if file transferred to OnAir PC'''
+        '''check if file transferred to destination(s)'''
         try:
             numberOfDestinations = len(destinations)
             numberOfDestinations = numberOfDestinations - 1
@@ -338,7 +345,9 @@ class TLShow:
             print('(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
         
         if self.url:
-            if TLShow.check_feed_loop(self) == True:
+            if self.is_permalink:
+                TLShow.download_file(self)
+            elif TLShow.check_feed_loop(self) == True:
                 TLShow.removeYesterdayFiles(self)
                 TLShow.download_file(self)
             else:
