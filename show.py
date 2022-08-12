@@ -113,7 +113,7 @@ class TLShow:
                 globbifyLength = globbifyLength - 1
 
 
-    def download_file(self):
+    def download_file(self, i=0):
         '''download audio file from rss feed or permalink'''
         if self.is_permalink:
             download = self.url
@@ -123,14 +123,13 @@ class TLShow:
         input_file = 'input.mp3'  # name the file we download
         # using wget because urlretrive is getting a 403 denied error
         subprocess.run(f'wget -q -O {input_file} {download}')
-        TLShow.check_downloaded_file(self, fileToCheck=input_file)
+        TLShow.check_downloaded_file(self, fileToCheck=input_file, i=i)
 
 
-    def check_downloaded_file(self, fileToCheck):
+    def check_downloaded_file(self, fileToCheck, i):
         '''TODO explain'''
         filesize = os.path.getsize(fileToCheck)
         is_not_empty = False
-        i = 0
         while i < 3:
             if filesize > 0:
                 TLShow.syslog(self, message=f'{self.show}: File is not empty. Continuing...')
@@ -139,8 +138,8 @@ class TLShow:
                 break
             else:
                 TLShow.syslog(self, message=f'{self.show}: File is empty. Will download again. Attempt # {i}.')
-                TLShow.download_file(self)
                 i = i+1
+                TLShow.download_file(self, i=i)
         if is_not_empty == True:
             pass
         else:
@@ -149,6 +148,8 @@ class TLShow:
     Yesterday's file will remain. \n\n\
     {timestamp}")
             TLShow.notify(self, message=toSend, subject='Error')
+            TLShow.remove(self, fileToDelete=fileToCheck)
+            
 
 
     def syslog(self, message):
