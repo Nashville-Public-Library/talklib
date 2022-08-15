@@ -50,6 +50,9 @@ class TLShow:
         self.check_if_below = check_if_below
         self.notifications = notifications
         self.twilio_enable = twilio_enable
+    
+    def __str__(self) -> str:
+        return "This is a really cool, useful class. Calling this method should give useful info. I'll come back to it. TODO"
 
 
     def convert(self, input):
