@@ -363,7 +363,7 @@ Please check and download manually! Yesterday's file will remain.\n\n\
                 input('(press enter to close this window)')  # force user to acknowledge
         elif self.is_local:
             if self.local_file:
-                TLShow.check_downloaded_file(self, fileToCheck=self.local_file)
+                TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0)
             else:
                 to_send = (f"There was a problem with {self.show}. \n\n\
 It looks like the source file doesn't exist. \
