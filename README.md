@@ -32,6 +32,8 @@ To use this module, you will need Python 3.10.1+ AND Windows binaries for the fo
 
 To repeat, this module **will not work** without FFmpeg, FFprobe, and Wget.
 
+It also uses Twilio for notifications. There is a Twilio library for Python. It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`). Store the Twilio credentials in environment variables on the PCs, as shown in the script. The alternative is to use `curl` with long, complicated URLs. See the examples belows for how to disable Twilio.
+
 It also uses a number of environment variables. Make sure to set all of these on your PC. (*TODO: make a list of these and add it here*)
 
 

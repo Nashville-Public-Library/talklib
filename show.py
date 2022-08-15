@@ -33,7 +33,7 @@ class TLShow:
     def __init__(
         self, show=None, show_filename=None, url=None, is_permalink=False, breakaway=None,
         include_date=False, remove_yesterday=False, is_local=False, local_file=None,
-        remove_source=False, check_if_above=0, check_if_below=0, notifications=True
+        remove_source=False, check_if_above=0, check_if_below=0, notifications=True, twilio_enable=True
         ):
 
         self.show = show
@@ -49,6 +49,7 @@ class TLShow:
         self.check_if_above = check_if_above    
         self.check_if_below = check_if_below
         self.notifications = notifications
+        self.twilio_enable = twilio_enable
 
 
     def convert(self, input):
@@ -63,7 +64,7 @@ class TLShow:
             pass
         else:
             subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-21 -y {outputFile}')
-        if self.check_if_below or self.check_if_above != 0:
+        if self.check_if_below or self.check_if_above:
             TLShow.check_length(self, fileToCheck=outputFile) # call this before removing the files
         else:
             TLShow.syslog(self, message=f'{self.show}: The check length function is turned off.')
@@ -103,14 +104,13 @@ class TLShow:
             while numberOfDestinations >= 0:
                 globbify = glob.glob(
                     f'{destinations[numberOfDestinations]}\{self.show_filename}*.wav')
-                globbifyLength = len(globbify) - 1
-                if globbifyLength >= 0:
-                    TLShow.syslog(self, message=f'{self.show}: Deleting {globbify[globbifyLength]}')
-                    os.remove(f'{globbify[globbifyLength]}')
+                if globbify:
+                    for file in globbify:
+                        TLShow.syslog(self, message=f'{self.show}: Deleting {file}')
+                        os.remove(f'{file}')
                 else:
-                    TLShow.syslog(self, message=f"{self.show}: Cannot find yesterday's files to delete. Continuing...")
+                    TLShow.syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destinations[numberOfDestinations]}. Continuing...")
                 numberOfDestinations = numberOfDestinations - 1
-                globbifyLength = globbifyLength - 1
 
 
     def download_file(self, i=0):
@@ -144,9 +144,9 @@ class TLShow:
             pass
         else:
             toSend = (f"There was a problem with {self.show}.\n\n\
-    It looks like the downloaded file is empty. Please check manually! \
-    Yesterday's file will remain. \n\n\
-    {timestamp}")
+It looks like the downloaded file is empty. Please check manually! \
+Yesterday's file will remain.\n\n\
+{timestamp}")
             TLShow.notify(self, message=toSend, subject='Error')
             TLShow.remove(self, fileToDelete=fileToCheck)
             
@@ -184,19 +184,20 @@ class TLShow:
 
     def send_sms(self, message):
         '''send sms via twilio. all info is stored in PC's environement variables'''
-        twilio_sid = os.environ.get('twilio_sid')
-        twilio_token = os.environ.get('twilio_token')
-        twilio_from = os.environ.get('twilio_from')
-        twilio_to = os.environ.get('twilio_to')
+        if self.twilio_enable:
+            twilio_sid = os.environ.get('twilio_sid')
+            twilio_token = os.environ.get('twilio_token')
+            twilio_from = os.environ.get('twilio_from')
+            twilio_to = os.environ.get('twilio_to')
 
-        client = Client(twilio_sid, twilio_token)
+            client = Client(twilio_sid, twilio_token)
 
-        message = client.messages.create(
-            body=message,
-            from_=twilio_from,
-            to=twilio_to
-        )
-        message.sid
+            message = client.messages.create(
+                body=message,
+                from_=twilio_from,
+                to=twilio_to
+            )
+            message.sid
 
 
     def notify(self, message, subject):
@@ -228,9 +229,9 @@ class TLShow:
             TLShow.countdown(self)
         except:
             toSend = (f"There was a problem with {self.show}.\n\n\
-    It looks like the file either wasn't converted or didn't transfer correctly. \
-    Please check manually! \n\n\
-        {timestamp}")
+It looks like the file either wasn't converted or didn't transfer correctly. \
+Please check manually!\n\n\
+{timestamp}")
             TLShow.notify(self, message=toSend, subject='Error')
             os.system('cls')
             print(toSend)  # get user's attention!
@@ -248,13 +249,13 @@ class TLShow:
 
         if duration > self.check_if_above:
             toSend = (f"Today's {self.show} is {duration} minutes long! \
-    Please check manually and make edits to bring it below {self.check_if_above} minutes.\n\n\
-    {timestamp}")
+Please check manually and make edits to bring it below {self.check_if_above} minutes.\n\n\
+{timestamp}")
             TLShow.notify(self, message=toSend, subject='Check Length')
         elif duration < self.check_if_below:
             toSend = (f"Today's {self.show} is only {duration} minutes long! \
-    This is unusual and could indicate a problem with the file. Please check manually!\n\n\
-    {timestamp}")
+This is unusual and could indicate a problem with the file. Please check manually!\n\n\
+{timestamp}")
             TLShow.notify(self, message=toSend, subject='Check Length')
         else:
             TLShow.syslog(self, message=f'{self.show}: File is {duration} minute(s). Continuing...')
@@ -347,6 +348,7 @@ class TLShow:
         
         if self.url:
             if self.is_permalink:
+                TLShow.removeYesterdayFiles(self)
                 TLShow.download_file(self)
             elif TLShow.check_feed_loop(self) == True:
                 TLShow.removeYesterdayFiles(self)
@@ -361,6 +363,7 @@ Please check and download manually! Yesterday's file will remain.\n\n\
                 print(toSend)
                 print()
                 input('(press enter to close this window)')  # force user to acknowledge
+
         elif self.is_local:
             if self.local_file:
                 TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0)
