@@ -36,7 +36,7 @@ FFmpeg and FFprobe should be two separate binaries.
 The alternative is to use `curl` with long, complicated URLs. See the "Usage" section below for how to disable Twilio.
 
 ### -Environment Variables
-It also uses a number of environment variables. Make sure to set all of these on your PC(s). (*TODO: make a list of these and add it here*)
+Many items are stored in environment variables. Make sure to set all of these on your PC(s). (*TODO: make a list of these and add it here*)
 
 
 *An obvious improvement here would be to download the audio files for the RSS feeds in a more "Pythonic" fashion, IE not using Wget.*
@@ -76,7 +76,7 @@ D:\wireready
 ````
 You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 
-----
+---
 
 ## Usage
 In a new Python script, use `from talklib.show import TLShow` to import the class to your script. 
@@ -85,7 +85,7 @@ Create an instance like this:
 
 `example = TLShow()`
 
-----
+---
 
 ### RSS Example
 
@@ -122,8 +122,8 @@ Let's go through what each of these are for
 `url` (required)
 - link to the RSS feed
 - ensure there is not a trailing forward slash `/` at the end of the link
-    - correct: 'https://somesite.org//wpfeed.rss'
-    - incorrect: 'https://somesite.org//wpfeed.rss/'
+    - correct: 'https://somesite.org/wpfeed.rss'
+    - incorrect: 'https://somesite.org/wpfeed.rss/'
 - enclose in quotes
 
 `remove_yesterday` (optional)
@@ -149,7 +149,7 @@ Let's go through what each of these are for
 `run()`
 - starts running the script with the attributes you set
 
-----
+---
 ### Local File Example
 
 For a show whos files we already have downloaded, here is an example script:
