@@ -52,7 +52,7 @@ class TLShow:
         self.twilio_enable = twilio_enable
     
     def __str__(self) -> str:
-        return "This is a really cool, useful class. Calling this method should give useful info. I'll come back to it. TODO"
+        return "This is a really cool, useful thing. Calling this method should give useful info. I'll come back to it. TODO"
 
 
     def convert(self, input):
@@ -353,9 +353,11 @@ This is unusual and could indicate a problem with the file. Please check manuall
             if self.is_permalink:
                 TLShow.removeYesterdayFiles(self)
                 TLShow.download_file(self)
+
             elif TLShow.check_feed_loop(self) == True:
                 TLShow.removeYesterdayFiles(self)
                 TLShow.download_file(self)
+                
             else:
                 toSend = (f"There was a problem with {self.show}. \n\n\
 It looks like today's file hasn't yet been posted. \

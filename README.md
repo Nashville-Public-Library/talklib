@@ -1,12 +1,45 @@
 # talklib
 
-## A TL module to process shows and segments
+## A module to automate processing of shows/segments airing on the TL
 
-Use this module to process two types of shows/segments:
-- shows/segments we receive via RSS feed
+Use this module to process these types of shows/segments:
+- Full shows we receive via RSS feed
     - such as New York Times, Wall Street Journal, etc.
-- shows/segments downloaded locally ahead of time
+- Segments we receive via RSS Feed
+    - Such as Health in a Heartbeat, Academic Minute, etc.
+- Segments we receive via "permalink"
+    - such as PNS
+- Segments downloaded locally ahead of time
     - such as Sound Beat, Animal Airwaves, etc.
+
+---
+
+## Dependencies
+
+### -Python
+Use Python 3.10.1 or above.
+
+### -Binaries
+You need Windows binaries for the following installed on the PC and added to the PATH:
+
+- **[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)**
+- **FFprobe**
+- **[Wget](http://wget.addictivecode.org/FrequentlyAskedQuestions.html#download)**
+
+To repeat, **this module will not work without FFmpeg, FFprobe, and Wget**. 
+
+FFmpeg and FFprobe should be two separate binaries.
+
+### -Twilio
+[Twilio](https://www.twilio.com/) is used for SMS notifications. There is a [Twilio library for Python](https://www.twilio.com/docs/libraries/python). It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`). Store the Twilio credentials in environment variables on the PCs, as shown in the script. 
+
+The alternative is to use `curl` with long, complicated URLs. See the "Usage" section below for how to disable Twilio.
+
+### -Environment Variables
+It also uses a number of environment variables. Make sure to set all of these on your PC(s). (*TODO: make a list of these and add it here*)
+
+
+*An obvious improvement here would be to download the audio files for the RSS feeds in a more "Pythonic" fashion, IE not using Wget.*
 
 ---
 ## Installation
@@ -19,25 +52,6 @@ To use this module:
 - If it exists, DO overwrite the existing directory.
 
 Depending on how you installed Python, the `site-packages` directory could be somewhere like: `C:\Users\<username>\AppData\Local\Programs\Python\Python###\Lib\site-packages`
-
----
-
-## Dependencies
-
-To use this module, you will need Python 3.10.1+ AND Windows binaries for the following installed on the PC and added to the PATH:
-
-- **FFmpeg**
-- **FFprobe**
-- **Wget**
-
-To repeat, this module **will not work** without FFmpeg, FFprobe, and Wget.
-
-It also uses Twilio for notifications. There is a Twilio library for Python. It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`). Store the Twilio credentials in environment variables on the PCs, as shown in the script. The alternative is to use `curl` with long, complicated URLs. See the examples belows for how to disable Twilio.
-
-It also uses a number of environment variables. Make sure to set all of these on your PC. (*TODO: make a list of these and add it here*)
-
-
-*An obvious improvement here would be to download the audio files for the RSS feeds in a more "Pythonic" fashion, IE not using Wget.*
 
 ---
 
@@ -95,36 +109,36 @@ WP.run()
 
 Let's go through what each of these are for
 
-`WP.show` (required)
+`show` (required)
 - This is the name of the program
 - Mostly used for notifications, etc.
 - enclose in quotes (single or double, Python doesn't care)
 
-`WP.show_filename` (required)
+`show_filename` (required)
 - the filename of the program
 - note that it does NOT include a trailing dash `-` OR the file extension `.wav`. use the base name only
 - enclose in quotes
 
-`WP.url` (required)
+`url` (required)
 - link to the RSS feed
 - ensure there is not a trailing forward slash `/` at the end of the link
     - correct: 'https://somesite.org//wpfeed.rss'
     - incorrect: 'https://somesite.org//wpfeed.rss/'
 - enclose in quotes
 
-`WP.remove_yesterday` (optional)
+`remove_yesterday` (optional)
 - whether or not you want to remove yesterday's files (if any exists)
 - if set to `True`, it will delete any file matching the show_filename attribute you set.
 - the default is `False`. 
 
-`WP.include_date` (optional)
+`include_date` (optional)
 - whether or not you want to include today's date in the filename
 - if set to `True`, the date will be appended as such: `WP-MMDDYY.wav`
 - if not set, or set to `False`, the resulting filename will be: `WP.wav`
 - Generally, for TL programs, if it is a daily show, like the New York Times, etc., you need the date in the filename, as this is what WireReady will match.
 - the default is `False`
 
-`WP.check_if_above` and `WP.check_if_below` (optional)
+`check_if_above` and `check_if_below` (optional)
 - these are for checking whether the length of the program (**in minutes!**) falls outside a range
 - used strictly for notification purposes
 - decimal numbers are OK.
@@ -132,7 +146,7 @@ Let's go through what each of these are for
 - do not enclose in quotes
 - again, these values are in MINUTES
 
-`WP.run()`
+`run()`
 - starts running the script with the attributes you set
 
 ----
@@ -155,4 +169,40 @@ MWB.check_if_below = 1.9
 
 MWB.run()
 ````
-Let's go through what each of these are for
+Definitions for attributes unique to local shows:
+
+`is_local` (required)
+- tells the module that this is a local show
+- you must set this to `True` if it is a local show
+- default is `False`
+
+`local_file` (required)
+- path to the local file
+- you will not probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [MISC](https://github.com/talkinglibrary/misc) repo for some examples.
+
+`remove_source` (optional)
+- whether or not you want to remove/delete the local source file after processing
+- default is `False`
+
+----
+### Permalink Example
+
+By "permalink", We're referring to shows whose audio URL does not change, E.G. PNS. For shows we receive via permalink, here is an example script:
+````
+from talklib.show import TLShow
+
+WK = TLShow()
+
+WK.show = 'Who Knows'
+WK.show_filename = 'WhoKnows'
+WK.url = 'https://somesite.org/who-knows-static'
+WK.is_permalink = True
+
+WK.run()
+````
+
+Definitions for attributes unique to "permalink" shows:
+
+`is_permalink` (required)
+- set to `True` for permalink shows
+- default is `False`
