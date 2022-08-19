@@ -66,8 +66,9 @@ Before we begin, a general note:
 - Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file). 
 - The batch script ensures we CD to the correct directory.
 - Ensure the Batch & Python scripts are in the same directory.
+- A sample `.bat` file (`Example.bat`) is inlcuded in this repo. 
 
-A sample `.bat` file (`Example.bat`) is inlcuded in this repo. Here is what an example directory structure should look like:
+Here is what an example directory structure should look like:
 ````
 D:\wireready
     \Washington Post
@@ -152,7 +153,7 @@ Let's go through what each of these are for
 ---
 ### Local File Example
 
-For a show whos files we already have downloaded, here is an example script:
+For a show whose files we already have downloaded, here is an example script:
 
 ````
 from talklib.show import TLShow
