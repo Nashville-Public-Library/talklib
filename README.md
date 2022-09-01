@@ -33,7 +33,7 @@ FFmpeg and FFprobe should be two separate binaries.
 ### -Twilio
 [Twilio](https://www.twilio.com/) is used for SMS notifications. There is a [Twilio library for Python](https://www.twilio.com/docs/libraries/python). It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`). Store the Twilio credentials in environment variables on the PCs, as shown in the script. 
 
-The alternative is to use `curl` with long, complicated URLs. See the "Usage" section below for how to disable Twilio.
+See the "Usage" section below for how to disable Twilio.
 
 ### -Environment Variables
 Many items are stored in environment variables. Make sure to set all of these on your PC(s). (*TODO: make a list of these and add it here*)
