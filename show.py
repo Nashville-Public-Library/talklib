@@ -34,9 +34,10 @@ def get_timestamp():
 class TLShow:
     '''TODO write something here'''
     def __init__(
-        self, show=None, show_filename=None, url=None, is_permalink=False, breakaway=None,
+        self, show=None, show_filename=None, url=None, is_permalink=False, breakaway=0,
         include_date=False, remove_yesterday=False, is_local=False, local_file=None,
-        remove_source=False, check_if_above=0, check_if_below=0, notifications=True, twilio_enable=True
+        remove_source=False, check_if_above=0, check_if_below=0, notifications=True, 
+        twilio_enable=True, ff_level=21
         ):
 
         self.show = show
@@ -53,6 +54,8 @@ class TLShow:
         self.check_if_below = check_if_below
         self.notifications = notifications
         self.twilio_enable = twilio_enable
+        self.ff_level = ff_level
+    
     
     def __str__(self) -> str:
         return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
@@ -66,10 +69,11 @@ class TLShow:
         else:
             outputFile = (f'{self.show_filename}.wav')
         TLShow.syslog(self, message=f'{self.show}: Converting to TL format.')
+
         if self.breakaway:
-            pass
+            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -t {self.breakaway} -af loudnorm=I=-{self.ff_level} -y {outputFile}')
         else:
-            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-21 -y {outputFile}')
+            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-{self.ff_level} -y {outputFile}')
         if self.check_if_below or self.check_if_above:
             TLShow.check_length(self, fileToCheck=outputFile) # call this before removing the files
         else:
