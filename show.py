@@ -22,7 +22,7 @@ import requests
 import glob
 
 
-# these are defined in the PC's environement variables.
+# global variables, defined in the PC's environement variables.
 # If you need to change them, change them there, not here!
 destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]
 
@@ -55,7 +55,7 @@ class TLShow:
         self.twilio_enable = twilio_enable
     
     def __str__(self) -> str:
-        return "This is a really cool, useful thing. Calling this method should give useful info. I'll come back to it. TODO"
+        return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
 
 
     def convert(self, input):
