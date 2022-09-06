@@ -25,7 +25,10 @@ import glob
 # these are defined in the PC's environement variables.
 # If you need to change them, change them there, not here!
 destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]
-timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
+
+def get_timestamp():
+    timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
+    return timestamp
 
 
 class TLShow:
@@ -146,6 +149,7 @@ class TLShow:
         if is_not_empty == True:
             pass
         else:
+            timestamp = get_timestamp()
             toSend = (f"There was a problem with {self.show}.\n\n\
 It looks like the downloaded file is empty. Please check manually! \
 Yesterday's file will remain.\n\n\
@@ -231,6 +235,7 @@ Yesterday's file will remain.\n\n\
                 TLShow.syslog(self, message=f'{self.show}: {fileToCheck} arrived at {destinations[numberOfDestinations]}')
             TLShow.countdown(self)
         except:
+            timestamp = get_timestamp()
             toSend = (f"There was a problem with {self.show}.\n\n\
 It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually!\n\n\
@@ -251,11 +256,13 @@ Please check manually!\n\n\
         duration = round(duration, 2)
 
         if duration > self.check_if_above:
+            timestamp = get_timestamp()
             toSend = (f"Today's {self.show} is {duration} minutes long! \
 Please check manually and make edits to bring it below {self.check_if_above} minutes.\n\n\
 {timestamp}")
             TLShow.notify(self, message=toSend, subject='Check Length')
         elif duration < self.check_if_below:
+            timestamp = get_timestamp()
             toSend = (f"Today's {self.show} is only {duration} minutes long! \
 This is unusual and could indicate a problem with the file. Please check manually!\n\n\
 {timestamp}")
@@ -359,6 +366,7 @@ This is unusual and could indicate a problem with the file. Please check manuall
                 TLShow.download_file(self)
                 
             else:
+                timestamp = get_timestamp()
                 toSend = (f"There was a problem with {self.show}. \n\n\
 It looks like today's file hasn't yet been posted. \
 Please check and download manually! Yesterday's file will remain.\n\n\
@@ -373,6 +381,7 @@ Please check and download manually! Yesterday's file will remain.\n\n\
             if self.local_file:
                 TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0)
             else:
+                timestamp = get_timestamp()
                 to_send = (f"There was a problem with {self.show}. \n\n\
 It looks like the source file doesn't exist. \
 Please check manually! Yesterday's file will remain.\n\n\
