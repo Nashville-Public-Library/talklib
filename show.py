@@ -6,6 +6,7 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
+from warnings import catch_warnings
 import xml.etree.ElementTree as ET
 import subprocess
 from datetime import datetime
@@ -360,6 +361,11 @@ This is unusual and could indicate a problem with the file. Please check manuall
             print()
             print('(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
         
+        # confirm the breakaway attribute is a number ffmpeg understands
+        if self.breakaway:
+            if not isinstance(self.breakaway, int or float):
+                raise Exception ('the breakaway attribute must be a number, without quotes')              
+
         if self.url:
             if self.is_permalink:
                 TLShow.removeYesterdayFiles(self)

@@ -77,69 +77,84 @@ D:\wireready
 ````
 You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 
----
+----
 
 ## Usage
-In a new Python script, use `from talklib.show import TLShow` to import the class to your script. 
+
+`TLShow` is the main class to use.
+
+In a new Python script, import the class to your script like this:
+
+`from talklib.show import TLShow`
 
 Create an instance like this: 
 
 `example = TLShow()`
 
----
+## Attributes
 
-### RSS Example
 
-For an RSS show, here is an example script:
-
-````
-from talklib.show import TLShow
-
-WP = TLShow()
-
-WP.show = 'Washington Post'
-WP.show_filename = 'WP'
-WP.url = 'https://somesite.org/wp-feed.rss'
-WP.remove_yesterday = True
-WP.include_date = True
-WP.check_if_above = 59
-WP.check_if_below = 55
-
-WP.run()
-````
-
-Let's go through what each of these are for
-
-`show` (required)
+`show`
+----
+required for all types of shows/segments
 - This is the name of the program
 - Mostly used for notifications, etc.
 - enclose in quotes (single or double, Python doesn't care)
 
-`show_filename` (required)
+`show_filename`
+----
+required for all types of shows/segments
 - the filename of the program
 - note that it does NOT include a trailing dash `-` OR the file extension `.wav`. use the base name only
 - enclose in quotes
 
-`url` (required)
+`url`
+----
+required for all RSS or permalink shows
 - link to the RSS feed
 - ensure there is not a trailing forward slash `/` at the end of the link
     - correct: 'https://somesite.org/wpfeed.rss'
     - incorrect: 'https://somesite.org/wpfeed.rss/'
 - enclose in quotes
 
-`remove_yesterday` (optional)
+`is_local`
+----
+required for "local" shows
+- tells the module that this is a local show
+- you must set this to `True` if it is a local show
+- default is `False`
+
+`local_file`
+----
+required for "local" shows
+- path to the local file as such: `D:\path\to\the\show.wav`
+- you will not probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [MISC](https://github.com/talkinglibrary/misc) repo for some examples.
+
+`is_permalink`
+----
+required for "permalink" shows
+- set to `True` for permalink shows
+- default is `False`
+
+`remove_yesterday`
+----
+optional
 - whether or not you want to remove yesterday's files (if any exists)
 - if set to `True`, it will delete any file matching the show_filename attribute you set.
 - the default is `False`. 
 
-`include_date` (optional)
+`include_date`
+----
+optional
 - whether or not you want to include today's date in the filename
 - if set to `True`, the date will be appended as such: `WP-MMDDYY.wav`
 - if not set, or set to `False`, the resulting filename will be: `WP.wav`
 - Generally, for TL programs, if it is a daily show, like the New York Times, etc., you need the date in the filename, as this is what WireReady will match.
 - the default is `False`
 
-`check_if_above` and `check_if_below` (optional)
+`check_if_above` and `check_if_below`
+----
+optional
 - these are for checking whether the length of the program (**in minutes!**) falls outside a range
 - used strictly for notification purposes
 - decimal numbers are OK.
@@ -147,11 +162,60 @@ Let's go through what each of these are for
 - do not enclose in quotes
 - again, these values are in MINUTES
 
-`run()`
-- starts running the script with the attributes you set
+`remove_source`
+----
+optional
+- whether or not you want to remove/delete the local source file after processing
+- applies only to local shows
+- default is `False`
 
+`notifications`
+----
+optional
+- whether you want to turn notifications (email, SMS) on or off
+- set to False if you want to turn notifications off
+- default is True
+
+`breakaway`
+----
+optional
+- if you only want to convert/output the audio file up to a certain point, set this to the number of seconds at which point you want it to stop.
+- decimal numbers are OK
+- again, this number is in **seconds**, not minutes
+- perhaps the only time you need to set this is for shows like PNS where there is an expected "breakaway" time.
+- default is to convert the entire file
+
+### to run the script:
+
+`run()`
+----
+required
+- executes the script with the attributes you set
+
+
+----
+## Examples
+### RSS Example
+
+For an RSS show, here is an example script:
+
+````
+from talklib.show import TLShow
+
+SD = TLShow()
+
+SD.show = 'Skywalker Daily News'
+SD.show_filename = 'SDN'
+SD.url = 'https://somesite.org/sdn-feed.rss'
+SD.remove_yesterday = True
+SD.include_date = True
+SD.check_if_above = 59
+SD.check_if_below = 55
+
+SD.run()
+````
 ---
-### Local File Example
+### Local Example
 
 For a show whose files we already have downloaded, here is an example script:
 
@@ -170,21 +234,6 @@ MWB.check_if_below = 1.9
 
 MWB.run()
 ````
-Definitions for attributes unique to local shows:
-
-`is_local` (required)
-- tells the module that this is a local show
-- you must set this to `True` if it is a local show
-- default is `False`
-
-`local_file` (required)
-- path to the local file
-- you will not probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [MISC](https://github.com/talkinglibrary/misc) repo for some examples.
-
-`remove_source` (optional)
-- whether or not you want to remove/delete the local source file after processing
-- default is `False`
-
 ----
 ### Permalink Example
 
@@ -201,9 +250,3 @@ WK.is_permalink = True
 
 WK.run()
 ````
-
-Definitions for attributes unique to "permalink" shows:
-
-`is_permalink` (required)
-- set to `True` for permalink shows
-- default is `False`
