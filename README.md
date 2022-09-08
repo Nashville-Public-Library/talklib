@@ -98,12 +98,14 @@ Create an instance like this:
 
 ### string 
 - must be enclosed in quotes (single or double; Python doesn't care)
-### bolean
+
+### boolean
 - either True or False
 - do not enclose in quotes
 - must be capitalized
     - correct: True
     - incorrect: true
+    
 ### number
 - in our case, these can be either type int OR float, meaning either whole numbers OR decimal numbers are allowed
 - do not enclose in quotes
