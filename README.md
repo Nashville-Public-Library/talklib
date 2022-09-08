@@ -91,25 +91,25 @@ Create an instance like this:
 
 `example = TLShow()`
 
-## Attributes
+## Instance Attributes
 
 
 `show`
-----
+
 required for all types of shows/segments
 - This is the name of the program
 - Mostly used for notifications, etc.
 - enclose in quotes (single or double, Python doesn't care)
 
 `show_filename`
-----
+
 required for all types of shows/segments
 - the filename of the program
 - note that it does NOT include a trailing dash `-` OR the file extension `.wav`. use the base name only
 - enclose in quotes
 
 `url`
-----
+
 required for all RSS or permalink shows
 - link to the RSS feed
 - ensure there is not a trailing forward slash `/` at the end of the link
@@ -118,33 +118,33 @@ required for all RSS or permalink shows
 - enclose in quotes
 
 `is_local`
-----
+
 required for "local" shows
 - tells the module that this is a local show
 - you must set this to `True` if it is a local show
 - default is `False`
 
 `local_file`
-----
+
 required for "local" shows
 - path to the local file as such: `D:\path\to\the\show.wav`
 - you will not probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [MISC](https://github.com/talkinglibrary/misc) repo for some examples.
 
 `is_permalink`
-----
+
 required for "permalink" shows
 - set to `True` for permalink shows
 - default is `False`
 
 `remove_yesterday`
-----
+
 optional
 - whether or not you want to remove yesterday's files (if any exists)
 - if set to `True`, it will delete any file matching the show_filename attribute you set.
 - the default is `False`. 
 
 `include_date`
-----
+
 optional
 - whether or not you want to include today's date in the filename
 - if set to `True`, the date will be appended as such: `WP-MMDDYY.wav`
@@ -153,7 +153,7 @@ optional
 - the default is `False`
 
 `check_if_above` and `check_if_below`
-----
+
 optional
 - these are for checking whether the length of the program (**in minutes!**) falls outside a range
 - used strictly for notification purposes
@@ -163,21 +163,21 @@ optional
 - again, these values are in MINUTES
 
 `remove_source`
-----
+
 optional
 - whether or not you want to remove/delete the local source file after processing
 - applies only to local shows
 - default is `False`
 
 `notifications`
-----
+
 optional
 - whether you want to turn notifications (email, SMS) on or off
 - set to False if you want to turn notifications off
 - default is True
 
 `breakaway`
-----
+
 optional
 - if you only want to convert/output the audio file up to a certain point, set this to the number of seconds at which point you want it to stop.
 - decimal numbers are OK
@@ -188,7 +188,7 @@ optional
 ### to run the script:
 
 `run()`
-----
+
 required
 - executes the script with the attributes you set
 
