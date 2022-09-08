@@ -94,38 +94,59 @@ Create an instance like this:
 
 ## Instance Attributes
 
+### Notes about formatting:
+
+### string 
+- must be enclosed in quotes (single or double; Python doesn't care)
+### bolean
+- either True or False
+- do not enclose in quotes
+- must be capitalized
+    - correct: True
+    - incorrect: true
+### number
+- in our case, these can be either type int OR float, meaning either whole numbers OR decimal numbers are allowed
+- do not enclose in quotes
 
 `show`
 
-required for all types of shows/segments
+*string*
+
+required
 - This is the name of the program
 - Mostly used for notifications, etc.
-- enclose in quotes (single or double, Python doesn't care)
 
 `show_filename`
 
-required for all types of shows/segments
+*string*
+
+required
+
 - the filename of the program
-- note that it does NOT include a trailing dash `-` OR the file extension `.wav`. use the base name only
-- enclose in quotes
+- do NOT include a trailing dash `-` OR a file extension `.wav`. use the base name only 
 
 `url`
 
+*string*
+
 required for all RSS or permalink shows
-- link to the RSS feed
-- ensure there is not a trailing forward slash `/` at the end of the link
+- URL for the RSS feed OR the permalink
+- ensure there is not a trailing forward slash `/` at the end of the URL
     - correct: 'https://somesite.org/wpfeed.rss'
     - incorrect: 'https://somesite.org/wpfeed.rss/'
-- enclose in quotes
 
 `is_local`
 
-required for "local" shows
-- tells the module that this is a local show
-- you must set this to `True` if it is a local show
+*boolean*
+
+*required* for "local" shows
+- tells the module whether this is a local show
+- must be set to `True` if it is a local show
 - default is `False`
 
 `local_file`
+
+*string*
 
 required for "local" shows
 - path to the local file as such: `D:\path\to\the\show.wav`
@@ -133,18 +154,24 @@ required for "local" shows
 
 `is_permalink`
 
+*boolean*
+
 required for "permalink" shows
-- set to `True` for permalink shows
+- must be set to `True` for permalink shows
 - default is `False`
 
 `remove_yesterday`
 
+*boolean*
+
 optional
 - whether or not you want to remove yesterday's files (if any exists)
 - if set to `True`, it will delete any file matching the show_filename attribute you set.
-- the default is `False`. 
+- default is `False`. 
 
 `include_date`
+
+*boolean*
 
 optional
 - whether or not you want to include today's date in the filename
@@ -155,50 +182,61 @@ optional
 
 `check_if_above` and `check_if_below`
 
+*number*
+
 optional
 - these are for checking whether the length of the program (**in minutes!**) falls outside a range
 - used strictly for notification purposes
-- decimal numbers are OK.
 - if these are not set, the checks will not be run
-- do not enclose in quotes
-- again, these values are in MINUTES
+- again, these values are in **minutes**, not seconds
 
 `remove_source`
 
+*boolean*
+
 optional
-- whether or not you want to remove/delete the local source file after processing
+- whether you want to remove/delete the original source file after processing
 - applies only to local shows
 - default is `False`
 
 `notifications`
 
+*boolean*
+
 optional
 - whether you want to enable notifications (email, SMS)
-- True = enable, False = diable
-- default is True
+- if disabled, you do not need to also disable twilio.
+- True = enable, False = disable
+- default is `True`
 
 `breakaway`
 
+*number*
+
 optional
 - if you only want to convert/output the audio file up to a certain point, set this to the number of seconds at which point you want it to stop.
-- decimal numbers are OK
 - again, this number is in **seconds**, not minutes
 - perhaps the only time you need to set this is for shows like PNS where there is an expected "breakaway" time.
 - default is to convert the entire file
 
 `twilio_enable`
 
+*boolean*
+
 optional
 - whether you want to enable twilio (SMS) notifications
-- True = enable, False = diable
-- default is True
+- True = enable, False = disable
+- default is `True`
 
 `ff_level`
+
+*number*
 
 optional
 - sets the level for FFmpeg's compression/normalization
 - this is the EBU R128 LUFS "integrated loudness" standard
 - the smaller the number, the more compression is applied (12 is more compressed than 13)
+- do not set to 0.
 - be careful with this!
 - default is 21
 
@@ -214,7 +252,9 @@ required
 ## Examples
 ### RSS Example
 
-For an RSS show, here is an example script:
+The minimum attributes you must set are `show`, `show_filename`, and `url`.
+
+Here is an example script:
 
 ````
 from talklib.show import TLShow
@@ -234,7 +274,11 @@ SD.run()
 ---
 ### Local Example
 
-For a show whose files we already have downloaded, here is an example script:
+"Local" shows are shows whose files we already have downloaded ahead of time.
+
+The minimum attributes you must set are: `show`, `show_filename`, `is_local`, and `local_file`. 
+
+Here is an example script:
 
 ````
 from talklib.show import TLShow
@@ -246,15 +290,19 @@ MWB.show_filename = 'MWB'
 MWB.is_local = True
 MWB.local_file = 'D:Production\path\to\the\file.wav'
 MWB.remove_source = True
-MWB.check_if_above = 2.1
-MWB.check_if_below = 1.9
+MBW.twilio_enable = False
 
 MWB.run()
 ````
 ----
 ### Permalink Example
 
-By "permalink", We're referring to shows whose audio URL does not change, E.G. PNS. For shows we receive via permalink, here is an example script:
+"Permalink" shows are shows whose audio URL does not change, E.G. PNS.
+
+The minimum attributes you must set are: `show`, `show_filename`, `url`, and `is_permalink`.
+
+Here is an example script:
+
 ````
 from talklib.show import TLShow
 
@@ -264,6 +312,7 @@ WK.show = 'Who Knows'
 WK.show_filename = 'WhoKnows'
 WK.url = 'https://somesite.org/who-knows-static'
 WK.is_permalink = True
+WK.notifications = False
 
 WK.run()
 ````
