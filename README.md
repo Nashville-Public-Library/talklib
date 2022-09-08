@@ -83,6 +83,7 @@ You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 
 `TLShow` is the main class to use.
 
+
 In a new Python script, import the class to your script like this:
 
 `from talklib.show import TLShow`
@@ -172,8 +173,8 @@ optional
 `notifications`
 
 optional
-- whether you want to turn notifications (email, SMS) on or off
-- set to False if you want to turn notifications off
+- whether you want to enable notifications (email, SMS)
+- True = enable, False = diable
 - default is True
 
 `breakaway`
@@ -184,6 +185,22 @@ optional
 - again, this number is in **seconds**, not minutes
 - perhaps the only time you need to set this is for shows like PNS where there is an expected "breakaway" time.
 - default is to convert the entire file
+
+`twilio_enable`
+
+optional
+- whether you want to enable twilio (SMS) notifications
+- True = enable, False = diable
+- default is True
+
+`ff_level`
+
+optional
+- sets the level for FFmpeg's compression/normalization
+- this is the EBU R128 LUFS "integrated loudness" standard
+- the smaller the number, the more compression is applied (12 is more compressed than 13)
+- be careful with this!
+- default is 21
 
 ### to run the script:
 
