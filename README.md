@@ -92,7 +92,7 @@ Create an instance like this:
 
 `example = TLShow()`
 
-## Instance Attributes
+## Attributes
 
 ### Notes about formatting:
 
@@ -152,7 +152,7 @@ required for all RSS or permalink shows
 
 required for "local" shows
 - path to the local file as such: `D:\path\to\the\show.wav`
-- you will not probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [MISC](https://github.com/talkinglibrary/misc) repo for some examples.
+- you will probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [MISC](https://github.com/talkinglibrary/misc) repo for some examples.
 
 `is_permalink`
 
@@ -242,12 +242,14 @@ optional
 - be careful with this!
 - default is 21
 
-### to run the script:
+## Methods
 
 `run()`
 
 required
 - executes the script with the attributes you set
+
+this should be the only method/function you call directly from an outside script. Even if your IDE shows you all the available methods, please ignore them as most of them are not (yet) designed to be called directly.
 
 
 ----

@@ -6,6 +6,7 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
+from typing import ParamSpecArgs
 import xml.etree.ElementTree as ET
 import subprocess
 from datetime import datetime
@@ -331,16 +332,20 @@ This is unusual and could indicate a problem with the file. Please check manuall
             number = number-1
             time.sleep(1)
 
-    def run(self):
-        '''Begins to process the file'''
-        print((f"I'm working on {self.show}. Just a moment..."))
-        TLShow.syslog(self, message=f'{self.show}: Starting script')
-
+    def check_attributes_are_valid(self):
+        '''
+        Run some checks on the attributes the user has set. IE the required
+        attributes have been set, they are the right type, etc.
+        '''
         if not self.show:
             raise Exception ('Sorry, you need to specify a name for the show.')
+        elif type(self.show) != str:
+            raise Exception ('Sorry, the show name must be a string. Did you forget to enclose in quotes?')
 
         if not self.show_filename:
             raise Exception ('Sorry, you need to specify a filename for the show.')
+        elif type(self.show_filename) != str:
+            raise Exception ('Sorry, the show filename must be a string. Did you forget to enclose in quotes?')
 
         if self.url and self.is_local:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
@@ -354,8 +359,15 @@ This is unusual and could indicate a problem with the file. Please check manuall
         
         # confirm the breakaway attribute is a number ffmpeg understands
         if self.breakaway:
-            if not isinstance(self.breakaway, int or float):
-                raise Exception ('the breakaway attribute must be a number, without quotes')              
+            if not (type(self.breakaway) == int or float):
+                raise Exception ('Sorry, the breakaway attribute must be a valid number (without quotes).')
+
+    def run(self):
+        '''Begins to process the file'''
+        print((f"I'm working on {self.show}. Just a moment..."))
+        TLShow.syslog(self, message=f'{self.show}: Starting script')
+
+        TLShow.check_attributes_are_valid(self)              
 
         if self.url:
             if self.is_permalink:
