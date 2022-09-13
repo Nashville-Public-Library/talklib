@@ -6,7 +6,6 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
-from typing import ParamSpecArgs
 import xml.etree.ElementTree as ET
 import subprocess
 from datetime import datetime
@@ -18,10 +17,10 @@ from logging.handlers import SysLogHandler
 import smtplib
 from email.message import EmailMessage
 import time
-from twilio.rest import Client
-import requests
 import glob
 
+import requests
+from twilio.rest import Client
 
 # global variables, defined in the PC's environement variables.
 # If you need to change them, change them there, not here!
@@ -346,6 +345,18 @@ This is unusual and could indicate a problem with the file. Please check manuall
             raise Exception ('Sorry, you need to specify a filename for the show.')
         elif type(self.show_filename) != str:
             raise Exception ('Sorry, the show filename must be a string. Did you forget to enclose in quotes?')
+
+        if self.url:
+            if type(self.url) != str:
+                raise Exception ('Sorry, the URL must be a string. Did you forget to enclose in quotes?')
+        
+        if self.is_local:
+            if type(self.is_local) != bool:
+                raise Exception ('Sorry, is_local must be either True or False (without quotes)')
+
+        if self.local_file:
+            if type(self.local_file) != str:
+                raise Exception ('Sorry, local_file must be a string. Did you forget the enclose in quotes?')
 
         if self.url and self.is_local:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
