@@ -111,9 +111,6 @@ class TLShow:
     def removeYesterdayFiles(self):
         '''delete yesterday's files from destinations. 
         OK to use glob wildcards since there should only ever be one file'''
-        
-        def __str__(self) -> str:
-            return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
 
         if self.remove_yesterday:
             numberOfDestinations = len(destinations)
@@ -250,7 +247,7 @@ Please check manually!\n\n\
 
     def check_length(self, fileToCheck):
         '''check length of converted file with ffprobe. if too long or short, send notification'''
-        if self.check_if_below or self.check_if_above:
+        if self.check_if_below and self.check_if_above:
             duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
             -of default=noprint_wrappers=1:nokey=1 {fileToCheck}")
             duration = float(duration)
@@ -331,6 +328,13 @@ This is unusual and could indicate a problem with the file. Please check manuall
             number = number-1
             time.sleep(1)
 
+    def check_types(attrib_to_check, type_to_check, attrib_return):
+        '''
+        TODO I really need to explain this stuff
+        '''
+        if type(attrib_to_check) != type_to_check:
+            raise Exception (f'Sorry, {attrib_return} must be type: {type_to_check}, but you used {type(attrib_to_check)}.')
+
     def check_attributes_are_valid(self):
         '''
         Run some checks on the attributes the user has set. IE the required
@@ -338,25 +342,22 @@ This is unusual and could indicate a problem with the file. Please check manuall
         '''
         if not self.show:
             raise Exception ('Sorry, you need to specify a name for the show.')
-        elif type(self.show) != str:
-            raise Exception ('Sorry, the show name must be a string. Did you forget to enclose in quotes?')
+        else:
+            TLShow.check_types(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
 
         if not self.show_filename:
             raise Exception ('Sorry, you need to specify a filename for the show.')
-        elif type(self.show_filename) != str:
-            raise Exception ('Sorry, the show filename must be a string. Did you forget to enclose in quotes?')
+        else:
+            TLShow.check_types(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
 
         if self.url:
-            if type(self.url) != str:
-                raise Exception ('Sorry, the URL must be a string. Did you forget to enclose in quotes?')
+            TLShow.check_types(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
         
         if self.is_local:
-            if type(self.is_local) != bool:
-                raise Exception ('Sorry, is_local must be either True or False (without quotes)')
+            TLShow.check_types(attrib_to_check=self.is_local, type_to_check=bool, attrib_return='is_local')
 
         if self.local_file:
-            if type(self.local_file) != str:
-                raise Exception ('Sorry, local_file must be a string. Did you forget the enclose in quotes?')
+            TLShow.check_types(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
 
         if self.url and self.is_local:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
@@ -364,7 +365,7 @@ This is unusual and could indicate a problem with the file. Please check manuall
         if self.url and self.local_file:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
 
-        if self.check_if_above == 0 or self.check_if_below == 0:
+        if not (self.check_if_above and self.check_if_below):
             print()
             print('(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
         
