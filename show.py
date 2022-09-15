@@ -271,11 +271,19 @@ This is unusual and could indicate a problem with the file. Please check manuall
 
     def get_feed(self):
         '''get the feed and create an ET object'''
-        header = {'User-Agent': 'Darth Vader'}  # usually helpful to identify yourself
-        rssfeed = requests.get(self.url, headers=header)
-        rssfeed = rssfeed.text
-        rssfeed = ET.fromstring(rssfeed)
-        return rssfeed
+        try:
+            header = {'User-Agent': 'Darth Vader'}  # usually helpful to identify yourself
+            rssfeed = requests.get(self.url, headers=header)
+            rssfeed = rssfeed.text
+            rssfeed = ET.fromstring(rssfeed)
+            return rssfeed
+        except Exception as a:
+            to_send = f"There's a Problem with {self.show}. It looks like the \
+issue is with the URL/feed. Here's the error: {a}\n\n\
+Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
+{get_timestamp()}"
+            TLShow.notify(self, subject='Error', message=to_send)
+            raise Exception (a)
 
     def check_feed_updated(self):
         '''TODO explain'''
@@ -332,8 +340,8 @@ This is unusual and could indicate a problem with the file. Please check manuall
         '''
         TODO I really need to explain this stuff
         '''
-        if type(attrib_to_check) != type_to_check:
-            raise Exception (f'Sorry, {attrib_return} must be type: {type_to_check}, but you used {type(attrib_to_check)}.')
+        if  type(attrib_to_check) != type_to_check:
+            raise Exception (f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}.")
 
     def check_attributes_are_valid(self):
         '''
@@ -369,8 +377,8 @@ This is unusual and could indicate a problem with the file. Please check manuall
             print()
             print('(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
         
-        # confirm the breakaway attribute is a number ffmpeg understands
         if self.breakaway:
+            # FFmpeg can take integers or floats
             if not (type(self.breakaway) == int or float):
                 raise Exception ('Sorry, the breakaway attribute must be a valid number (without quotes).')
 
