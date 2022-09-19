@@ -5,26 +5,37 @@ It's best to read the docs.
 © Nashville Public Library
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
-
 import xml.etree.ElementTree as ET
 import subprocess
-from datetime import datetime
 import shutil
 import os
+import time
+import glob
+import smtplib
+from email.message import EmailMessage
 import logging
 import logging.handlers
 from logging.handlers import SysLogHandler
-import smtplib
-from email.message import EmailMessage
-import time
-import glob
+from datetime import datetime
 
 import requests
 from twilio.rest import Client
 
-# global variables, defined in the PC's environement variables.
-# If you need to change them, change them there, not here!
-destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]
+from . import ev as tlev
+
+# global variables imported declared in the ev file
+destinations = tlev.destinations
+
+syslog_host = tlev.syslog_host
+
+fromEmail = tlev.fromEmail
+toEmail = tlev.toEmail
+mail_server = tlev.mail_server
+
+twilio_sid = tlev.twilio_sid
+twilio_token = tlev.twilio_token
+twilio_from = tlev.twilio_from
+twilio_to = tlev.twilio_to
 
 def get_timestamp():
     timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
@@ -165,12 +176,11 @@ Yesterday's file will remain.\n\n\
             
     def syslog(self, message):
         '''send message to syslog server'''
-        host = os.environ["syslog_server"]  # IP of PC with syslog server software
         port = int('514')
-
         my_logger = logging.getLogger('MyLogger')
         my_logger.setLevel(logging.DEBUG)
-        handler = SysLogHandler(address=(host, port))
+        # syslog_host is pulled from global vars up top
+        handler = SysLogHandler(address=(syslog_host, port))
         my_logger.addHandler(handler)
 
         my_logger.info(message)
@@ -178,9 +188,6 @@ Yesterday's file will remain.\n\n\
 
     def send_mail(self, message, subject):
         '''send email to TL gmail account via relay address'''
-        fromEmail = os.environ['fromEmail']  # from where should emails appear to come?
-        toEmail = os.environ['toEmail']  # to where should emails be sent?
-        mail_server = os.environ["mail_server_external"]  # IP of mail server
         format = EmailMessage()
         format.set_content(message)
         format['Subject'] = f'{subject}: {self.show}'
@@ -194,10 +201,6 @@ Yesterday's file will remain.\n\n\
     def send_sms(self, message):
         '''send sms via twilio. all info is stored in PC's environement variables'''
         if self.twilio_enable:
-            twilio_sid = os.environ.get('twilio_sid')
-            twilio_token = os.environ.get('twilio_token')
-            twilio_from = os.environ.get('twilio_from')
-            twilio_to = os.environ.get('twilio_to')
 
             client = Client(twilio_sid, twilio_token)
 
@@ -384,15 +387,18 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 
     def run(self):
         '''Begins to process the file'''
+
         print((f"I'm working on {self.show}. Just a moment..."))
         TLShow.syslog(self, message=f'{self.show}: Starting script')
 
         TLShow.check_attributes_are_valid(self)              
 
         if self.url:
+            # if url is declared, it's either an RSS or permalink show
             if self.is_permalink:
                 TLShow.removeYesterdayFiles(self)
                 TLShow.download_file(self)
+            # if url but not permalink, it must be an RSS feed
             elif TLShow.check_feed_loop(self) == True:
                 TLShow.removeYesterdayFiles(self)
                 TLShow.download_file(self)

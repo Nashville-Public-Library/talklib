@@ -31,15 +31,16 @@ To repeat, **this module will not work without FFmpeg, FFprobe, and Wget**.
 FFmpeg and FFprobe should be two separate binaries.
 
 ### -Twilio
-[Twilio](https://www.twilio.com/) is used for SMS notifications. There is a [Twilio library for Python](https://www.twilio.com/docs/libraries/python). It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`). Store the Twilio credentials in environment variables on the PCs, as shown in the script. 
+[Twilio](https://www.twilio.com/) is used for SMS notifications. There is a [Twilio library for Python](https://www.twilio.com/docs/libraries/python). It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`).
 
 See the "Usage" section below for how to disable Twilio.
 
 ### -Environment Variables
-Many items are stored in environment variables. Make sure to set all of these on your PC(s). (*TODO: make a list of these and add it here*)
+Many global variables are declared in local environment variables, since they contain sensitive info we don't want exposed (EG on GitHub).
 
+The entire list of these is in the ev.py file. Make sure to set all of these on your PC(s). They are case-sensitive!
 
-*An obvious improvement here would be to download the audio files for the RSS feeds in a more "Pythonic" fashion, IE not using Wget.*
+On Windows, run a search for 'environment variables' and you will see how to create/change them.
 
 ---
 ## Installation
