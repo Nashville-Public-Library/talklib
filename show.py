@@ -5,6 +5,7 @@ It's best to read the docs.
 © Nashville Public Library
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
+import errno
 import xml.etree.ElementTree as ET
 import subprocess
 import shutil
@@ -21,7 +22,10 @@ from datetime import datetime
 import requests
 from twilio.rest import Client
 
-from . import ev as tlev
+try:
+    from . import ev as tlev
+except ImportError as e:
+    print(e)
 
 # global variables imported declared in the ev file
 destinations = tlev.destinations
@@ -228,25 +232,25 @@ Yesterday's file will remain.\n\n\
 
     def check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
-        try:
-            numberOfDestinations = len(destinations)
-            numberOfDestinations = numberOfDestinations - 1
-            while numberOfDestinations >= 0:
-                os.path.isfile(
-                    f'{destinations[numberOfDestinations]}\{fileToCheck}')
+        numberOfDestinations = len(destinations)
+        numberOfDestinations = numberOfDestinations - 1
+        success = False
+        while numberOfDestinations >= 0:
+            if os.path.isfile(f'{destinations[numberOfDestinations]}\{fileToCheck}'):
                 numberOfDestinations = numberOfDestinations-1
                 TLShow.syslog(self, message=f'{self.show}: {fileToCheck} arrived at {destinations[numberOfDestinations]}')
-            TLShow.countdown(self)
-        except:
-            toSend = (f"There was a problem with {self.show}.\n\n\
+                success = True
+            else:
+                toSend = (f"There was a problem with {self.show}.\n\n\
 It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually!\n\n\
 {get_timestamp()}")
-            TLShow.notify(self, message=toSend, subject='Error')
-            os.system('cls')
-            print(toSend)  # get user's attention!
-            print()
-            input('(press enter to close this window)') # force user to acknowledge by closing window
+                TLShow.notify(self, message=toSend, subject='Error')
+                TLShow.print_to_screen(message=toSend)
+                break
+        if success:
+            TLShow.countdown(self)
+            
 
     def check_length(self, fileToCheck):
         '''check length of converted file with ffprobe. if too long or short, send notification'''
@@ -330,14 +334,18 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         os.system('cls')
         toSend = f'{self.show}: All Done.'
         TLShow.syslog(self, message=toSend)
-        print(toSend)
-        print()
+        print(f'{toSend}\n')
         number = 5
         i = 0
         while i < number:
             print(f'This window will close in {number} seconds...', end='\r')
             number = number-1
             time.sleep(1)
+
+    def print_to_screen(message):
+        os.system('cls')
+        print(f'{message}\n')  # get user's attention!
+        input('(press enter to close this window)') # force user to acknowledge by closing window
 
     def check_types(attrib_to_check, type_to_check, attrib_return):
         '''
@@ -408,10 +416,7 @@ It looks like today's file hasn't yet been posted. \
 Please check and download manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=toSend, subject='Error')
-                os.system('cls')
-                print(toSend)
-                print()
-                input('(press enter to close this window)')  # force user to acknowledge
+                TLShow.print_to_screen(message=toSend)
 
         elif self.is_local:
             if self.local_file:
@@ -422,10 +427,7 @@ It looks like the source file doesn't exist. \
 Please check manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=to_send, subject='Error')
-                os.system('cls')
-                print(to_send)
-                print()
-                input('(press enter to close this window)') #force user to acknowledge   
+                TLShow.print_to_screen(message=to_send)
                    
         else:
             raise Exception ('Sorry, you need to specify either a URL or local audio file. \

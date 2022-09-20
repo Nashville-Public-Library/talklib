@@ -13,6 +13,7 @@ If you need to change them, change them at the PC level, not here.
 
 import os
 
+
 destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']] # where should output files go?
 syslog_host = os.environ["syslog_server"] # ip of syslog server (PC with syslog software)
 fromEmail = os.environ['fromEmail']  # from where should emails appear to come?
