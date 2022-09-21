@@ -5,7 +5,7 @@ It's best to read the docs.
 © Nashville Public Library
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
-import errno
+
 import xml.etree.ElementTree as ET
 import subprocess
 import shutil
@@ -44,6 +44,12 @@ twilio_to = tlev.twilio_to
 def get_timestamp():
     timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
     return timestamp
+
+def clear_screen():
+        if os.name == 'nt':
+            os.system('cls')
+        else:
+            os.system('clear')
 
 
 class TLShow:
@@ -145,13 +151,13 @@ class TLShow:
     def download_file(self, i=0):
         '''download audio file from rss feed or permalink'''
         if self.is_permalink:
-            download = self.url
+            download_URL = self.url
         else:
-            download = TLShow.get_audio_url(self)
+            download_URL = TLShow.get_audio_url(self)
         TLShow.syslog(self, message=f'{self.show}: Attempting to download audio file.')
         input_file = 'input.mp3'  # name the file we download
-        # using wget because urlretrive is getting a 403 denied error
-        subprocess.run(f'wget -q -O {input_file} {download}')
+        # using wget because urlretrive is getting a 403 denied error...and it's just easier, honestly.
+        subprocess.run(f'wget -q -O {input_file} {download_URL}')
         TLShow.check_downloaded_file(self, fileToCheck=input_file, i=i)
 
     def check_downloaded_file(self, fileToCheck, i):
@@ -273,6 +279,7 @@ This is unusual and could indicate a problem with the file. Please check manuall
                 TLShow.notify(self, message=toSend, subject='Check Length')
             else:
                 TLShow.syslog(self, message=f'{self.show}: File is {duration} minute(s). Continuing...')
+
         else:
             TLShow.syslog(self, message=f'{self.show}: The check length function is turned off.')
 
@@ -331,7 +338,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         that the script has finished and is about to exit.
         Otherwise, the user does not know what happened; they
         just see the screen disappear.'''
-        os.system('cls')
+        clear_screen()
         toSend = f'{self.show}: All Done.'
         TLShow.syslog(self, message=toSend)
         print(f'{toSend}\n')
@@ -343,7 +350,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             time.sleep(1)
 
     def print_to_screen(message):
-        os.system('cls')
+        clear_screen()
         print(f'{message}\n')  # get user's attention!
         input('(press enter to close this window)') # force user to acknowledge by closing window
 
@@ -356,7 +363,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 
     def check_attributes_are_valid(self):
         '''
-        Run some checks on the attributes the user has set. IE the required
+        Run some checks on the attributes the user has set. I.E. the required
         attributes have been set, they are the right type, etc.
         '''
         if not self.show:
@@ -385,8 +392,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
 
         if not (self.check_if_above and self.check_if_below):
-            print()
-            print('(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
+            print('\n(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
         
         if self.breakaway:
             # FFmpeg can take integers or floats
