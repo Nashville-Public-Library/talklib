@@ -63,7 +63,7 @@ Before we begin, a general note:
 ### We run most of our Python scripts via WireReady (WR)
 - The "Run" command in WR defaults to running from a different directory AND a different drive letter. This causes confusion.
 - WR also does not run `.py` files by default. 
-- For these reasons and more, we do not run `.py` files directly from WR.
+- These are some of the reasons why we do not run `.py` files directly from WR.
 - Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file). 
 - The batch script ensures we CD to the correct directory.
 - Ensure the Batch & Python scripts are in the same directory.
@@ -84,8 +84,7 @@ You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 
 `TLShow` is the main class to use.
 
-
-In a new Python script, import the class to your script like this:
+Import the class to your script like this:
 
 `from talklib.show import TLShow`
 
@@ -93,23 +92,9 @@ Create an instance like this:
 
 `example = TLShow()`
 
-## Attributes
+----
 
-### Notes about formatting:
-
-### string 
-- must be enclosed in quotes (single or double; Python doesn't care)
-
-### boolean
-- either True or False
-- do not enclose in quotes
-- must be capitalized
-    - correct: True
-    - incorrect: true
-    
-### number
-- in our case, these can be either type int OR float, meaning either whole numbers OR decimal numbers are allowed
-- do not enclose in quotes
+## Available Attributes
 
 `show`
 
@@ -242,6 +227,22 @@ optional
 - do not set to 0.
 - be careful with this!
 - default is 21
+
+### Notes about formatting:
+
+### string 
+- must be enclosed in quotes (single or double; Python doesn't care)
+
+### boolean
+- either True or False
+- do not enclose in quotes
+- must be capitalized
+    - correct: True
+    - incorrect: true
+    
+### number
+- in our case, these can be either type int OR float, meaning either whole numbers OR decimal numbers are allowed
+- do not enclose in quotes
 
 ## Methods
 

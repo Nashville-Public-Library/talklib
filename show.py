@@ -284,7 +284,7 @@ This is unusual and could indicate a problem with the file. Please check manuall
             TLShow.syslog(self, message=f'{self.show}: The check length function is turned off.')
 
     def get_feed(self):
-        '''get the feed and create an ET object'''
+        '''get the feed and create an ET object, which can then be called from other functions.'''
         try:
             header = {'User-Agent': 'Darth Vader'}  # usually helpful to identify yourself
             rssfeed = requests.get(self.url, headers=header)
