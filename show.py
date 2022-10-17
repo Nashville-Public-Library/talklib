@@ -46,10 +46,11 @@ def get_timestamp():
     return timestamp
 
 def clear_screen():
-        if os.name == 'nt':
-            os.system('cls')
-        else:
-            os.system('clear')
+    '''clears the terminal'''
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
 
 
 class TLShow:
