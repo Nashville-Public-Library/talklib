@@ -266,7 +266,10 @@ Please check manually!\n\n\
 
     def check_length(self, fileToCheck):
         '''check length of converted file with ffprobe. if too long or short, send notification'''
-        if self.check_if_below and self.check_if_above:
+        # if these are not declared, don't run this check.
+        if not (self.check_if_below and self.check_if_above):
+            TLShow.syslog(self, message=f'{self.show}: The check length function is turned off.')
+        else:
             duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
             -of default=noprint_wrappers=1:nokey=1 {fileToCheck}")
 
@@ -288,9 +291,6 @@ This is unusual and could indicate a problem with the file. Please check manuall
             else:
                 TLShow.syslog(self, message=f'{self.show}: File is {duration} minute(s). Continuing...')
 
-        else:
-            TLShow.syslog(self, message=f'{self.show}: The check length function is turned off.')
-
     def get_feed(self):
         '''get the feed and create an ET object, which can then be called from other functions.'''
         try:
@@ -308,7 +308,14 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             raise Exception (a)
 
     def check_feed_updated(self):
-        '''TODO explain'''
+        '''
+        get the ET object from the get_feed function, 
+        then parse through it to check whether there is an entry with today's date.
+        If yes, return True.
+
+        The format for this date is a standard format (E.G. '17 Oct 2022') set by 
+        some standards organization. Most podcasts/RSS feeds follow this standard.
+        '''
         root = TLShow.get_feed(self)
         for t in root.findall('channel'):
             item = t.find('item')  # 'find' only returns the first match!
