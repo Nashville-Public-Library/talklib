@@ -262,7 +262,7 @@ The minimum attributes you must set are `show`, `show_filename`, and `url`.
 
 Here is an example script:
 
-````
+````python
 from talklib.show import TLShow
 
 SD = TLShow()
@@ -286,7 +286,7 @@ The minimum attributes you must set are: `show`, `show_filename`, `is_local`, an
 
 Here is an example script:
 
-````
+````python
 from talklib.show import TLShow
 
 MWB = TLShow()
@@ -309,7 +309,7 @@ The minimum attributes you must set are: `show`, `show_filename`, `url`, and `is
 
 Here is an example script:
 
-````
+````python
 from talklib.show import TLShow
 
 WK = TLShow()
