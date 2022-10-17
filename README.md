@@ -45,7 +45,7 @@ On Windows, run a search for 'environment variables' and you will see how to cre
 ---
 ## Installation
 
-To use this module: 
+### Download
 - clone this repo 
 - unzip it
 - remove the "-main" from the directory name (it should just be called "talklib")
@@ -53,6 +53,13 @@ To use this module:
 - If it exists, DO overwrite the existing directory.
 
 Depending on how you installed Python, the `site-packages` directory could be somewhere like: `C:\Users\<username>\AppData\Local\Programs\Python\Python###\Lib\site-packages`
+
+### Install Python Packages
+- open a `cmd` terminal
+- cd to this directory
+- run `pip install -r requirements.txt`
+
+This will download all the Python packages we're using. Yes, doing this will download the packages globally. It's probably fine, for now...
 
 ---
 
