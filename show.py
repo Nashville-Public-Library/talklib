@@ -83,6 +83,7 @@ class TLShow:
         return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
     
     def create_output_filename(self):
+        '''returns the audio filename to use depending on whether we should include the date'''
         if self.include_date:
             date = datetime.now().strftime("%m%d%y")
             outputFile = (f"{self.show_filename}-{date}.wav")
@@ -93,14 +94,14 @@ class TLShow:
     def convert(self, input):
         '''convert file with ffmpeg and proceed'''
         outputFile = TLShow.create_output_filename(self)
-        TLShow.syslog(self, message=f'{self.show}: Attempting to convert to TL format.')
+        TLShow.syslog(self, message=f'{self.show}: Converting to TL format...')
 
         if self.breakaway:
             subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -t {self.breakaway} -af loudnorm=I=-{self.ff_level} -y {outputFile}')
         else:
             subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-{self.ff_level} -y {outputFile}')
 
-        TLShow.syslog(self, message=f'{self.show}: File converted')
+        TLShow.syslog(self, message=f'{self.show}: Conversion complete')
         TLShow.check_length(self, fileToCheck=outputFile) #call this before removing the file!
         TLShow.remove(self, fileToDelete=input)
         TLShow.copy(self, fileToCopy=outputFile)
@@ -150,7 +151,12 @@ class TLShow:
                 numberOfDestinations = numberOfDestinations - 1
 
     def download_file(self, i=0):
-        '''download audio file from rss feed or permalink'''
+        '''
+        Download audio file from RSS feed or permalink.
+        If this is a permalink show, we can just use the URL. BUT
+        if this is an RSS show, the URL links to an RSS feed, so 
+        we need to call the function for that.       
+        '''
         if self.is_permalink:
             download_URL = self.url
         else:
@@ -210,7 +216,7 @@ Yesterday's file will remain.\n\n\
         mail.quit()
 
     def send_sms(self, message):
-        '''send sms via twilio. all info is stored in PC's environement variables'''
+        '''send sms via twilio. The Variables below are environement variables, declared up top'''
         if self.twilio_enable:
 
             client = Client(twilio_sid, twilio_token)
@@ -223,7 +229,7 @@ Yesterday's file will remain.\n\n\
             message.sid
 
     def notify(self, message, subject):
-        '''TODO: explain'''
+        '''we generally only want to send SMS via Twilio if today is on a weekend'''
         if self.notifications:
             short_day = datetime.now().strftime('%a')
             weekend = ['Sat', 'Sun']
@@ -257,13 +263,14 @@ Please check manually!\n\n\
                 break
         if success:
             TLShow.countdown(self)
-            
 
     def check_length(self, fileToCheck):
         '''check length of converted file with ffprobe. if too long or short, send notification'''
         if self.check_if_below and self.check_if_above:
             duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
             -of default=noprint_wrappers=1:nokey=1 {fileToCheck}")
+
+            # convert the number to something more usable/readable
             duration = float(duration)
             duration = duration/60
             duration = round(duration, 2)
