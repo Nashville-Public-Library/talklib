@@ -6,6 +6,7 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
+from sqlite3 import DatabaseError
 import xml.etree.ElementTree as ET
 import subprocess
 import shutil
@@ -97,9 +98,11 @@ class TLShow:
         TLShow.syslog(self, message=f'{self.show}: Converting to TL format...')
 
         if self.breakaway:
-            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -t {self.breakaway} -af loudnorm=I=-{self.ff_level} -y {outputFile}')
+            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 \
+                -t {self.breakaway} -af loudnorm=I=-{self.ff_level} -y {outputFile}')
         else:
-            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 -af loudnorm=I=-{self.ff_level} -y {outputFile}')
+            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 \
+                -af loudnorm=I=-{self.ff_level} -y {outputFile}')
 
         TLShow.syslog(self, message=f'{self.show}: Conversion complete')
         TLShow.check_length(self, fileToCheck=outputFile) #call this before removing the file!
@@ -140,17 +143,16 @@ class TLShow:
             numberOfDestinations = numberOfDestinations - 1
 
             while numberOfDestinations >= 0:
-                globbify = glob.glob(
-                    f'{destinations[numberOfDestinations]}\{self.show_filename}*.wav')
-                if globbify:
-                    for file in globbify:
+                matched_filenames = glob.glob(f'{destinations[numberOfDestinations]}\{self.show_filename}*.wav')
+                if matched_filenames:
+                    for file in matched_filenames:
                         TLShow.syslog(self, message=f'{self.show}: Deleting {file}')
                         os.remove(f'{file}')
                 else:
                     TLShow.syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destinations[numberOfDestinations]}. Continuing...")
                 numberOfDestinations = numberOfDestinations - 1
 
-    def download_file(self, i=0):
+    def download_file(self, how_many_attempts=0):
         '''
         Download audio file from RSS feed or permalink.
         If this is a permalink show, we can just use the URL. BUT
@@ -161,11 +163,12 @@ class TLShow:
             download_URL = self.url
         else:
             download_URL = TLShow.get_audio_url(self)
+
         TLShow.syslog(self, message=f'{self.show}: Attempting to download audio file.')
         input_file = 'input.mp3'  # name the file we download
         # using wget because urlretrive is getting a 403 denied error...and it's just easier, honestly.
         subprocess.run(f'wget -q -O {input_file} {download_URL}')
-        TLShow.check_downloaded_file(self, fileToCheck=input_file, i=i)
+        TLShow.check_downloaded_file(self, fileToCheck=input_file, i=how_many_attempts)
 
     def check_downloaded_file(self, fileToCheck, i):
         '''TODO explain'''
@@ -180,10 +183,8 @@ class TLShow:
             else:
                 TLShow.syslog(self, message=f'{self.show}: File is empty. Will download again. Attempt # {i}.')
                 i = i+1
-                TLShow.download_file(self, i=i)
-        if is_not_empty == True:
-            pass
-        else:
+                TLShow.download_file(self, how_many_attempts=i)
+        if not is_not_empty:
             toSend = (f"There was a problem with {self.show}.\n\n\
 It looks like the downloaded file is empty. Please check manually! \
 Yesterday's file will remain.\n\n\
@@ -204,7 +205,10 @@ Yesterday's file will remain.\n\n\
         my_logger.removeHandler(handler) # don't forget this after you send the message!
 
     def send_mail(self, message, subject):
-        '''send email to TL gmail account via relay address'''
+        '''
+        send email to TL gmail account via relay address.
+        Several of these variables are environement variables, declared up top.
+        '''
         format = EmailMessage()
         format.set_content(message)
         format['Subject'] = f'{subject}: {self.show}'
@@ -216,11 +220,13 @@ Yesterday's file will remain.\n\n\
         mail.quit()
 
     def send_sms(self, message):
-        '''send sms via twilio. The Variables below are environement variables, declared up top'''
+        '''
+        send sms via twilio. 
+        Several of these variables are environement variables, declared up top.
+        '''
         if self.twilio_enable:
 
             client = Client(twilio_sid, twilio_token)
-
             message = client.messages.create(
                 body=message,
                 from_=twilio_from,
@@ -240,8 +246,6 @@ Yesterday's file will remain.\n\n\
             else:
                 TLShow.send_mail(self, message=message, subject=subject)
                 TLShow.syslog(self, message=message)
-        else:
-            pass
 
     def check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
@@ -369,12 +373,17 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         print(f'{message}\n')  # get user's attention!
         input('(press enter to close this window)') # force user to acknowledge by closing window
 
-    def check_types(attrib_to_check, type_to_check, attrib_return):
+    def check_str_and_bool_type(attrib_to_check, type_to_check, attrib_return):
         '''
         TODO I really need to explain this stuff
         '''
         if  type(attrib_to_check) != type_to_check:
             raise Exception (f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}.")
+
+    def check_int_and_float_type(attrib_to_check, attrib_return):
+        '''something'''
+        if not (type(attrib_to_check) == int or type(attrib_to_check) == float):
+            raise Exception (f'Sorry, the {attrib_return} attribute must be a valid number (without quotes).')
 
     def check_attributes_are_valid(self):
         '''
@@ -384,21 +393,12 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if not self.show:
             raise Exception ('Sorry, you need to specify a name for the show.')
         else:
-            TLShow.check_types(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
+            TLShow.check_str_and_bool_type(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
 
         if not self.show_filename:
             raise Exception ('Sorry, you need to specify a filename for the show.')
         else:
-            TLShow.check_types(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
-
-        if self.url:
-            TLShow.check_types(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
-        
-        if self.is_local:
-            TLShow.check_types(attrib_to_check=self.is_local, type_to_check=bool, attrib_return='is_local')
-
-        if self.local_file:
-            TLShow.check_types(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
+            TLShow.check_str_and_bool_type(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
 
         if self.url and self.is_local:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
@@ -406,18 +406,28 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.url and self.local_file:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
 
-        if not (self.check_if_above and self.check_if_below):
-            print('\n(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
+        if self.url:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
+        
+        if self.is_local:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.is_local, type_to_check=bool, attrib_return='is_local')
+
+        if self.local_file:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
         
         if self.breakaway:
-            # FFmpeg can take integers or floats
-            if not (type(self.breakaway) == int or float):
-                raise Exception ('Sorry, the breakaway attribute must be a valid number (without quotes).')
+            TLShow.check_int_and_float_type(attrib_to_check=self.breakaway, attrib_return='breakaway')
+        
+        if self.ff_level:
+            TLShow.check_int_and_float_type(attrib_to_check=self.ff_level, attrib_return='fflevel')
+
+        if not (self.check_if_above and self.check_if_below):
+            print('\n(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
 
     def run(self):
         '''Begins to process the file'''
 
-        print((f"I'm working on {self.show}. Just a moment..."))
+        print(f"I'm working on {self.show}. Just a moment...\n")
         TLShow.syslog(self, message=f'{self.show}: Starting script')
 
         TLShow.check_attributes_are_valid(self)              

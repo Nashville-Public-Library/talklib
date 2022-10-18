@@ -230,12 +230,14 @@ optional
 optional
 - sets the level for FFmpeg's compression/normalization
 - this is the EBU R128 LUFS "integrated loudness" standard
-- the smaller the number, the more compression is applied (12 is more compressed than 13)
-- do not set to 0.
-- be careful with this!
+- the smaller the number, the more compression is applied (17 is more compressed than 18)
+- the max is 5 (do not set to 1, 2, 3, or 4)!
+- **be careful with this!**
 - default is 21
 
 ### Notes about formatting:
+
+if you're new to Python, here're some reminders
 
 ### string 
 - must be enclosed in quotes (single or double; Python doesn't care)
@@ -249,6 +251,8 @@ optional
     
 ### number
 - in our case, these can be either type int OR float, meaning either whole numbers OR decimal numbers are allowed
+    - OK: 5
+    - also OK: 5.4
 - do not enclose in quotes
 
 ## Methods
@@ -257,6 +261,7 @@ optional
 
 required
 - executes the script with the attributes you set
+- should be the last line in your script
 
 this should be the only method/function you call directly from an outside script. Even if your IDE shows you all the available methods, please ignore them as most of them are not (yet) designed to be called directly.
 
