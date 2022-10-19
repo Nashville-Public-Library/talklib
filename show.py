@@ -6,7 +6,6 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
-from sqlite3 import DatabaseError
 import xml.etree.ElementTree as ET
 import subprocess
 import shutil
@@ -193,11 +192,13 @@ Yesterday's file will remain.\n\n\
             TLShow.remove(self, fileToDelete=fileToCheck)
             
     def syslog(self, message):
-        '''send message to syslog server'''
+        '''
+        send message to syslog server.
+        'syslog_host' variable is pulled from global vars up top
+        '''
         port = int('514')
         my_logger = logging.getLogger('MyLogger')
         my_logger.setLevel(logging.DEBUG)
-        # syslog_host is pulled from global vars up top
         handler = SysLogHandler(address=(syslog_host, port))
         my_logger.addHandler(handler)
 
@@ -318,7 +319,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         If yes, return True.
 
         The format for this date is a standard format (E.G. '17 Oct 2022') set by 
-        some standards organization. Most podcasts/RSS feeds follow this standard.
+        a standards organization. Most podcasts/RSS feeds follow this standard.
         '''
         root = TLShow.get_feed(self)
         for t in root.findall('channel'):
@@ -340,8 +341,10 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             return audio_url
 
     def check_feed_loop(self):
-        '''occasionally, the first time we check the feed, it is not showing as updated.
-        It's being cached, or something...? So we are checking it 3 times, for good measure.'''
+        '''
+        occasionally, the first time we check the feed, it is not showing as updated.
+        It's being cached, or something...? So we are checking it 3 times, for good measure.
+        '''
         i = 0
         while i < 3:
             TLShow.syslog(self, message=f'{self.show}: Attempt {i} to check feed.')
@@ -353,10 +356,12 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
                 i = i+1
 
     def countdown(self):
-        '''the reason for this is to give a visual cue to the user
+        '''
+        the reason for this is to give a visual cue to the user
         that the script has finished and is about to exit.
         Otherwise, the user does not know what happened; they
-        just see the screen disappear.'''
+        just see the screen disappear.
+        '''
         clear_screen()
         toSend = f'{self.show}: All Done.'
         TLShow.syslog(self, message=toSend)
@@ -375,13 +380,19 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 
     def check_str_and_bool_type(attrib_to_check, type_to_check, attrib_return):
         '''
-        TODO I really need to explain this stuff
+        we are checking whether an attribut is either type str or bool, depending on what is passed in.
+        
+        'attrib_return' is solely for printing the message back out to the screen/log.
+        It is not needed for the actual type check.
+        I can't figure out how else to get the name of the attribute.
         '''
         if  type(attrib_to_check) != type_to_check:
             raise Exception (f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}.")
 
     def check_int_and_float_type(attrib_to_check, attrib_return):
-        '''something'''
+        '''
+        Attributes passed here can be either int or float.
+        '''
         if not (type(attrib_to_check) == int or type(attrib_to_check) == float):
             raise Exception (f'Sorry, the {attrib_return} attribute must be a valid number (without quotes).')
 
@@ -425,7 +436,11 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             print('\n(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
 
     def run(self):
-        '''Begins to process the file'''
+        '''
+        Begins to process the file
+
+        TODO split this into multiple functions!
+        '''
 
         print(f"I'm working on {self.show}. Just a moment...\n")
         TLShow.syslog(self, message=f'{self.show}: Starting script')
