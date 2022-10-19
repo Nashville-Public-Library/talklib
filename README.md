@@ -2,6 +2,8 @@
 
 ## A module to automate processing of shows/segments airing on the TL
 
+[Skip to Examples](#examples)
+
 Use this module to process these types of shows/segments:
 - Full shows we receive via RSS feed
     - such as New York Times, Wall Street Journal, etc.
@@ -33,14 +35,14 @@ FFmpeg and FFprobe should be two separate binaries.
 ### -Twilio
 [Twilio](https://www.twilio.com/) is used for SMS notifications. There is a [Twilio library for Python](https://www.twilio.com/docs/libraries/python). It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`).
 
+Access our TL Twilio info (token, etc.) by [logging in](https://www.twilio.com/login) to Twilio.
+
 See the "Usage" section below for how to disable Twilio.
 
 ### -Environment Variables
-Many global variables are declared in local environment variables, since they contain sensitive info we don't want exposed (EG on GitHub).
+Several global variables used here are pulled from environment variables. This gives the module more portability, and keeps sensitive info out of the module.
 
 The entire list of these is in the ev.py file. Make sure to set all of these on your PC(s). They are case-sensitive!
-
-On Windows, run a search for 'environment variables' and you will see how to create/change them.
 
 ---
 ## Installation
@@ -102,6 +104,8 @@ Create an instance like this:
 ----
 
 ## Available Attributes
+
+### here is a list of all the attributes, along with their type and whether they are required.
 
 `show`
 
