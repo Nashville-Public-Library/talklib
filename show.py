@@ -27,6 +27,8 @@ try:
 except ImportError as e:
     print(e)
 
+from .utils import get_timestamp, clear_screen    
+
 # global variables imported declared in the ev file
 destinations = tlev.destinations
 
@@ -40,17 +42,6 @@ twilio_sid = tlev.twilio_sid
 twilio_token = tlev.twilio_token
 twilio_from = tlev.twilio_from
 twilio_to = tlev.twilio_to
-
-def get_timestamp():
-    timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
-    return timestamp
-
-def clear_screen():
-    '''clears the terminal'''
-    if os.name == 'nt':
-        os.system('cls')
-    else:
-        os.system('clear')
 
 
 class TLShow:
