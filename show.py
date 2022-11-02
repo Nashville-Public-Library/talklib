@@ -266,6 +266,9 @@ Please check manually!\n\n\
         if not (self.check_if_below and self.check_if_above):
             TLShow.syslog(self, message=f'{self.show}: The check length function is turned off.')
         else:
+            TLShow.syslog(self, message=f'{self.show}: Checking whether length is between \
+{self.check_if_below} and {self.check_if_above}')
+
             duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
             -of default=noprint_wrappers=1:nokey=1 {fileToCheck}")
 
