@@ -68,6 +68,7 @@ class TLShow:
         self.notifications = notifications
         self.twilio_enable = twilio_enable
         self.ff_level = ff_level
+        self.syslog_enable = True
     
     
     def __str__(self) -> str:
@@ -155,7 +156,6 @@ class TLShow:
             download_URL = TLShow.get_audio_url(self)
 
         TLShow.syslog(self, message=f'{self.show}: Attempting to download audio file.')
-
         input_file = 'input.mp3'  # name the file we download
         with open (input_file, mode='wb') as downloaded_file:
             a = requests.get(download_URL)
@@ -192,14 +192,17 @@ Yesterday's file will remain.\n\n\
         send message to syslog server.
         'syslog_host' variable is pulled from global vars up top
         '''
-        port = int('514')
-        my_logger = logging.getLogger('MyLogger')
-        my_logger.setLevel(logging.DEBUG)
-        handler = SysLogHandler(address=(syslog_host, port))
-        my_logger.addHandler(handler)
+        if not self.syslog_enable:
+            pass
+        else:
+            port = int('514')
+            my_logger = logging.getLogger('MyLogger')
+            my_logger.setLevel(logging.DEBUG)
+            handler = SysLogHandler(address=(syslog_host, port))
+            my_logger.addHandler(handler)
 
-        my_logger.info(message)
-        my_logger.removeHandler(handler) # don't forget this after you send the message!
+            my_logger.info(message)
+            my_logger.removeHandler(handler) # don't forget this after you send the message!
 
     def send_mail(self, message, subject):
         '''
