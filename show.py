@@ -147,7 +147,7 @@ class TLShow:
         Download audio file from RSS feed or permalink.
         If this is a permalink show, we can just use the URL. BUT
         if this is an RSS show, the URL links to an RSS feed, so 
-        we need to call the function for that.       
+        we need to call the function for that.
         '''
         if self.is_permalink:
             download_URL = self.url
@@ -155,9 +155,14 @@ class TLShow:
             download_URL = TLShow.get_audio_url(self)
 
         TLShow.syslog(self, message=f'{self.show}: Attempting to download audio file.')
+
         input_file = 'input.mp3'  # name the file we download
-        # using wget because urlretrive is getting a 403 denied error...and it's just easier, honestly.
-        subprocess.run(f'wget -q -O {input_file} {download_URL}')
+        with open (input_file, mode='wb') as downloaded_file:
+            a = requests.get(download_URL)
+            downloaded_file.write(a.content)
+            downloaded_file.close()
+        
+        TLShow.syslog(self, message=f'{self.show}: File downloaded successfully in current directory.')
         TLShow.check_downloaded_file(self, fileToCheck=input_file, i=how_many_attempts)
 
     def check_downloaded_file(self, fileToCheck, i):
