@@ -329,7 +329,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             pub_date = item.find('pubDate').text
             today = datetime.now().strftime("%a, %d %b")
             if today in pub_date:
-                TLShow.syslog(self, message=f'{self.show}: The feed is updated. Continuing...')
+                TLShow.syslog(self, message=f'{self.show}: The feed is updated.')
                 return True
 
     def get_audio_url(self):
