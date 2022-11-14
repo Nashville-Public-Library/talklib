@@ -63,7 +63,7 @@ def test_check_feed_loop():
 # first, make sure there are no exceptions thrown for our correctly set up instance
 def test_check_attributes_are_valid_1():
     test = generate_test_instance()
-    assert test.check_attributes_are_valid() != Exception
+    assert test.check_attributes_are_valid()
 
 # now, start deliberatly triggering exceptions with different invalid attributes.
 # running one test per invalid attribute.
@@ -111,12 +111,10 @@ def test_check_attributes_are_valid_7():
         test.check_attributes_are_valid()
         
 def test_gen2():
+    '''implementation test with real audio'''
     test = generate_test_instance()
     with pytest.raises(Exception) as something:
         assert test.run() == something
-
-def test_teardown():
-    '''remove the audio file after the tests have run'''
-    test = generate_test_instance()
+    # don't forget to delete the audio
     test.remove_yesterday = True
     test.removeYesterdayFiles()

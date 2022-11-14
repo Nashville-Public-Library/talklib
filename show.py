@@ -440,7 +440,6 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
     def run(self):
         '''
         Begins to process the file
-
         TODO split this into multiple functions!
         '''
 
