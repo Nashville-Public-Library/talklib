@@ -12,24 +12,16 @@ import xml.etree.ElementTree as ET
 url = 'https://feeds.npr.org/500005/podcast.xml'
 
 def generate_test_instance():
-    test = TLShow() 
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = url
+    # disable notifications for testing. Need separate tests for these!
     test.notifications = False
     test.syslog_enable = False
     return test
 
-def test_gen():
-    test = generate_test_instance()
-    assert type(test.create_output_filename()) == str
-
-def test_attributes(): 
-    test = generate_test_instance()
-    assert test.ff_level == 21
-    assert type(test.ff_level) == int
-
-    assert type(test.show) == str
+# ---------- Misc Methods ----------
 
 def test_decide_whether_to_remove():
     '''
@@ -51,7 +43,7 @@ def test_check_feed_updated():
 
 def test_get_audio_url():
     test = generate_test_instance()
-    assert type(test.get_audio_url()) == str
+    assert type(test.get_RSS_audio_url()) == str
 
 def test_check_feed_loop():
     test = generate_test_instance()
@@ -64,6 +56,10 @@ def test_check_feed_loop():
 def test_check_attributes_are_valid_1():
     test = generate_test_instance()
     assert test.check_attributes_are_valid()
+
+def test_gen():
+    test = generate_test_instance()
+    assert type(test.create_output_filename()) == str
 
 # now, start deliberatly triggering exceptions with different invalid attributes.
 # running one test per invalid attribute.
@@ -110,11 +106,28 @@ def test_check_attributes_are_valid_7():
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
         
-def test_gen2():
+def test_run():
     '''implementation test with real audio'''
     test = generate_test_instance()
-    with pytest.raises(Exception) as something:
-        assert test.run() == something
-    # don't forget to delete the audio
+    with pytest.raises(Exception):
+        assert test.run() # this is asserting this method does not raise an exception
+
+# def test_is_permalink():
+#     test = TLShow()
+#     test.show = 'Delete Me'
+#     test.show_filename = 'delete_me'
+#     test.url = url
+#     test.is_permalink = True
+#     test.notifications = False
+#     test.syslog_enable = False
+#     test.run()
+
+
+
+# ---------- Teardown/Cleanup ----------
+
+def test_teardown():
+    '''don't forget to delete the audio'''
+    test = generate_test_instance()
     test.remove_yesterday = True
     test.removeYesterdayFiles()

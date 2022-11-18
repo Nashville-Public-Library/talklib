@@ -149,11 +149,16 @@ class TLShow:
         If this is a permalink show, we can just use the URL. BUT
         if this is an RSS show, the URL links to an RSS feed, so 
         we need to call the function for that.
+
+        please split these into separate functions, one for permalink 
+        and one for RSS. or implement some other method to test against
+        a user declaring URL & is_permalink with an RSS URL, which
+        currently will throw an error.
         '''
         if self.is_permalink:
             download_URL = self.url
         else:
-            download_URL = TLShow.get_audio_url(self)
+            download_URL = TLShow.get_RSS_audio_url(self)
 
         TLShow.syslog(self, message=f'{self.show}: Attempting to download audio file.')
         input_file = 'input.mp3'  # name the file we download
@@ -332,7 +337,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
                 TLShow.syslog(self, message=f'{self.show}: The feed is updated.')
                 return True
 
-    def get_audio_url(self):
+    def get_RSS_audio_url(self):
         '''TODO: explain'''
         root = TLShow.get_feed(self)
         for t in root.findall('channel'):
@@ -434,6 +439,9 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.ff_level:
             TLShow.check_int_and_float_type(attrib_to_check=self.ff_level, attrib_return='fflevel')
 
+        if self.is_permalink:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
+
         if not (self.check_if_above and self.check_if_below):
             print('\n(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
 
@@ -479,3 +487,4 @@ Please check manually! Yesterday's file will remain.\n\n\
         else:
             raise Exception ('Sorry, you need to specify either a URL or local audio file. \
 Did you set is_local to True?')
+        return None
