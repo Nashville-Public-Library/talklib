@@ -3,7 +3,7 @@ getting started with some general tests for the talklib module via Pytest.
 '''
 import pytest
 
-from talklib.show import TLShow
+from ..show import TLShow
 import xml.etree.ElementTree as ET
 
 
@@ -111,18 +111,6 @@ def test_run():
     test = generate_test_instance()
     with pytest.raises(Exception):
         assert test.run() # this is asserting this method does not raise an exception
-
-# def test_is_permalink():
-#     test = TLShow()
-#     test.show = 'Delete Me'
-#     test.show_filename = 'delete_me'
-#     test.url = url
-#     test.is_permalink = True
-#     test.notifications = False
-#     test.syslog_enable = False
-#     test.run()
-
-
 
 # ---------- Teardown/Cleanup ----------
 
