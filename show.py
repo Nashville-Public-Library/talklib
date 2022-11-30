@@ -47,10 +47,22 @@ twilio_to = tlev.twilio_to
 class TLShow:
     '''TODO write something here'''
     def __init__(
-        self, show=None, show_filename=None, url=None, is_permalink=False, breakaway=0,
-        include_date=False, remove_yesterday=False, is_local=False, local_file=None,
-        remove_source=False, check_if_above=0, check_if_below=0, notifications=True, 
-        twilio_enable=True, ff_level=21
+        self, 
+        show=None, 
+        show_filename=None, 
+        url=None, 
+        is_permalink=False, 
+        breakaway=0,
+        include_date=False, 
+        remove_yesterday=False, 
+        is_local=False, 
+        local_file=None,
+        remove_source=False, 
+        check_if_above=0, 
+        check_if_below=0, 
+        notifications=True, 
+        twilio_enable=True, 
+        ff_level=21
         ):
 
         self.show = show
