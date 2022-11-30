@@ -184,7 +184,10 @@ class TLShow:
 
     def check_downloaded_file(self, fileToCheck, i):
         '''TODO explain'''
-        filesize = os.path.getsize(fileToCheck)
+        try:
+            filesize = os.path.getsize(fileToCheck)
+        except Exception as e:
+            raise e
         is_not_empty = False
         while i < 3:
             if filesize > 0:
