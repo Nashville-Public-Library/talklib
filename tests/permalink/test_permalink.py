@@ -1,6 +1,6 @@
 import pytest
 
-from ..show import TLShow
+from ...show import TLShow
 
 url = 'https://pnsne.ws/3mVuTax'
 
@@ -21,6 +21,12 @@ def test_run():
     test = generate_test_instance()
     with pytest.raises(Exception):
         assert test.run()
+
+def test_run2():
+    test = generate_test_instance()
+    test.url = 'nourl'
+    with pytest.raises(Exception):
+        test.run()
 
 # ---------- Teardown/Cleanup ----------
 
