@@ -15,6 +15,80 @@ def generate_test_instance():
     test.syslog_enable = False
     return test
 
+# ---------- check attributes ----------
+
+def test_attrib_1a():
+    test = generate_test_instance()
+    test.show = None
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_1b():
+    test = generate_test_instance()
+    test.show = 5
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_1c():
+    test = generate_test_instance()
+    test.show = True
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_1d():
+    test = generate_test_instance()
+    test.show = ''
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_2a():
+    test = generate_test_instance()
+    test.show_filename = None
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_2b():
+    test = generate_test_instance()
+    test.show_filename = 5
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_2c():
+    test = generate_test_instance()
+    test.show_filename = True
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_2d():
+    test = generate_test_instance()
+    test.show_filename = ''
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_3a():
+    test = generate_test_instance()
+    test.url = 5
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_3b():
+    test = generate_test_instance()
+    test.url = True
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_4b():
+    test = generate_test_instance()
+    test.is_permalink = 5
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_attrib_4c():
+    test = generate_test_instance()
+    test.is_permalink = 'not boolean'
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
 # ---------- full run ---------- # 
 
 def test_run():
