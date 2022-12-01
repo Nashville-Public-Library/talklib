@@ -4,7 +4,7 @@
 
 [Skip to Examples](#examples)
 
-Use this module to process these types of shows/segments:
+Use this module to process the following types of shows/segments:
 - Full shows we receive via RSS feed
     - such as New York Times, Wall Street Journal, etc.
 - Segments we receive via RSS Feed
@@ -21,26 +21,22 @@ Use this module to process these types of shows/segments:
 ### -Python
 Use Python 3.10.1 or above.
 
-### -Binaries
-You need Windows binaries for the following installed on the PC and added to the PATH:
+### -FFmpeg
+You need Windows binaries for **[FFmpeg & FFprobe](https://www.ffmpeg.org/download.html#build-windows)** installed on the PC and added to the PATH:
 
-- **[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)**
-- **FFprobe**
-- **[Wget](http://wget.addictivecode.org/FrequentlyAskedQuestions.html#download)**
-
-To repeat, **this module will not work without FFmpeg, FFprobe, and Wget**. 
+To repeat, **this module will not work without FFmpeg and FFprobe**. 
 
 FFmpeg and FFprobe should be two separate binaries.
 
 ### -Twilio
-[Twilio](https://www.twilio.com/) is used for SMS notifications. There is a [Twilio library for Python](https://www.twilio.com/docs/libraries/python). It is not in the Python standard library and needs to be installed via PIP (`pip install twilio`).
+[Twilio](https://www.twilio.com/) is used for SMS and phone call notifications.
 
 Access our TL Twilio info (token, etc.) by [logging in](https://www.twilio.com/login) to Twilio.
 
 See the "Usage" section below for how to disable Twilio.
 
 ### -Environment Variables
-Several global variables used here are pulled from environment variables. This gives the module more portability, and keeps sensitive info out of the module.
+Several global variables used here are pulled from environment variables. This gives the module more portability, and keeps sensitive info separated.
 
 The entire list of these is in the ev.py file. Make sure to set all of these on your PC(s). They are case-sensitive!
 
@@ -57,11 +53,12 @@ The entire list of these is in the ev.py file. Make sure to set all of these on 
 Depending on how you installed Python, the `site-packages` directory could be somewhere like: `C:\Users\<username>\AppData\Local\Programs\Python\Python###\Lib\site-packages`
 
 ### Install Python Packages
-- open a `cmd` terminal
-- cd to this directory
-- run `pip install -r requirements.txt`
-
-This will download all the Python packages we're using. Yes, doing this will download the packages globally. It's probably fine, for now...
+- open a terminal window
+- cd into the talklib directory
+- run `pip install -r requirements.txt` 
+    - This will download all the 3rd party Python packages we're using
+    - Please note, this will install things globally. for the TL, that's likely what you want
+    - if you only want to install things locally (for testing, etc.), use a virtual environment.
 
 ---
 
@@ -73,8 +70,7 @@ Before we begin, a general note:
 - The "Run" command in WR defaults to running from a different directory AND a different drive letter. This causes confusion.
 - WR also does not run `.py` files by default. 
 - These are some of the reasons why we do not run `.py` files directly from WR.
-- Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file). 
-- The batch script ensures we CD to the correct directory.
+- Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file).
 - Ensure the Batch & Python scripts are in the same directory.
 - A sample `.bat` file (`Example.bat`) is inlcuded in this repo. 
 
@@ -286,8 +282,9 @@ SD = TLShow()
 SD.show = 'Skywalker Daily News'
 SD.show_filename = 'SDN'
 SD.url = 'https://somesite.org/sdn-feed.rss'
+
+# these are optional
 SD.remove_yesterday = True
-SD.include_date = True
 SD.check_if_above = 59
 SD.check_if_below = 55
 
@@ -311,6 +308,8 @@ MWB.show = 'Magical World of Bees'
 MWB.show_filename = 'MWB'
 MWB.is_local = True
 MWB.local_file = 'D:Production\path\to\the\file.wav'
+
+# these are optional
 MWB.remove_source = True
 MBW.twilio_enable = False
 
@@ -334,7 +333,10 @@ WK.show = 'Who Knows'
 WK.show_filename = 'WhoKnows'
 WK.url = 'https://somesite.org/who-knows-static'
 WK.is_permalink = True
+
+# these are optional
 WK.notifications = False
+WK.include_date = True
 
 WK.run()
 ````
