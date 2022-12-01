@@ -105,12 +105,19 @@ def test_check_attributes_are_valid_7():
     test.ff_level = True
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
+
+# ---------- run ----------
         
 def test_run():
-    '''implementation test with real audio'''
+    '''implementation test with real audio. asserts that no exceptions are raised'''
     test = generate_test_instance()
+    test.run()
+
+def test_run2():
+    test = generate_test_instance()
+    test.url = 'invalid_URL'
     with pytest.raises(Exception):
-        assert test.run() # this is asserting this method does not raise an exception
+        test.run()
 
 # ---------- Teardown/Cleanup ----------
 

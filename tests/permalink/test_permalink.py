@@ -20,8 +20,7 @@ def generate_test_instance():
 def test_run():
     '''asserts no exceptions are raised for the correct/normal case'''
     test = generate_test_instance()
-    with pytest.raises(Exception):
-        assert test.run()
+    test.run()
 
 def test_run2():
     '''asserts an exception is raised with an invalid url'''

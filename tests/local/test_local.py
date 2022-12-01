@@ -1,14 +1,17 @@
 import pytest
+import os
 
 from ...show import TLShow
 
 url = 'https://pnsne.ws/3mVuTax'
 
+cwd = os.getcwd()
+
 def generate_test_instance():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    test.local_file = 'audio/local_test_file.mp3'
+    test.local_file = 'tests\local\local_test_file.mp3'
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
@@ -20,14 +23,13 @@ def generate_test_instance():
 def test_run():
     '''asserts no exception is raised for normal/correct case'''
     test = generate_test_instance()
-    with pytest.raises(Exception):
-        assert test.run()
+    test.run()
 
 def test_run2():
     '''check exception is raised with incorrect file name/path'''
     test = generate_test_instance()
     test.local_file = 'nofile'
-    with pytest.raises(Exception):
+    with pytest.raises(FileNotFoundError):
         test.run()
 
 # ---------- Teardown/Cleanup ----------

@@ -186,7 +186,7 @@ class TLShow:
         '''TODO explain'''
         try:
             filesize = os.path.getsize(fileToCheck)
-        except Exception as e:
+        except FileNotFoundError as e:
             raise e
         is_not_empty = False
         while i < 3:
