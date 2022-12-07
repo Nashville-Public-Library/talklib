@@ -125,6 +125,12 @@ class TLShow:
         TLShow.check_file_transferred(self, fileToCheck=fileToCopy)
 
     def decide_whether_to_remove(self):
+        '''
+        url shows should always remove the "source" files,
+        since these are the files downloaded from the internet.
+        local shows are downloaded ahead of time. we do not necessarily 
+        want to delete these
+        '''
         if self.url:
             return True
         elif self.local_file:
