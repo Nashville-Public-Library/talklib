@@ -481,7 +481,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         print(f"I'm working on {self.show}. Just a moment...\n")
         TLShow.syslog(self, message=f'{self.show}: Starting script')
 
-        TLShow.check_attributes_are_valid(self)              
+        TLShow.check_attributes_are_valid(self)
 
         if self.url:
             # if url is declared, it's either an RSS or permalink show

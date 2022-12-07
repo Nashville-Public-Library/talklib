@@ -65,8 +65,7 @@ def test_gen():
     test = generate_test_instance()
     assert type(test.create_output_filename()) == str
 
-# now, start deliberatly triggering exceptions with different invalid attributes.
-# running one test per invalid attribute.
+# now, start deliberatly triggering exceptions with invalid attributes.
 
 def test_check_attributes_are_valid_1a():
     test = generate_test_instance()
@@ -119,5 +118,12 @@ def test_check_attributes_are_valid_10():
 def test_check_attributes_are_valid_11():
     test = generate_test_instance()
     test.twilio_enable = 4.5
+    with pytest.raises(Exception):
+        test.run()
+ 
+def test_check_attributes_are_valid_12():
+    '''exception should be raised if both url & is_local are declared'''
+    test = generate_test_instance()
+    test.is_local = True
     with pytest.raises(Exception):
         test.run()

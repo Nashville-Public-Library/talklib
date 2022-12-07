@@ -1,4 +1,7 @@
 # pointless
 __pycache__
 
+# for pytest
+.coverage
+
 venv
