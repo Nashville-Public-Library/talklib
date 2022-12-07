@@ -1,6 +1,3 @@
-'''
-getting started with some general tests for the talklib module via Pytest.
-'''
 import pytest
 
 from ...show import TLShow
@@ -105,24 +102,3 @@ def test_check_attributes_are_valid_7():
     test.ff_level = True
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
-
-# ---------- run ----------
-        
-def test_run():
-    '''implementation test with real audio. asserts that no exceptions are raised'''
-    test = generate_test_instance()
-    test.run()
-
-def test_run2():
-    test = generate_test_instance()
-    test.url = 'invalid_URL'
-    with pytest.raises(Exception):
-        test.run()
-
-# ---------- Teardown/Cleanup ----------
-
-def test_teardown():
-    '''don't forget to delete the audio'''
-    test = generate_test_instance()
-    test.remove_yesterday = True
-    test.removeYesterdayFiles()

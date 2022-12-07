@@ -1,27 +1,18 @@
 import pytest
-import os
 
 from ...show import TLShow
 
 url = 'https://pnsne.ws/3mVuTax'
-cwd = os.getcwd()
 
 def generate_test_instance():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    
-    # this is ugly. i am sorry
-    if 'tests\\local' in cwd:
-        test.local_file = 'local_test_file.mp3'
-    else: 
-        test.local_file = 'tests\\local\\local_test_file.mp3'
-
-    test.is_local = True
+    test.url = url
+    test.is_permalink = True
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False 
+    test.notifications = False
     test.syslog_enable = False
-
     return test
 
 # ---------- check attributes ----------
@@ -76,47 +67,24 @@ def test_attrib_2d():
 
 def test_attrib_3a():
     test = generate_test_instance()
-    test.local_file = 5
+    test.url = 5
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
 
 def test_attrib_3b():
     test = generate_test_instance()
-    test.local_file = True
-    with pytest.raises(Exception):
-        test.check_attributes_are_valid()
-
-def test_attrib_4a():
-    test = generate_test_instance()
-    test.is_local = 5
+    test.url = True
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
 
 def test_attrib_4b():
     test = generate_test_instance()
-    test.is_local = 'break'
+    test.is_permalink = 5
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
 
-# ---------- full run ---------- # 
-
-def test_run():
-    '''asserts no exception is raised for normal/correct case'''
+def test_attrib_4c():
     test = generate_test_instance()
-    test.run()
-
-
-def test_run_1a():
-    '''check exception is raised with incorrect file name/path'''
-    test = generate_test_instance()
-    test.local_file = 'nofile'
-    with pytest.raises(FileNotFoundError):
-        test.run()
-
-# ---------- Teardown/Cleanup ----------
-
-def test_teardown():
-    '''don't forget to delete the audio'''
-    test = generate_test_instance()
-    test.remove_yesterday = True
-    test.removeYesterdayFiles()
+    test.is_permalink = 'not boolean'
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
