@@ -24,6 +24,17 @@ def generate_test_instance():
 
     return test
 
+def test_decide_whether_to_remove():
+    '''local files should default to not remove files'''
+    test = generate_test_instance()
+    assert test.decide_whether_to_remove() == False
+
+def test_decide_whether_to_remove_2():
+    '''should be true if we set this variable to true'''
+    test = generate_test_instance()
+    test.remove_source = True
+    assert test.decide_whether_to_remove()
+
 # ---------- check attributes ----------
 
 def test_attrib_1a():

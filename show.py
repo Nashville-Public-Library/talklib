@@ -130,6 +130,8 @@ class TLShow:
         elif self.local_file:
             if self.remove_source == True:
                 return True 
+            else: 
+                return False
 
     def remove(self, fileToDelete, is_output_file=False):
         '''TODO explain'''
