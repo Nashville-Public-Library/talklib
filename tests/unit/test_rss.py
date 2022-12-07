@@ -34,6 +34,13 @@ def test_get_feed():
     test = generate_test_instance()
     assert (isinstance(test.get_feed(), ET.Element))
 
+def test_get_feed_fails_with_invalid_url():
+    '''check an exception is raised when an invalid url is used'''
+    test = generate_test_instance()
+    test.url = 'nourl'
+    with pytest.raises(Exception):
+        test.run()
+
 def test_check_feed_updated():
     test = generate_test_instance()
     assert test.check_feed_updated()
@@ -52,7 +59,7 @@ def test_check_feed_loop():
 # first, make sure there are no exceptions thrown for our correctly set up instance
 def test_check_attributes_are_valid_1():
     test = generate_test_instance()
-    assert test.check_attributes_are_valid()
+    test.check_attributes_are_valid()
 
 def test_gen():
     test = generate_test_instance()
@@ -61,7 +68,7 @@ def test_gen():
 # now, start deliberatly triggering exceptions with different invalid attributes.
 # running one test per invalid attribute.
 
-def test_check_attributes_are_valid_1():
+def test_check_attributes_are_valid_1a():
     test = generate_test_instance()
     test.show = 42
     with pytest.raises(Exception):
@@ -79,18 +86,6 @@ def test_check_attributes_are_valid_3():
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
 
-def test_check_attributes_are_valid_4():
-    test = generate_test_instance()
-    test.is_local = 42
-    with pytest.raises(Exception):
-        test.check_attributes_are_valid()
-
-def test_check_attributes_are_valid_5():
-    test = generate_test_instance()
-    test.local_file = 42
-    with pytest.raises(Exception):
-        test.check_attributes_are_valid()
-
 def test_check_attributes_are_valid_6():
     test = generate_test_instance()
     test.breakaway = True
@@ -102,3 +97,27 @@ def test_check_attributes_are_valid_7():
     test.ff_level = True
     with pytest.raises(Exception):
         test.check_attributes_are_valid()
+
+def test_check_attributes_are_valid_8():
+    test = generate_test_instance()
+    test.check_if_above = [1,2]
+    with pytest.raises(Exception):
+        test.run()
+
+def test_check_attributes_are_valid_9():
+    test = generate_test_instance()
+    test.check_if_below = [1,2]
+    with pytest.raises(Exception):
+        test.run()
+
+def test_check_attributes_are_valid_10():
+    test = generate_test_instance()
+    test.notifications = 5
+    with pytest.raises(Exception):
+        test.run()
+
+def test_check_attributes_are_valid_11():
+    test = generate_test_instance()
+    test.twilio_enable = 4.5
+    with pytest.raises(Exception):
+        test.run()

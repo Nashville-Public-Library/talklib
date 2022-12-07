@@ -146,7 +146,7 @@ class TLShow:
             numberOfDestinations = numberOfDestinations - 1
 
             while numberOfDestinations >= 0:
-                matched_filenames = glob.glob(f'{destinations[numberOfDestinations]}\{self.show_filename}*.wav')
+                matched_filenames = glob.glob(f'{destinations[numberOfDestinations]}/{self.show_filename}*.wav')
                 if matched_filenames:
                     for file in matched_filenames:
                         TLShow.syslog(self, message=f'{self.show}: Deleting {file}')
@@ -273,7 +273,7 @@ Yesterday's file will remain.\n\n\
         numberOfDestinations = numberOfDestinations - 1
         success = False
         while numberOfDestinations >= 0:
-            if os.path.isfile(f'{destinations[numberOfDestinations]}\{fileToCheck}'):
+            if os.path.isfile(f'{destinations[numberOfDestinations]}/{fileToCheck}'):
                 numberOfDestinations = numberOfDestinations-1
                 TLShow.syslog(self, message=f'{self.show}: {fileToCheck} arrived at {destinations[numberOfDestinations]}')
                 success = True
@@ -400,7 +400,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         print(f'{message}\n')  # get user's attention!
         input('(press enter to close this window)') # force user to acknowledge by closing window
 
-    def check_str_and_bool_type(attrib_to_check, type_to_check, attrib_return):
+    def check_str_and_bool_type(attrib_to_check, type_to_check, attrib_return: str):
         '''
         we are checking whether an attribut is either type str or bool, depending on what is passed in.
         
@@ -411,7 +411,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if  type(attrib_to_check) != type_to_check:
             raise Exception (f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}.")
 
-    def check_int_and_float_type(attrib_to_check, attrib_return):
+    def check_int_and_float_type(attrib_to_check, attrib_return: str):
         '''
         Attributes passed here can be either int or float.
         '''
@@ -459,6 +459,18 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 
         if not (self.check_if_above and self.check_if_below):
             print('\n(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
+        
+        if self.check_if_above:
+            TLShow.check_int_and_float_type(attrib_to_check=self.check_if_above, attrib_return='check_if_above')
+        
+        if self.check_if_below:
+            TLShow.check_int_and_float_type(attrib_to_check=self.check_if_below, attrib_return='check_if_below')
+        
+        if self.notifications:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications, type_to_check=bool, attrib_return='notifications')
+
+        if self.twilio_enable:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
 
     def run(self):
         '''
