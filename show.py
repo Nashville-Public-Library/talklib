@@ -48,21 +48,21 @@ class TLShow:
     '''TODO write something here'''
     def __init__(
         self, 
-        show=None, 
-        show_filename=None, 
-        url=None, 
-        is_permalink=False, 
-        breakaway=0,
-        include_date=False, 
-        remove_yesterday=False, 
-        is_local=False, 
-        local_file=None,
-        remove_source=False, 
+        show: str = None, 
+        show_filename: str = None, 
+        url: str = None, 
+        is_permalink: bool = False, 
+        breakaway = 0, # either int or float is fine
+        include_date: bool = False, 
+        remove_yesterday: bool = False, 
+        is_local: bool = False, 
+        local_file: str = None,
+        remove_source: bool = False, 
         check_if_above=0, 
         check_if_below=0, 
-        notifications=True, 
-        twilio_enable=True, 
-        ff_level=21
+        notifications: bool = True, 
+        twilio_enable: bool = True, 
+        ff_level=21 # either int or float is fine
         ):
 
         self.show = show
