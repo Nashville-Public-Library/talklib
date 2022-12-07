@@ -3,5 +3,6 @@ __pycache__
 
 # for pytest
 coverage
+.coverage
 
 venv
