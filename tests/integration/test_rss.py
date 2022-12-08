@@ -40,4 +40,4 @@ def test_teardown():
     '''don't forget to delete the audio'''
     test = generate_test_instance()
     test.remove_yesterday = True
-    test.removeYesterdayFiles()
+    test.remove_yesterday_files()

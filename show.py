@@ -143,9 +143,12 @@ class TLShow:
         '''TODO explain'''
         if TLShow.decide_whether_to_remove(self) or is_output_file:
             TLShow.syslog(self, message=f'{self.show}: Deleting {fileToDelete}')
-            os.remove(fileToDelete)  # remove original file from current directory
+            try:
+                os.remove(fileToDelete)  # remove original file from current directory
+            except Exception as e:
+                self.syslog(message=e)
 
-    def removeYesterdayFiles(self):
+    def remove_yesterday_files(self):
         '''delete yesterday's files from destinations. 
         OK to use glob wildcards since there should only ever be one file'''
 
@@ -494,11 +497,11 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.url:
             # if url is declared, it's either an RSS or permalink show
             if self.is_permalink:
-                TLShow.removeYesterdayFiles(self)
+                TLShow.remove_yesterday_files(self)
                 TLShow.download_file(self)
             # if url but not permalink, it must be an RSS feed
             elif TLShow.check_feed_loop(self) == True:
-                TLShow.removeYesterdayFiles(self)
+                TLShow.remove_yesterday_files(self)
                 TLShow.download_file(self)
             else:
                 toSend = (f"There was a problem with {self.show}. \n\n\

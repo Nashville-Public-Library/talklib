@@ -53,6 +53,12 @@ def test_check_feed_loop():
     test = generate_test_instance()
     assert type(test.check_feed_loop()) == bool
 
+def test_remove_yesterday_files():
+    '''if we pass an invalid file to delete, it should be handled gracefully without exceptions'''
+    test = generate_test_instance()
+    test.remove(fileToDelete='not_a_file.wav')
+
+
 
 # ---------- attribute checks ----------
 
@@ -127,3 +133,4 @@ def test_check_attributes_are_valid_12():
     test.is_local = True
     with pytest.raises(Exception):
         test.run()
+
