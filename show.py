@@ -27,7 +27,7 @@ try:
 except ImportError as e:
     print(e)
 
-from .utils import get_timestamp, clear_screen    
+from .utils import get_timestamp, clear_screen, print_to_screen
 
 # global variables imported declared in the ev file
 destinations = tlev.destinations
@@ -323,11 +323,13 @@ Please check manually!\n\n\
 Please check manually and make edits to bring it below {self.check_if_above} minutes.\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=toSend, subject='Check Length')
+
             elif duration < self.check_if_below:
                 toSend = (f"Today's {self.show} is only {duration} minutes long! \
 This is unusual and could indicate a problem with the file. Please check manually!\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=toSend, subject='Check Length')
+
             else:
                 TLShow.syslog(self, message=f'File is {duration} minute(s). Continuing...')
 
@@ -407,11 +409,6 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             print(f'This window will close in {number} seconds...', end='\r')
             number = number-1
             time.sleep(1)
-
-    def print_to_screen(message):
-        clear_screen()
-        print(f'{message}\n')  # get user's attention!
-        input('(press enter to close this window)') # force user to acknowledge by closing window
 
     def check_str_and_bool_type(attrib_to_check, type_to_check, attrib_return: str):
         '''
@@ -522,7 +519,7 @@ It looks like the source file doesn't exist. \
 Please check manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=to_send, subject='Error')
-                TLShow.print_to_screen(message=to_send)
+                print_to_screen(message=to_send)
                    
         else:
             raise Exception ('Sorry, you need to specify either a URL or local audio file. \

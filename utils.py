@@ -11,3 +11,8 @@ def clear_screen():
         os.system('cls')
     else:
         os.system('clear')
+
+def print_to_screen(message):
+    clear_screen()
+    print(f'{message}\n')  # get user's attention!
+    input('(press enter to close this window)') # force user to acknowledge by closing window
