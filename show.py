@@ -200,7 +200,9 @@ class TLShow:
         try:
             filesize = os.path.getsize(fileToCheck)
         except FileNotFoundError as e:
+            TLShow.notify(self, message=f'It looks like the file does not exist. Here is the error: {e}', subject='Error')
             raise e
+            
         is_not_empty = False
         while i < 3:
             if filesize > 0:
@@ -447,11 +449,6 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             if not self.is_local:
                 raise Exception('Sorry, you need to specify either a URL or a local file')
 
-        # if EITHER of these are set, BOTH must be set
-        if self.is_local or self.local_file:
-            if not self.local_file and not self.local_file:
-                raise Exception('Sorry, local files need both "is_local" and local_file" attributes to be set')
-
         if self.url and self.is_local:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
         
@@ -507,7 +504,6 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
                    
         else:
             raise Exception ('Sorry, something bad happened')
-            return None
 
     def run_URL(self):
             # if url is declared, it's either an RSS or permalink show
@@ -536,3 +532,4 @@ Please check manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}")
             TLShow.notify(self, message=to_send, subject='Error')
             print_to_screen(message=to_send)
+            raise FileNotFoundError
