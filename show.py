@@ -492,10 +492,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.check_str_and_bool_type(attrib_to_check=self.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
 
     def run(self):
-        '''
-        Begins to process the file
-        TODO split this into multiple functions!
-        '''
+        '''begins to process the file'''
 
         print(f"I'm working on {self.show}. Just a moment...\n")
         TLShow.syslog(self, message=f'Starting script')
@@ -503,34 +500,39 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         TLShow.check_attributes_are_valid(self)
 
         if self.url:
+            TLShow.run_URL(self)
+
+        elif self.is_local:
+            TLShow.run_local(self)
+                   
+        else:
+            raise Exception ('Sorry, something bad happened')
+            return None
+
+    def run_URL(self):
             # if url is declared, it's either an RSS or permalink show
-            if self.is_permalink:
-                TLShow.remove_yesterday_files(self)
-                TLShow.download_file(self)
-            # if url but not permalink, it must be an RSS feed
-            elif TLShow.check_feed_loop(self) == True:
-                TLShow.remove_yesterday_files(self)
-                TLShow.download_file(self)
-            else:
-                toSend = (f"There was a problem with {self.show}. \n\n\
+        if self.is_permalink:
+            TLShow.remove_yesterday_files(self)
+            TLShow.download_file(self)
+        # if url but not permalink, it must be an RSS feed
+        elif TLShow.check_feed_loop(self) == True:
+            TLShow.remove_yesterday_files(self)
+            TLShow.download_file(self)
+        else:
+            toSend = (f"There was a problem with {self.show}. \n\n\
 It looks like today's file hasn't yet been posted. \
 Please check and download manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}")
-                TLShow.notify(self, message=toSend, subject='Error')
-                print_to_screen(message=toSend)
-
-        elif self.is_local:
-            if self.local_file:
-                TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0)
-            else:
-                to_send = (f"There was a problem with {self.show}. \n\n\
+            TLShow.notify(self, message=toSend, subject='Error')
+            print_to_screen(message=toSend)
+    
+    def run_local(self):
+        if self.local_file:
+            TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0)
+        else:
+            to_send = (f"There was a problem with {self.show}. \n\n\
 It looks like the source file doesn't exist. \
 Please check manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}")
-                TLShow.notify(self, message=to_send, subject='Error')
-                print_to_screen(message=to_send)
-                   
-        else:
-            raise Exception ('Sorry, you need to specify either a URL or local audio file. \
-Did you set is_local to True?')
-        return None
+            TLShow.notify(self, message=to_send, subject='Error')
+            print_to_screen(message=to_send)
