@@ -38,6 +38,13 @@ def test_run_1a():
     test.local_file = 'nofile'
     with pytest.raises(FileNotFoundError):
         test.run()
+ 
+def test_run_2():
+    test = generate_test_instance()
+    test.url = None
+    test.is_local = None
+    with pytest.raises(Exception):
+        test.run()
 
 # ---------- Teardown/Cleanup ----------
 

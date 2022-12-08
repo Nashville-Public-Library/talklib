@@ -35,6 +35,18 @@ def test_decide_whether_to_remove_2():
     test.remove_source = True
     assert test.decide_whether_to_remove()
 
+def test_check_attributes_are_valid_1():
+    test = generate_test_instance()
+    test.is_local = None
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
+def test_check_attributes_are_valid_2():
+    test = generate_test_instance()
+    test.local_file = None
+    with pytest.raises(Exception):
+        test.check_attributes_are_valid()
+
 # ---------- check attributes ----------
 
 def test_attrib_1a():
