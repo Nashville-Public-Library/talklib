@@ -443,6 +443,15 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         else:
             TLShow.check_str_and_bool_type(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
 
+        if not self.url:
+            if not self.is_local:
+                raise Exception('Sorry, you need to specify either a URL or a local file')
+
+        # if EITHER of these are set, BOTH must be set
+        if self.is_local or self.local_file:
+            if not self.local_file and not self.local_file:
+                raise Exception('Sorry, local files need both "is_local" and local_file" attributes to be set')
+
         if self.url and self.is_local:
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
         
@@ -508,7 +517,7 @@ It looks like today's file hasn't yet been posted. \
 Please check and download manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=toSend, subject='Error')
-                TLShow.print_to_screen(message=toSend)
+                print_to_screen(message=toSend)
 
         elif self.is_local:
             if self.local_file:
