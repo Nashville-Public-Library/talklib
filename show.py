@@ -27,7 +27,7 @@ try:
 except ImportError as e:
     print(e)
 
-from .utils import get_timestamp, clear_screen, print_to_screen
+from .utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday
 
 # global variables imported declared in the ev file
 destinations = tlev.destinations
@@ -272,13 +272,11 @@ Yesterday's file will remain.\n\n\
     def notify(self, message, subject):
         '''we generally only want to send SMS via Twilio if today is on a weekend'''
         if self.notifications:
-            short_day = datetime.now().strftime('%a')
-            weekend = ['Sat', 'Sun']
-            if short_day in weekend:
-                TLShow.send_sms(self, message=message)
+            if today_is_weekday:
                 TLShow.send_mail(self, message=message, subject=subject)
                 TLShow.syslog(self, message=message)
             else:
+                TLShow.send_sms(self, message=message)
                 TLShow.send_mail(self, message=message, subject=subject)
                 TLShow.syslog(self, message=message)
 
