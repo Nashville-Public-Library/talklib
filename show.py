@@ -296,7 +296,7 @@ It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually!\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=toSend, subject='Error')
-                TLShow.print_to_screen(message=toSend)
+                print_to_screen(message=toSend)
                 break
         if success:
             TLShow.countdown(self)
