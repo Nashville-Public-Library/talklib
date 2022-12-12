@@ -20,7 +20,7 @@ def generate_test_instance():
 
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False 
+    test.notifications = False
     test.syslog_enable = False
 
     return test
