@@ -18,18 +18,18 @@ Use this module to process the following types of shows/segments:
 
 ## Dependencies
 
-### -Python
+### -[Python](https://www.python.org/downloads/)
 Use Python 3.10.1 or above.
 
-### -FFmpeg
-You need Windows binaries for **[FFmpeg & FFprobe](https://www.ffmpeg.org/download.html#build-windows)** installed on the PC and added to the PATH:
+### -[FFmpeg]((https://www.ffmpeg.org/download.html#build-windows))
+You need Windows binaries for FFmpeg & FFprobe installed on the PC and added to the PATH:
 
 To repeat, **this module will not work without FFmpeg and FFprobe**. 
 
 FFmpeg and FFprobe should be two separate binaries.
 
-### -Twilio
-[Twilio](https://www.twilio.com/) is used for SMS and phone call notifications.
+### -[Twilio](https://www.twilio.com/)
+Twilio is used for SMS and phone call notifications.
 
 Access our TL Twilio info (token, etc.) by [logging in](https://www.twilio.com/login) to Twilio.
 
@@ -86,6 +86,8 @@ You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 ----
 
 ## Usage
+
+[Skip to Examples](#examples)
 
 `TLShow` is the main class to use.
 
