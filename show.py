@@ -272,7 +272,7 @@ Yesterday's file will remain.\n\n\
     def notify(self, message, subject):
         '''we generally only want to send SMS via Twilio if today is on a weekend'''
         if self.notifications:
-            if today_is_weekday:
+            if today_is_weekday():
                 TLShow.send_mail(self, message=message, subject=subject)
                 TLShow.syslog(self, message=message)
             else:
