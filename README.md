@@ -5,14 +5,13 @@
 [Skip to Examples](#examples)
 
 Use this module to process the following types of shows/segments:
-- Full shows we receive via RSS feed
-    - such as New York Times, Wall Street Journal, etc.
-- Segments we receive via RSS Feed
-    - Such as Health in a Heartbeat, Academic Minute, etc.
+- Shows and segments we receive via RSS feed
+    - Shows such as New York Times, Wall Street Journal,  etc.
+    - Segments such as Health in a Heartbeat, Academic Minute, etc.
 - Segments we receive via "permalink"
-    - such as PNS
+    - Such as PNS
 - Segments downloaded locally ahead of time
-    - such as Sound Beat, Animal Airwaves, etc.
+    - Such as Sound Beat, Animal Airwaves, etc.
 
 ---
 
@@ -57,8 +56,8 @@ Depending on how you installed Python, the `site-packages` directory could be so
 - cd into the talklib directory
 - run `pip install -r requirements.txt` 
     - This will download all the 3rd party Python packages we're using
-    - Please note, this will install things globally. for the TL, that's likely what you want
-    - if you only want to install things locally (for testing, etc.), use a virtual environment.
+    - Please note, this will install things globally. For the TL, that's likely what you want
+    - If you only want to install things locally (for testing, etc.), use a virtual environment.
 
 ---
 
