@@ -21,11 +21,13 @@ def clear_screen():
         os.system('clear')
 
 def print_to_screen(message):
+    '''clear terminal and print message to screen.'''
     clear_screen()
     print(f'{message}\n')  # get user's attention!
     input('(press enter to close this window)') # force user to acknowledge by closing window
 
 def today_is_weekday():
+    '''crude mechanism for determining if today is a weekday.'''
     today = datetime.now().strftime('%a')
     weekend = ['Sat', 'Sun']
     if today not in weekend:
@@ -45,10 +47,7 @@ def send_call(message):
     call.sid
 
 def send_sms(message):
-    '''
-    send sms via twilio. 
-    Several of these variables are environement variables, declared up top.
-    '''
+    '''send sms via twilio. '''
     client = Client(twilio_sid, twilio_token)
     message = client.messages.create(
         body=message,
