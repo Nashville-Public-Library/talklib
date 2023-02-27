@@ -131,7 +131,7 @@ class TLShow:
         url shows should always remove the "source" files,
         since these are the files downloaded from the internet.
         local shows are downloaded ahead of time. we do not necessarily 
-        want to delete these
+        want to delete these.
         '''
         if self.url:
             return True
@@ -146,7 +146,7 @@ class TLShow:
         if TLShow.decide_whether_to_remove(self) or is_output_file:
             TLShow.syslog(self, message=f'Deleting {fileToDelete}')
             try:
-                os.remove(fileToDelete)  # remove original file from current directory
+                os.remove(fileToDelete)
             except Exception as e:
                 self.syslog(message=e)
 
@@ -406,9 +406,9 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         '''
         we are checking whether an attribut is either type str or bool, depending on what is passed in.
         
-        'attrib_return' is solely for printing the message back out to the screen/log.
-        It is not needed for the actual type check.
-        I can't figure out how else to get the name of the attribute.
+        'attrib_return' is solely for printing the message back out to the screen/log,
+        it is not needed for the actual type check.
+        (I can't figure out how else to get the name of the attribute)
         '''
         if  type(attrib_to_check) != type_to_check:
             raise Exception (f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}.")
@@ -464,7 +464,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
 
         if not (self.check_if_above and self.check_if_below):
-            print('\n(You did not specify check_if_below and/or check_if_above. These tests will not be run.')
+            print('\n(You did not specify check_if_below and/or check_if_above. These checks will not be run.')
         
         if self.check_if_above:
             TLShow.check_int_and_float_type(attrib_to_check=self.check_if_above, attrib_return='check_if_above')
