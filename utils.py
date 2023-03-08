@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 from twilio.rest import Client
 
-from . import ev as tlev
+import talklib.ev as tlev
 
 twilio_sid = tlev.twilio_sid
 twilio_token = tlev.twilio_token
