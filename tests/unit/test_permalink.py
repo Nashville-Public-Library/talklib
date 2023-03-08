@@ -1,6 +1,6 @@
 import pytest
 
-from ...show import TLShow
+from talklib.show import TLShow
 
 url = 'https://pnsne.ws/3mVuTax'
 
