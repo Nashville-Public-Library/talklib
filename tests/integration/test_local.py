@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 import os
 
-from ...show import TLShow
+from talklib.show import TLShow
 
 url = 'https://pnsne.ws/3mVuTax'
 cwd = os.getcwd()
@@ -46,6 +46,13 @@ def test_run_2():
     test.is_local = None
     with pytest.raises(Exception):
         test.run()
+
+def test_check_length():
+    test = generate_test_instance()
+    test.check_if_above = 10
+    test.check_if_below = 5
+    assert type(test.check_length(fileToCheck=test.local_file)) == float
+    
 
 '''
 We are doing this because the print_to_screen function is called which calls the builtin 'input' function.
