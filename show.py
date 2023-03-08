@@ -20,14 +20,9 @@ from logging.handlers import SysLogHandler
 from datetime import datetime
 
 import requests
-from twilio.rest import Client
 
-try:
-    from . import ev as tlev
-except ImportError as e:
-    print(e)
-
-from .utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
+import talklib.ev as tlev
+from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
 
 # global variables imported declared in the ev file
 destinations = tlev.destinations
@@ -324,6 +319,8 @@ This is unusual and could indicate a problem with the file. Please check manuall
 
             else:
                 TLShow.syslog(self, message=f'File is {duration} minute(s). Continuing...')
+            
+            return duration
 
     def get_feed(self):
         '''get the feed and create an ET object, which can then be called from other functions.'''
