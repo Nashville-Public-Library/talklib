@@ -1,22 +1,26 @@
 import pytest
+import requests
 from unittest import mock
 import os
 
 from talklib.show import TLShow
 
 url = 'https://pnsne.ws/3mVuTax'
-cwd = os.getcwd()
+input_file = 'input.mp3'  # name the file we download
+
+def download_test_file():
+    with open (input_file, mode='wb') as downloaded_file:
+        a = requests.get(url)
+        downloaded_file.write(a.content)
+        downloaded_file.close()
+    return downloaded_file.name
 
 def generate_test_instance():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     
-    # this is ugly. i am sorry
-    if 'tests' in cwd:
-        test.local_file = 'local_test_file.mp3'
-    else: 
-        test.local_file = 'tests/local_test_file.mp3'
+    test.local_file = download_test_file()
 
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
@@ -75,3 +79,4 @@ def test_teardown():
     test = generate_test_instance()
     test.remove_yesterday = True
     test.remove_yesterday_files()
+    os.remove(input_file)
