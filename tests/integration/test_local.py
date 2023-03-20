@@ -19,9 +19,7 @@ def generate_test_instance():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    
     test.local_file = download_test_file()
-
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
