@@ -111,11 +111,11 @@ class TLShow:
 
     def copy(self, fileToCopy):
         '''TODO explain'''
-        numberOfDestinations = len(destinations) - 1
-        while numberOfDestinations >= 0:
-            TLShow.syslog(self, message=f'Copying {fileToCopy} to {destinations[numberOfDestinations]}...')
-            shutil.copy(fileToCopy, destinations[numberOfDestinations])
-            numberOfDestinations = numberOfDestinations-1
+        
+        for destination in destinations:
+            TLShow.syslog(self, message=f'Copying {fileToCopy} to {destination}...')
+            shutil.copy(fileToCopy, destination)
+
         #this is the file we're copying, so it is the file already converted. we always want to remove this.
         TLShow.remove(self, fileToDelete=fileToCopy, is_output_file=True)
         TLShow.check_file_transferred(self, fileToCheck=fileToCopy)
@@ -145,21 +145,21 @@ class TLShow:
                 self.syslog(message=e)
 
     def remove_yesterday_files(self):
-        '''delete yesterday's files from destinations. 
-        OK to use glob wildcards since there should only ever be one file'''
+        '''
+        delete yesterday's files from destinations. 
+        OK to use glob wildcards since there should only ever be one file
+        '''
 
         if self.remove_yesterday:
-            numberOfDestinations = len(destinations) - 1
 
-            while numberOfDestinations >= 0:
-                matched_filenames = glob.glob(f'{destinations[numberOfDestinations]}/{self.show_filename}*.wav')
+            for destination in destinations:
+                matched_filenames = glob.glob(f'{destination}/{self.show_filename}*.wav')
                 if matched_filenames:
                     for file in matched_filenames:
                         TLShow.syslog(self, message=f'Deleting {file}')
                         os.remove(f'{file}')
                 else:
-                    TLShow.syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destinations[numberOfDestinations]}. Continuing...")
-                numberOfDestinations = numberOfDestinations - 1
+                    TLShow.syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destination}. Continuing...")
 
     def download_file(self, how_many_attempts=0):
         '''
