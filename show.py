@@ -49,17 +49,17 @@ class TLShow:
         show_filename: str = None, 
         url: str = None, 
         is_permalink: bool = False, 
-        breakaway = 0, # either int or float is fine
+        breakaway: int | float = 0, # either int or float is fine
         include_date: bool = False, 
         remove_yesterday: bool = False, 
         is_local: bool = False, 
         local_file: str = None,
         remove_source: bool = False, 
-        check_if_above=0, 
-        check_if_below=0, 
+        check_if_above: int | float = 0, # either int or float is fine
+        check_if_below: int | float = 0, # either int or float is fine
         notifications: bool = True, 
         twilio_enable: bool = True, 
-        ff_level=21 # either int or float is fine
+        ff_level: int | float = 21 # either int or float is fine
         ):
 
         self.show = show
@@ -151,7 +151,6 @@ class TLShow:
         '''
 
         if self.remove_yesterday:
-
             for destination in destinations:
                 matched_filenames = glob.glob(f'{destination}/{self.show_filename}*.wav')
                 if matched_filenames:
@@ -235,7 +234,7 @@ Yesterday's file will remain.\n\n\
     def send_mail(self, message, subject):
         '''
         send email to TL gmail account via relay address.
-        Several of these variables are environement variables, declared up top.
+        Several of these variables are environment variables, declared up top.
         '''
         format = EmailMessage()
         format.set_content(message)
@@ -398,7 +397,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 
     def check_str_and_bool_type(attrib_to_check, type_to_check, attrib_return: str):
         '''
-        we are checking whether an attribut is either type str or bool, depending on what is passed in.
+        we are checking whether an attribute is either type str or bool, depending on what is passed in.
         
         'attrib_return' is solely for printing the message back out to the screen/log,
         it is not needed for the actual type check.
