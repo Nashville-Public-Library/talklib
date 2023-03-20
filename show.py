@@ -111,8 +111,7 @@ class TLShow:
 
     def copy(self, fileToCopy):
         '''TODO explain'''
-        numberOfDestinations = len(destinations)
-        numberOfDestinations = numberOfDestinations - 1
+        numberOfDestinations = len(destinations) - 1
         while numberOfDestinations >= 0:
             TLShow.syslog(self, message=f'Copying {fileToCopy} to {destinations[numberOfDestinations]}...')
             shutil.copy(fileToCopy, destinations[numberOfDestinations])
@@ -150,8 +149,7 @@ class TLShow:
         OK to use glob wildcards since there should only ever be one file'''
 
         if self.remove_yesterday:
-            numberOfDestinations = len(destinations)
-            numberOfDestinations = numberOfDestinations - 1
+            numberOfDestinations = len(destinations) - 1
 
             while numberOfDestinations >= 0:
                 matched_filenames = glob.glob(f'{destinations[numberOfDestinations]}/{self.show_filename}*.wav')
@@ -269,8 +267,7 @@ Yesterday's file will remain.\n\n\
 
     def check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
-        numberOfDestinations = len(destinations)
-        numberOfDestinations = numberOfDestinations - 1
+        numberOfDestinations = len(destinations) - 1
         success = False
         while numberOfDestinations >= 0:
             if os.path.isfile(f'{destinations[numberOfDestinations]}/{fileToCheck}'):
