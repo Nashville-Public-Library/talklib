@@ -43,7 +43,7 @@ The entire list of these is in the ev.py file. Make sure to set all of these on 
 ## Installation
 
 ### Download
-- clone this repo 
+- download this repository 
 - unzip it
 - remove the "-main" from the directory name (it should just be called "talklib")
 - copy the directory to the `site-packages` directory inside the Python directory
@@ -71,7 +71,7 @@ Before we begin, a general note:
 - These are some of the reasons why we do not run `.py` files directly from WR.
 - Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file).
 - Ensure the Batch & Python scripts are in the same directory.
-- A sample `.bat` file (`Example.bat`) is inlcuded in this repo. 
+- A sample `.bat` file (`Example.bat`) is included in this repo. 
 
 Here is what an example directory structure should look like:
 ````
