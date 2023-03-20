@@ -94,6 +94,10 @@ Import the class to your script like this:
 
 `from talklib.show import TLShow`
 
+You can also use:
+
+`from talklib import TLShow`
+
 Create an instance like this: 
 
 `example = TLShow()`
