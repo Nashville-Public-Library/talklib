@@ -29,6 +29,13 @@ def test_run2():
     with pytest.raises(Exception):
         test.run()
 
+def test_run3():
+    '''assert an exception is raised with a valid URL BUT it is an RSS feed, when expecting a permalink URL'''
+    test = generate_test_instance()
+    test.url = 'https://feeds.npr.org/500005/podcast.xml'
+    with pytest.raises(Exception):
+        test.run()
+
 # ---------- Teardown/Cleanup ----------
 
 def test_teardown():
