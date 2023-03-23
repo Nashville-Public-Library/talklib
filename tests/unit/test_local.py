@@ -10,13 +10,7 @@ def generate_test_instance():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    
-    # this is ugly. i am sorry
-    if 'tests\\' in cwd:
-        test.local_file = 'local_test_file.mp3'
-    else: 
-        test.local_file = 'tests\\local_test_file.mp3'
-
+    test.local_file = 'some_file.mp3'
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False 
