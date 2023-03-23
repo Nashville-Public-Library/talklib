@@ -34,6 +34,13 @@ def test_run2():
     with pytest.raises(Exception):
         test.run()
 
+def test_run3():
+    '''assert an exception is raised when the URL is a valid URL but not an rss feed'''
+    test = generate_test_instance()
+    test.url = 'https://pnsne.ws/3mVuTax'
+    with pytest.raises(Exception):
+        test.run()
+
 # ---------- Teardown/Cleanup ----------
 
 def test_teardown():
