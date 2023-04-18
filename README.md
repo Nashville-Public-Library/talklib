@@ -9,7 +9,7 @@ Use this module to process the following types of shows/segments:
     - Shows such as New York Times, Wall Street Journal,  etc.
     - Segments such as Health in a Heartbeat, Academic Minute, etc.
 - Segments we receive via "permalink"
-    - Such as PNS
+    - Such as PNS, Cirrus, etc.
 - Segments downloaded locally ahead of time
     - Such as Sound Beat, Animal Airwaves, etc.
 
