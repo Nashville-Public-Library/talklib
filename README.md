@@ -323,7 +323,7 @@ MWB.run()
 ----
 ### Permalink Example
 
-"Permalink" shows are shows whose audio URL does not change, E.G. PNS.
+"Permalink" shows are shows whose audio URL does not change, E.G. PNS & Cirrus
 
 The minimum attributes you must set are: `show`, `show_filename`, `url`, and `is_permalink`.
 
