@@ -11,7 +11,8 @@ import xml.etree.ElementTree as ET
 # (many times per day) and because the audio file is short/small!
 url = 'https://feeds.npr.org/500005/podcast.xml'
 
-def generate_test_instance():
+@pytest.fixture(scope='module', autouse=True)
+def template():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
@@ -19,32 +20,29 @@ def generate_test_instance():
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
     test.syslog_enable = False
+    
     return test
 
 # ---------- run ----------
         
-def test_run():
+def test_run(template):
     '''implementation test with real audio. asserts that no exceptions are raised'''
-    test = generate_test_instance()
-    test.run()
+    template.run()
 
-def test_run2():
-    test = generate_test_instance()
-    test.url = 'invalid_URL'
+def test_run2(template):
+    template.url = 'invalid_URL'
     with pytest.raises(Exception):
-        test.run()
+        template.run()
 
-def test_run3():
+def test_run3(template):
     '''assert an exception is raised when the URL is a valid URL but not an rss feed'''
-    test = generate_test_instance()
-    test.url = 'https://pnsne.ws/3mVuTax'
+    template.url = 'https://pnsne.ws/3mVuTax'
     with pytest.raises(Exception):
-        test.run()
+        template.run()
 
 # ---------- Teardown/Cleanup ----------
 
-def test_teardown():
+def test_teardown(template):
     '''don't forget to delete the audio'''
-    test = generate_test_instance()
-    test.remove_yesterday = True
-    test.remove_yesterday_files()
+    template.remove_yesterday = True
+    template.remove_yesterday_files()
