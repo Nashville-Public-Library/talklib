@@ -4,7 +4,8 @@ from ...show import TLShow
 
 url = 'https://pnsne.ws/3mVuTax'
 
-def generate_test_instance():
+@pytest.fixture
+def template():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
@@ -13,33 +14,30 @@ def generate_test_instance():
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
     test.syslog_enable = False
+
     return test
 
 # ---------- full run ---------- # 
 
-def test_run():
+def test_run(template):
     '''asserts no exceptions are raised for the correct/normal case'''
-    test = generate_test_instance()
-    test.run()
+    template.run()
 
-def test_run2():
+def test_run2(template):
     '''asserts an exception is raised with an invalid url'''
-    test = generate_test_instance()
-    test.url = 'nourl'
+    template.url = 'nourl'
     with pytest.raises(Exception):
-        test.run()
+        template.run()
 
-def test_run3():
+def test_run3(template):
     '''assert an exception is raised with a valid URL BUT it is an RSS feed, when expecting a permalink URL'''
-    test = generate_test_instance()
-    test.url = 'https://feeds.npr.org/500005/podcast.xml'
+    template.url = 'https://feeds.npr.org/500005/podcast.xml'
     with pytest.raises(Exception):
-        test.run()
+        template.run()
 
 # ---------- Teardown/Cleanup ----------
 
-def test_teardown():
+def test_teardown(template):
     '''don't forget to delete the audio'''
-    test = generate_test_instance()
-    test.remove_yesterday = True
-    test.remove_yesterday_files()
+    template.remove_yesterday = True
+    template.remove_yesterday_files()
