@@ -8,14 +8,8 @@ from talklib.show import TLShow
 url = 'https://pnsne.ws/3mVuTax'
 input_file = 'input.mp3'  # name the file we download
 
-def download_test_file():
-    with open (input_file, mode='wb') as downloaded_file:
-        a = requests.get(url)
-        downloaded_file.write(a.content)
-        downloaded_file.close()
-    return downloaded_file.name
-
-def generate_test_instance():
+@pytest.fixture
+def template():
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
@@ -27,33 +21,38 @@ def generate_test_instance():
 
     return test
 
+def download_test_file():
+    with open (input_file, mode='wb') as downloaded_file:
+        a = requests.get(url)
+        downloaded_file.write(a.content)
+        downloaded_file.close()
+    return downloaded_file.name
+
 # ---------- full run ---------- # 
 
-def test_run():
+def test_run(template):
     '''asserts no exception is raised for normal/correct case'''
-    test = generate_test_instance()
-    test.run()
+    template.run()
 
 
-def test_run_1a():
+def test_run_1a(template):
     '''check exception is raised with incorrect file name/path'''
-    test = generate_test_instance()
-    test.local_file = 'nofile'
+    template.local_file = 'nofile'
     with pytest.raises(FileNotFoundError):
-        test.run()
+        template.run()
  
-def test_run_2():
-    test = generate_test_instance()
-    test.url = None
-    test.is_local = None
+def test_run_2(template):
+    
+    template.url = None
+    template.is_local = None
     with pytest.raises(Exception):
-        test.run()
+        template.run()
 
-def test_check_length():
-    test = generate_test_instance()
-    test.check_if_above = 10
-    test.check_if_below = 5
-    assert type(test.check_length(fileToCheck=test.local_file)) == float
+def test_check_length(template):
+    
+    template.check_if_above = 10
+    template.check_if_below = 5
+    assert type(template.check_length(fileToCheck=template.local_file)) == float
     
 
 '''
@@ -64,17 +63,15 @@ when called for it. This is ugly and I'm sorry, but I do not want to lose the in
 since it is a needed reminder to the user that something bad has happened!
 '''
 @mock.patch('builtins.input', side_effect=['11', '13', 'Bob'])
-def test_run_3(self):
-    test = generate_test_instance()
-    test.local_file = None
+def test_run_3(self, template):
+    template.local_file = None
     with pytest.raises(FileNotFoundError):
-        test.run()
+        template.run()
 
 # ---------- Teardown/Cleanup ----------
 
-def test_teardown():
+def test_teardown(template):
     '''don't forget to delete the audio'''
-    test = generate_test_instance()
-    test.remove_yesterday = True
-    test.remove_yesterday_files()
+    template.remove_yesterday = True
+    template.remove_yesterday_files()
     os.remove(input_file)
