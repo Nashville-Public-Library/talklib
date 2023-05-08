@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 # (many times per day) and because the audio file is short/small!
 url = 'https://feeds.npr.org/500005/podcast.xml'
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture()
 def template():
     test = TLShow()
     test.show = 'Delete Me'
@@ -25,16 +25,16 @@ def template():
 
 # ---------- run ----------
         
-def test_run(template):
+def test_run(template: TLShow):
     '''implementation test with real audio. asserts that no exceptions are raised'''
     template.run()
 
-def test_run2(template):
+def test_run2(template: TLShow):
     template.url = 'invalid_URL'
     with pytest.raises(Exception):
         template.run()
 
-def test_run3(template):
+def test_run3(template: TLShow):
     '''assert an exception is raised when the URL is a valid URL but not an rss feed'''
     template.url = 'https://pnsne.ws/3mVuTax'
     with pytest.raises(Exception):
@@ -42,7 +42,7 @@ def test_run3(template):
 
 # ---------- Teardown/Cleanup ----------
 
-def test_teardown(template):
+def test_teardown(template: TLShow):
     '''don't forget to delete the audio'''
     template.remove_yesterday = True
     template.remove_yesterday_files()
