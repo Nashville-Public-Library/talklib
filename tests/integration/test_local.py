@@ -30,25 +30,25 @@ def download_test_file():
 
 # ---------- full run ---------- # 
 
-def test_run(template):
+def test_run(template: TLShow):
     '''asserts no exception is raised for normal/correct case'''
     template.run()
 
 
-def test_run_1a(template):
+def test_run_1a(template: TLShow):
     '''check exception is raised with incorrect file name/path'''
     template.local_file = 'nofile'
     with pytest.raises(FileNotFoundError):
         template.run()
  
-def test_run_2(template):
+def test_run_2(template: TLShow):
     
     template.url = None
     template.is_local = None
     with pytest.raises(Exception):
         template.run()
 
-def test_check_length(template):
+def test_check_length(template: TLShow):
     
     template.check_if_above = 10
     template.check_if_below = 5
@@ -63,14 +63,14 @@ when called for it. This is ugly and I'm sorry, but I do not want to lose the in
 since it is a needed reminder to the user that something bad has happened!
 '''
 @mock.patch('builtins.input', side_effect=['11', '13', 'Bob'])
-def test_run_3(self, template):
+def test_run_3(self, template: TLShow):
     template.local_file = None
     with pytest.raises(FileNotFoundError):
         template.run()
 
 # ---------- Teardown/Cleanup ----------
 
-def test_teardown(template):
+def test_teardown(template: TLShow):
     '''don't forget to delete the audio'''
     template.remove_yesterday = True
     template.remove_yesterday_files()
