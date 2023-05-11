@@ -4,8 +4,6 @@ getting started with some general tests for the talklib module via Pytest.
 import pytest
 
 from ...show import TLShow
-import xml.etree.ElementTree as ET
-
 
 # this RSS feed chosen as test feed because it is reliably updated every day 
 # (many times per day) and because the audio file is short/small!
