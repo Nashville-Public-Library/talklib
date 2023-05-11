@@ -4,6 +4,7 @@ getting started with some general tests for the talklib module via Pytest.
 import pytest
 
 from ...show import TLShow
+from . import mock
 
 # this RSS feed chosen as test feed because it is reliably updated every day 
 # (many times per day) and because the audio file is short/small!
@@ -15,11 +16,16 @@ def template():
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = url
+
+    test.destinations = mock.mock_destinations()
+
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
     test.syslog_enable = False
     
-    return test
+    yield test
+
+    mock.remove_destinations()
 
 # ---------- run ----------
         
