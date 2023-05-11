@@ -2,12 +2,12 @@ from datetime import datetime
 import os
 from twilio.rest import Client
 
-import talklib.ev as tlev
+from ev import EV
 
-twilio_sid = tlev.twilio_sid
-twilio_token = tlev.twilio_token
-twilio_from = tlev.twilio_from
-twilio_to = tlev.twilio_to
+twilio_sid = EV().twilio_sid
+twilio_token = EV().twilio_token
+twilio_from = EV().twilio_from
+twilio_to = EV().twilio_to
 
 def get_timestamp():
     timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')

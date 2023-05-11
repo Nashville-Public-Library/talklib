@@ -21,27 +21,14 @@ from datetime import datetime
 
 import requests
 
-import talklib.ev as tlev
-from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
-
-# global variables imported declared in the ev file
-destinations = tlev.destinations
-
-syslog_host = tlev.syslog_host
-
-fromEmail = tlev.fromEmail
-toEmail = tlev.toEmail
-mail_server = tlev.mail_server
-
-twilio_sid = tlev.twilio_sid
-twilio_token = tlev.twilio_token
-twilio_from = tlev.twilio_from
-twilio_to = tlev.twilio_to
+# import talklib.ev as tlev
+from ev import EV
+from utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
 
 cwd = os.getcwd()
 
 
-class TLShow:
+class TLShow(EV):
     '''TODO write something here'''
     def __init__(
         self, 
@@ -78,6 +65,8 @@ class TLShow:
         self.twilio_enable = twilio_enable
         self.ff_level = ff_level
         self.syslog_enable = True
+
+        EV.__init__(self)
     
     
     def __str__(self) -> str:
@@ -112,7 +101,7 @@ class TLShow:
     def copy(self, fileToCopy):
         '''TODO explain'''
         
-        for destination in destinations:
+        for destination in self.destinations:
             TLShow.syslog(self, message=f'Copying {fileToCopy} to {destination}...')
             shutil.copy(fileToCopy, destination)
 
@@ -151,7 +140,7 @@ class TLShow:
         '''
 
         if self.remove_yesterday:
-            for destination in destinations:
+            for destination in self.destinations:
                 matched_filenames = glob.glob(f'{destination}/{self.show_filename}*.wav')
                 if matched_filenames:
                     for file in matched_filenames:
@@ -225,7 +214,7 @@ Yesterday's file will remain.\n\n\
             port = int('514')
             my_logger = logging.getLogger('MyLogger')
             my_logger.setLevel(logging.DEBUG)
-            handler = SysLogHandler(address=(syslog_host, port))
+            handler = SysLogHandler(address=(self.syslog_host, port))
             my_logger.addHandler(handler)
 
             my_logger.info(f'{self.show}: {message}')
@@ -239,10 +228,10 @@ Yesterday's file will remain.\n\n\
         format = EmailMessage()
         format.set_content(message)
         format['Subject'] = f'{subject}: {self.show}'
-        format['From'] = fromEmail
-        format['To'] = toEmail
+        format['From'] = self.fromEmail
+        format['To'] = self.toEmail
 
-        mail = smtplib.SMTP(host=mail_server)
+        mail = smtplib.SMTP(host=self.mail_server)
         mail.send_message(format)
         mail.quit()
 
@@ -266,12 +255,12 @@ Yesterday's file will remain.\n\n\
 
     def check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
-        numberOfDestinations = len(destinations) - 1
+        numberOfDestinations = len(self.destinations) - 1
         success = False
         while numberOfDestinations >= 0:
-            if os.path.isfile(f'{destinations[numberOfDestinations]}/{fileToCheck}'):
+            if os.path.isfile(f'{self.destinations[numberOfDestinations]}/{fileToCheck}'):
                 numberOfDestinations = numberOfDestinations-1
-                TLShow.syslog(self, message=f'{fileToCheck} arrived at {destinations[numberOfDestinations]}')
+                TLShow.syslog(self, message=f'{fileToCheck} arrived at {self.destinations[numberOfDestinations]}')
                 success = True
             else:
                 toSend = (f"There was a problem with {self.show}.\n\n\

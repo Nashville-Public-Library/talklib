@@ -13,12 +13,14 @@ If you need to change them, change them at the PC level, not here.
 
 import os
 
-destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']] # where should output files go?
-syslog_host = os.environ["syslog_server"] # ip of syslog server (PC with syslog software)
-fromEmail = os.environ['fromEmail']  # from where should emails appear to come?
-toEmail = os.environ['toEmail']  # to where should emails be sent?
-mail_server = os.environ["mail_server_external"]  # IP of mail server (ITS set this up for us)
-twilio_sid = os.environ['twilio_sid'] # locate by logging in to Twilio website
-twilio_token = os.environ['twilio_token'] # locate by logging in to Twilio website
-twilio_from = os.environ['twilio_from'] # locate by logging in to Twilio website
-twilio_to = os.environ['twilio_to'] # to where should texts/calls be sent
+class EV:
+    def __init__(self):
+        self.destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]# where should output files go?
+        self.syslog_host = os.environ["syslog_server"] # ip of syslog server (PC with syslog software)
+        self.fromEmail = os.environ['fromEmail']  # from where should emails appear to come?
+        self.toEmail = os.environ['toEmail']  # to where should emails be sent?
+        self.mail_server = os.environ["mail_server_external"]  # IP of mail server (ITS set this up for us)
+        self.twilio_sid = os.environ['twilio_sid'] # locate by logging in to Twilio website
+        self.twilio_token = os.environ['twilio_token']# locate by logging in to Twilio website
+        self.twilio_from = os.environ['twilio_from'] # locate by logging in to Twilio website
+        self.twilio_to = os.environ['twilio_to'] # to where should texts/calls be sent
