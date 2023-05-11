@@ -2,7 +2,6 @@ import pytest
 import requests
 from unittest.mock import patch
 import os
-import shutil
 
 from ...show import TLShow
 from . import mock
