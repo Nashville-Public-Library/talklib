@@ -23,7 +23,7 @@ import requests
 
 # import talklib.ev as tlev
 from ev import EV
-from utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
+# from utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
 
 cwd = os.getcwd()
 
