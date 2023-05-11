@@ -52,21 +52,27 @@ def test_run(template: TLShow):
     template.run()
 
 
-def test_run_1a(template: TLShow):
+def test_run_no_file(template: TLShow):
     '''check exception is raised with incorrect file name/path'''
     template.local_file = 'nofile'
     with pytest.raises(FileNotFoundError):
         template.run()
  
-def test_run_2(template: TLShow):
-    
+def test_run_no_URL_OR_local(template: TLShow):
+    '''should raise an exception if neither URL NOR local is declared'''
     template.url = None
     template.is_local = None
     with pytest.raises(Exception):
         template.run()
 
+def test_run_remove_source(template: TLShow):
+    '''source file should be removed if this attribute is declared'''
+    template.remove_source = True
+    template.run()
+    assert os.path.exists(input_file) == False
+
 def test_check_length(template: TLShow):
-    
+    ''''''
     template.check_if_above = 10
     template.check_if_below = 5
     assert type(template.check_length(fileToCheck=template.local_file)) == float
@@ -80,7 +86,7 @@ when called for it. This is ugly and I'm sorry, but I do not want to lose the in
 since it is a needed reminder to the user that something bad has happened!
 '''
 @patch('builtins.input', side_effect=['11', '13', 'Bob'])
-def test_run_3(self, template: TLShow):
+def test_run_none_file(self, template: TLShow):
     template.local_file = None
     with pytest.raises(FileNotFoundError):
         template.run()
