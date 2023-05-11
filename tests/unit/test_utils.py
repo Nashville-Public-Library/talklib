@@ -1,9 +1,15 @@
 import os
 import pytest
 
-from ... import utils
+try:
+    from ... import utils
+except KeyError:
+    pass
 
-from ...show import TLShow
+try:
+    from ...show import TLShow
+except KeyError:
+    pass
 
 cwd = os.getcwd()
 

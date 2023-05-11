@@ -1,6 +1,9 @@
 import pytest
 
-from ...show import TLShow
+try:
+    from ...show import TLShow
+except KeyError:
+    pass
 import xml.etree.ElementTree as ET
 
 

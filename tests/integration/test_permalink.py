@@ -1,6 +1,9 @@
 import pytest
 
-from ...show import TLShow
+try:
+    from ...show import TLShow
+except KeyError:
+    pass
 from . import mock
 
 url = 'https://pnsne.ws/3mVuTax'

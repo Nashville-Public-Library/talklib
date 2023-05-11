@@ -3,7 +3,10 @@ getting started with some general tests for the talklib module via Pytest.
 '''
 import pytest
 
-from ...show import TLShow
+try:
+    from ...show import TLShow
+except KeyError:
+    pass
 from . import mock
 
 # this RSS feed chosen as test feed because it is reliably updated every day 

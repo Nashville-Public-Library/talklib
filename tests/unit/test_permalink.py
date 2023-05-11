@@ -1,6 +1,9 @@
 import pytest
 
-from ...show import TLShow
+try:
+    from ...show import TLShow
+except KeyError:
+    pass
 
 url = 'https://pnsne.ws/3mVuTax'
 
