@@ -5,7 +5,7 @@ import os
 import shutil
 
 from ...show import TLShow
-from .mock import mock_destinations, remove_destinations
+from . import mock
 
 url = 'https://pnsne.ws/3mVuTax'
 input_file = 'input.mp3'  # name the file we download
@@ -17,18 +17,20 @@ def template():
     test.show_filename = 'delete_me'
     test.local_file = download_test_file()
     test.is_local = True
-    test.destinations = mock_destinations()
+
+    test.destinations = mock.mock_destinations()
+
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
     test.syslog_enable = False
 
     yield test
     
-    remove_destinations()
+    mock.remove_destinations()
 
     test.remove_yesterday = True
     test.remove_yesterday_files()
-    
+
     os.remove(input_file)
 
 def download_test_file():
