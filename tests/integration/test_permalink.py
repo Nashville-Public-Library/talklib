@@ -1,6 +1,7 @@
 import pytest
 
 from ...show import TLShow
+from . import mock
 
 url = 'https://pnsne.ws/3mVuTax'
 
@@ -11,11 +12,15 @@ def template():
     test.show_filename = 'delete_me'
     test.url = url
     test.is_permalink = True
+
+    test.destinations = mock.mock_destinations()
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
     test.syslog_enable = False
 
-    return test
+    yield test
+
+    mock.remove_destinations()
 
 # ---------- full run ---------- # 
 
