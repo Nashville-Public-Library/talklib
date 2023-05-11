@@ -1,9 +1,11 @@
 import pytest
 import requests
-from unittest import mock
+from unittest.mock import patch
 import os
+import shutil
 
-from talklib.show import TLShow
+from ...show import TLShow
+from .mock import mock_destinations, remove_destinations
 
 url = 'https://pnsne.ws/3mVuTax'
 input_file = 'input.mp3'  # name the file we download
@@ -15,11 +17,19 @@ def template():
     test.show_filename = 'delete_me'
     test.local_file = download_test_file()
     test.is_local = True
+    test.destinations = mock_destinations()
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False
     test.syslog_enable = False
 
-    return test
+    yield test
+    
+    remove_destinations()
+
+    test.remove_yesterday = True
+    test.remove_yesterday_files()
+    
+    os.remove(input_file)
 
 def download_test_file():
     with open (input_file, mode='wb') as downloaded_file:
@@ -62,16 +72,8 @@ our code is calling for input. It confuses the test, so we need to mock giving t
 when called for it. This is ugly and I'm sorry, but I do not want to lose the input function,
 since it is a needed reminder to the user that something bad has happened!
 '''
-@mock.patch('builtins.input', side_effect=['11', '13', 'Bob'])
+@patch('builtins.input', side_effect=['11', '13', 'Bob'])
 def test_run_3(self, template: TLShow):
     template.local_file = None
     with pytest.raises(FileNotFoundError):
         template.run()
-
-# ---------- Teardown/Cleanup ----------
-
-def test_teardown(template: TLShow):
-    '''don't forget to delete the audio'''
-    template.remove_yesterday = True
-    template.remove_yesterday_files()
-    os.remove(input_file)
