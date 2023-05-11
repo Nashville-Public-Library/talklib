@@ -1,6 +1,6 @@
 import pytest
 
-from talklib import TLShow
+from ...show import TLShow
 import xml.etree.ElementTree as ET
 
 

@@ -1,9 +1,9 @@
 import os
 import pytest
 
-import talklib.utils as utils
+from ... import utils
 
-from talklib.show import TLShow
+from ...show import TLShow
 
 cwd = os.getcwd()
 
