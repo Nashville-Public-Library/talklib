@@ -39,10 +39,3 @@ def test_run3(template: TLShow):
     template.url = 'https://feeds.npr.org/500005/podcast.xml'
     with pytest.raises(Exception):
         template.run()
-
-# ---------- Teardown/Cleanup ----------
-
-def test_teardown(template: TLShow):
-    '''don't forget to delete the audio'''
-    template.remove_yesterday = True
-    template.remove_yesterday_files()
