@@ -31,7 +31,12 @@ def template():
     test.remove_yesterday = True
     test.remove_yesterday_files()
 
-    os.remove(input_file)
+    # if you try and don't succeed...
+    try:
+        os.remove(input_file)
+    except:
+        # ...life goes on
+        pass
 
 def download_test_file():
     with open (input_file, mode='wb') as downloaded_file:
