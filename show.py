@@ -94,6 +94,7 @@ class TLShow(EV):
                 -af loudnorm=I=-{self.ff_level} -y {outputFile}')
 
         TLShow.syslog(self, message='Conversion complete')
+        return outputFile
         TLShow.check_length(self, fileToCheck=outputFile) #call this before removing the file!
         TLShow.remove(self, fileToDelete=input)
         TLShow.copy(self, fileToCopy=outputFile)
@@ -174,7 +175,7 @@ class TLShow(EV):
             downloaded_file.close()
         
         TLShow.syslog(self, message=f'File downloaded successfully in {cwd}.')
-        return downloaded_file.name, how_many_attempts
+        return downloaded_file.name
 
     def check_downloaded_file(self, fileToCheck, i):
         '''TODO explain'''
@@ -467,8 +468,12 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 
         TLShow.check_attributes_are_valid(self)
 
-        if self.url:
-            TLShow.run_URL(self)
+        if self.url and self.is_permalink:
+            TLShow.run_URL_permalink(self)
+
+        # if url but not permalink, it must be an RSS feed...right?
+        elif self.url:
+            TLShow.run_URL_RSS(self)
 
         elif self.is_local:
             TLShow.run_local(self)
@@ -476,30 +481,41 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         else:
             raise Exception ('Sorry, something bad happened')
 
-    def run_URL(self):
-            # if url is declared, it's either an RSS or permalink show
-        if self.is_permalink:
+    def run_URL_permalink(self):
+        # if url is declared, it's either an RSS or permalink show
+        if self.url and self.is_permalink:
             TLShow.remove_yesterday_files(self)
-            downloaded_file, how_many_attempts = TLShow.download_file(self)
-            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=how_many_attempts):
-                TLShow.convert(self, input=downloaded_file)
+            downloaded_file = TLShow.download_file(self)
+            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=0):
+                output_file = TLShow.convert(self, input=downloaded_file)
+            TLShow.check_length(self, fileToCheck=output_file)
+            TLShow.remove(self, fileToDelete=downloaded_file)
+            TLShow.copy(self, fileToCopy=output_file)
 
-        # if url but not permalink, it must be an RSS feed
-        elif TLShow.check_feed_loop(self) == True:
+    def run_URL_RSS(self):
+        if TLShow.check_feed_loop(self) == True:
             TLShow.remove_yesterday_files(self)
-            TLShow.download_file(self)
+            downloaded_file = TLShow.download_file(self)
+            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=0):
+                output_file = TLShow.convert(self, input=downloaded_file)
+            TLShow.check_length(self, fileToCheck=output_file)
+            TLShow.remove(self, fileToDelete=downloaded_file)
+            TLShow.copy(self, fileToCopy=output_file)
         else:
             toSend = (f"There was a problem with {self.show}. \n\n\
-It looks like today's file hasn't yet been posted. \
-Please check and download manually! Yesterday's file will remain.\n\n\
-{get_timestamp()}")
+    It looks like today's file hasn't yet been posted. \
+    Please check and download manually! Yesterday's file will remain.\n\n\
+    {get_timestamp()}")
             TLShow.notify(self, message=toSend, subject='Error')
             print_to_screen(message=toSend)
     
     def run_local(self):
         if self.local_file:
             if TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0):
-                TLShow.convert(self, input=self.local_file)
+                output_file = TLShow.convert(self, input=self.local_file)
+            TLShow.check_length(self, fileToCheck=output_file)
+            TLShow.remove(self, fileToDelete=self.local_file)
+            TLShow.copy(self, fileToCopy=output_file)
         else:
             to_send = (f"There was a problem with {self.show}. \n\n\
 It looks like the source file doesn't exist. \
