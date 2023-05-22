@@ -82,7 +82,7 @@ class TLShow(EV):
         return outputFile
 
     def convert(self, input):
-        '''convert file with ffmpeg and proceed'''
+        '''convert file with ffmpeg and return filename'''
         outputFile = TLShow.create_output_filename(self)
         TLShow.syslog(self, message='Converting to TL format...')
 
@@ -95,9 +95,6 @@ class TLShow(EV):
 
         TLShow.syslog(self, message='Conversion complete')
         return outputFile
-        TLShow.check_length(self, fileToCheck=outputFile) #call this before removing the file!
-        TLShow.remove(self, fileToDelete=input)
-        TLShow.copy(self, fileToCopy=outputFile)
 
     def copy(self, fileToCopy):
         '''TODO explain'''
