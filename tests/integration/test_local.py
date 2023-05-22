@@ -12,6 +12,13 @@ from .remove_ev import remove_EV
 url = 'https://pnsne.ws/3mVuTax'
 input_file = 'input.mp3'  # name the file we download
 
+def download_test_file():
+    with open (input_file, mode='wb') as downloaded_file:
+        a = requests.get(url)
+        downloaded_file.write(a.content)
+        downloaded_file.close()
+    return downloaded_file.name
+
 @pytest.fixture
 def template():
     remove_EV()
@@ -29,24 +36,15 @@ def template():
 
     yield test
     
+    # teardown stuff
+
     mock.remove_destinations()
 
-    test.remove_yesterday = True
-    test.remove_yesterday_files()
-
-    # if you try and don't succeed...
-    try:
+    if os.path.exists(input_file):
         os.remove(input_file)
-    except:
-        # ...life goes on
-        pass
+    if os.path.exists(f'{test.show_filename}.wav'):
+        os.remove(f'{test.show_filename}.wav')
 
-def download_test_file():
-    with open (input_file, mode='wb') as downloaded_file:
-        a = requests.get(url)
-        downloaded_file.write(a.content)
-        downloaded_file.close()
-    return downloaded_file.name
 
 # ---------- full run ---------- # 
 
@@ -79,6 +77,9 @@ def test_check_length(template: TLShow):
     template.check_if_above = 10
     template.check_if_below = 5
     assert type(template.check_length(fileToCheck=template.local_file)) == float
+
+def test_convert(template: TLShow):
+    assert template.convert(template.local_file) == f'{template.show_filename}.wav'
     
 
 '''
