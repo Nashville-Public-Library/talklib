@@ -1,10 +1,8 @@
 import pytest
 
-try:
-    from ...show import TLShow
-except KeyError:
-    pass
 import xml.etree.ElementTree as ET
+
+from .remove_ev import remove_EV
 
 
 # this RSS feed chosen as template feed because it is reliably updated every day 
@@ -13,6 +11,12 @@ url = 'https://feeds.npr.org/500005/podcast.xml'
 
 @pytest.fixture
 def template():
+    remove_EV()
+    try:
+        from ...show import TLShow
+    except KeyError:
+        pass
+    test = TLShow()
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'

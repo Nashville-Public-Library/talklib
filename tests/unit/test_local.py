@@ -2,16 +2,18 @@ from datetime import datetime
 import pytest
 import os
 
-try:
-    from ...show import TLShow
-except KeyError:
-    pass
+from .remove_ev import remove_EV
 
 url = 'https://pnsne.ws/3mVuTax'
 cwd = os.getcwd()
 
 @pytest.fixture
 def template():
+    remove_EV()
+    try:
+        from ...show import TLShow
+    except KeyError:
+        pass
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'

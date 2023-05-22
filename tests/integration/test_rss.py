@@ -3,11 +3,9 @@ getting started with some general tests for the talklib module via Pytest.
 '''
 import pytest
 
-try:
-    from ...show import TLShow
-except KeyError:
-    pass
+
 from . import mock
+from .remove_ev import remove_EV
 
 # this RSS feed chosen as test feed because it is reliably updated every day 
 # (many times per day) and because the audio file is short/small!
@@ -15,6 +13,11 @@ url = 'https://feeds.npr.org/500005/podcast.xml'
 
 @pytest.fixture()
 def template():
+    remove_EV()
+    try:
+        from ...show import TLShow
+    except KeyError:
+        pass
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'

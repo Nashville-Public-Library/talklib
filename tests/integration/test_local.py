@@ -2,10 +2,7 @@ import pytest
 import requests
 from unittest.mock import patch
 import os
-try:
-    from ...show import TLShow
-except KeyError:
-    pass
+
 from . import mock
 from .remove_ev import remove_EV
 
@@ -22,6 +19,10 @@ def download_test_file():
 @pytest.fixture
 def template():
     remove_EV()
+    try:
+        from ...show import TLShow
+    except KeyError:
+        pass
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
