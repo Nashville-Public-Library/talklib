@@ -274,7 +274,11 @@ Please check manually!\n\n\
             TLShow.countdown(self)
 
     def check_length(self, fileToCheck):
-        '''check length of converted file with ffprobe. if too long or short, send notification'''
+        '''
+        Check length of converted file with ffprobe. if too long or short, send notification.
+        Notice we do not raise exceptions or halt execution. This is strictly for checking/notifying and
+        troubleshooting afterwards. Do not raise exceptions here.
+        '''
         # if these are not declared, don't run this check.
         if not (self.check_if_below and self.check_if_above):
             TLShow.syslog(self, message='The check length function is turned off.')
@@ -493,7 +497,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.copy(self, fileToCopy=output_file)
 
     def run_URL_RSS(self):
-        if TLShow.check_feed_loop(self) == True:
+        if TLShow.check_feed_loop(self):
             TLShow.remove_yesterday_files(self)
             downloaded_file = TLShow.download_file(self)
             if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=0):
