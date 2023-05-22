@@ -1,3 +1,4 @@
+from datetime import datetime
 import pytest
 import os
 
@@ -31,12 +32,24 @@ def test_decide_whether_to_remove_2(template: TLShow):
     template.remove_source = True
     assert template.decide_whether_to_remove()
 
+def test_create_output_filename(template: TLShow):
+    '''should be filename with '.wav' appended since self.include_date defaults to False'''
+    assert template.create_output_filename() == f'{template.show_filename}.wav'
+
+def test_create_output_filename_2(template: TLShow):
+    '''if include_date is true, datetime should be included in filename'''
+    template.include_date = True
+    assert template.create_output_filename() == f'{template.show_filename}-{datetime.now().strftime("%m%d%y")}.wav'
+
+def test_create_output_filename_3(template: TLShow):
+    assert type(template.create_output_filename()) == str
+
+# ---------- check attributes ----------
+
 def test_check_attributes_are_valid_1(template: TLShow):
     template.is_local = None
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
-
-# ---------- check attributes ----------
 
 def test_attrib_1a(template: TLShow):
     template.show = None
