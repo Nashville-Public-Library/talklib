@@ -188,9 +188,8 @@ class TLShow(EV):
         while i < 3:
             if filesize > 0:
                 TLShow.syslog(self, message='File is not empty. Continuing...')
-                TLShow.convert(self, input=fileToCheck)
                 is_not_empty = True
-                break
+                return True
             else:
                 TLShow.syslog(self, message=f'File is empty. Will download again. Attempt # {i}.')
                 i = i+1
@@ -482,7 +481,9 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.is_permalink:
             TLShow.remove_yesterday_files(self)
             downloaded_file, how_many_attempts = TLShow.download_file(self)
-            TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=how_many_attempts)
+            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=how_many_attempts):
+                TLShow.convert(self, input=downloaded_file)
+
         # if url but not permalink, it must be an RSS feed
         elif TLShow.check_feed_loop(self) == True:
             TLShow.remove_yesterday_files(self)
@@ -497,7 +498,8 @@ Please check and download manually! Yesterday's file will remain.\n\n\
     
     def run_local(self):
         if self.local_file:
-            TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0)
+            if TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0):
+                TLShow.convert(self, input=self.local_file)
         else:
             to_send = (f"There was a problem with {self.show}. \n\n\
 It looks like the source file doesn't exist. \
