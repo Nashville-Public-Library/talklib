@@ -2,10 +2,8 @@ import pytest
 import requests
 from unittest.mock import patch
 import os
-try:
-    from ...show import TLShow
-except KeyError:
-    pass
+
+from ...show import TLShow
 from . import mock
 
 url = 'https://pnsne.ws/3mVuTax'
