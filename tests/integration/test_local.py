@@ -31,6 +31,7 @@ def template():
     test.destinations = mock.mock_destinations()
 
     # disable notifications for testing. Need separate tests for these!
+    #
     test.notifications = False
     test.syslog_enable = False
 
