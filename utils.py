@@ -4,11 +4,6 @@ from twilio.rest import Client
 
 from ev import EV
 
-twilio_sid = EV().twilio_sid
-twilio_token = EV().twilio_token
-twilio_from = EV().twilio_from
-twilio_to = EV().twilio_to
-
 def get_timestamp():
     timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
     return timestamp
@@ -37,21 +32,21 @@ def today_is_weekday():
 
 def send_call(message):
     '''send voice call via twilio'''
-    client = Client(twilio_sid, twilio_token)
+    client = Client(EV().twilio_sid, EV().twilio_token)
 
     call = client.calls.create(
                             twiml=f'<Response><Say>{message}</Say></Response>',
-                            to=twilio_to,
-                            from_=twilio_from
+                            to=EV().twilio_to,
+                            from_=EV().twilio_from
                         )
     call.sid
 
 def send_sms(message):
     '''send sms via twilio. '''
-    client = Client(twilio_sid, twilio_token)
+    client = Client(EV().twilio_sid, EV().twilio_token)
     message = client.messages.create(
         body=message,
-        from_=twilio_from,
-        to=twilio_to
+        from_=EV().twilio_from,
+        to=EV().twilio_to
     )
     message.sid
