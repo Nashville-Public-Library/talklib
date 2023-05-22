@@ -147,7 +147,7 @@ class TLShow(EV):
                 else:
                     TLShow.syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destination}. Continuing...")
 
-    def download_file(self, how_many_attempts=0):
+    def download_file(self):
         '''
         Download audio file from RSS feed or permalink.
         If this is a permalink show, we can just use the URL. BUT
@@ -174,7 +174,7 @@ class TLShow(EV):
         TLShow.syslog(self, message=f'File downloaded successfully in {cwd}.')
         return downloaded_file.name
 
-    def check_downloaded_file(self, fileToCheck, i):
+    def check_downloaded_file(self, fileToCheck, how_many_attempts):
         '''TODO explain'''
         try:
             filesize = os.path.getsize(fileToCheck)
@@ -183,15 +183,16 @@ class TLShow(EV):
             raise e
             
         is_not_empty = False
-        while i < 3:
+        while how_many_attempts < 3:
             if filesize > 0:
                 TLShow.syslog(self, message='File is not empty. Continuing...')
                 is_not_empty = True
                 return True
             else:
-                TLShow.syslog(self, message=f'File is empty. Will download again. Attempt # {i}.')
-                i = i+1
-                TLShow.download_file(self, how_many_attempts=i)
+                TLShow.syslog(self, message=f'File is empty. Will download again. Attempt # {how_many_attempts}.')
+                how_many_attempts = how_many_attempts+1
+                TLShow.download_file(self)
+                TLShow.check_downloaded_file(self, fileToCheck=fileToCheck, how_many_attempts=how_many_attempts)
         if not is_not_empty:
             toSend = (f"There was a problem with {self.show}.\n\n\
 It looks like the downloaded file is empty. Please check manually! \
@@ -199,6 +200,7 @@ Yesterday's file will remain.\n\n\
 {get_timestamp()}")
             TLShow.notify(self, message=toSend, subject='Error')
             TLShow.remove(self, fileToDelete=fileToCheck)
+            raise Exception (toSend)
             
     def syslog(self, message):
         '''
@@ -487,7 +489,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.url and self.is_permalink:
             TLShow.remove_yesterday_files(self)
             downloaded_file = TLShow.download_file(self)
-            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=0):
+            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, how_many_attempts=0):
                 output_file = TLShow.convert(self, input=downloaded_file)
             TLShow.check_length(self, fileToCheck=output_file)
             TLShow.remove(self, fileToDelete=downloaded_file)
@@ -497,7 +499,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if TLShow.check_feed_loop(self):
             TLShow.remove_yesterday_files(self)
             downloaded_file = TLShow.download_file(self)
-            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=0):
+            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, how_many_attempts=0):
                 output_file = TLShow.convert(self, input=downloaded_file)
             TLShow.check_length(self, fileToCheck=output_file)
             TLShow.remove(self, fileToDelete=downloaded_file)
@@ -512,7 +514,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
     
     def run_local(self):
         if self.local_file:
-            if TLShow.check_downloaded_file(self, fileToCheck=self.local_file, i=0):
+            if TLShow.check_downloaded_file(self, fileToCheck=self.local_file, how_many_attempts=0):
                 output_file = TLShow.convert(self, input=self.local_file)
             TLShow.check_length(self, fileToCheck=output_file)
             TLShow.remove(self, fileToDelete=self.local_file)
