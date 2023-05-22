@@ -2,12 +2,9 @@ import pytest
 import requests
 from unittest.mock import patch
 import os
-try:
-    from ...show import TLShow
-except KeyError:
-    pass
+
+from ...show import TLShow
 from . import mock
-from .remove_ev import remove_EV
 
 url = 'https://pnsne.ws/3mVuTax'
 input_file = 'input.mp3'  # name the file we download
@@ -21,7 +18,6 @@ def download_test_file():
 
 @pytest.fixture
 def template():
-    remove_EV()
     test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'

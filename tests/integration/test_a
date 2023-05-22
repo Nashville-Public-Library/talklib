@@ -1,0 +1,4 @@
+from .remove_ev import remove_EV
+
+def test_remove_EV():
+    remove_EV()
