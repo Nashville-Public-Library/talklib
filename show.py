@@ -174,7 +174,7 @@ class TLShow(EV):
             downloaded_file.close()
         
         TLShow.syslog(self, message=f'File downloaded successfully in {cwd}.')
-        TLShow.check_downloaded_file(self, fileToCheck=input_file, i=how_many_attempts)
+        return downloaded_file.name, how_many_attempts
 
     def check_downloaded_file(self, fileToCheck, i):
         '''TODO explain'''
@@ -481,7 +481,8 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             # if url is declared, it's either an RSS or permalink show
         if self.is_permalink:
             TLShow.remove_yesterday_files(self)
-            TLShow.download_file(self)
+            downloaded_file, how_many_attempts = TLShow.download_file(self)
+            TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, i=how_many_attempts)
         # if url but not permalink, it must be an RSS feed
         elif TLShow.check_feed_loop(self) == True:
             TLShow.remove_yesterday_files(self)
