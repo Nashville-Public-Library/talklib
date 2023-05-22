@@ -88,10 +88,10 @@ class TLShow(EV):
 
         if self.breakaway:
             subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 \
-                -t {self.breakaway} -af loudnorm=I=-{self.ff_level} -y {outputFile}')
+                -t {self.breakaway} -af loudnorm=I=-{self.ff_level} -y {outputFile}', shell=True)
         else:
             subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 \
-                -af loudnorm=I=-{self.ff_level} -y {outputFile}')
+                -af loudnorm=I=-{self.ff_level} -y {outputFile}', shell=True)
 
         TLShow.syslog(self, message='Conversion complete')
         return outputFile
