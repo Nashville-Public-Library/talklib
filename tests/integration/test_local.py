@@ -5,22 +5,11 @@ import os
 
 from ...show import TLShow
 from . import mock
+from .mock import env_vars
 
 url = 'https://pnsne.ws/3mVuTax'
 input_file = 'input.mp3'  # name the file we download
 
-env_vars = {
-        'OnAirPC': 'nothing',
-        'ProductionPC': 'mocked_value2',
-        'syslog_server': 'mocked_value2',
-        'fromEmail': 'mocked_value2',
-        'toEmail': 'mocked_value2',
-        'mail_server_external': 'mocked_value2',
-        'twilio_sid': 'mocked_value2',
-        'twilio_token': 'mocked_value2',
-        'twilio_from': 'mocked_value2',
-        'twilio_to': 'mocked_value2',
-    }
 
 def download_test_file():
     with open (input_file, mode='wb') as downloaded_file:
