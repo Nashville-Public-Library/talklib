@@ -9,6 +9,19 @@ from . import mock
 url = 'https://pnsne.ws/3mVuTax'
 input_file = 'input.mp3'  # name the file we download
 
+env_vars = {
+        'OnAirPC': 'nothing',
+        'ProductionPC': 'mocked_value2',
+        'syslog_server': 'mocked_value2',
+        'fromEmail': 'mocked_value2',
+        'toEmail': 'mocked_value2',
+        'mail_server_external': 'mocked_value2',
+        'twilio_sid': 'mocked_value2',
+        'twilio_token': 'mocked_value2',
+        'twilio_from': 'mocked_value2',
+        'twilio_to': 'mocked_value2',
+    }
+
 def download_test_file():
     with open (input_file, mode='wb') as downloaded_file:
         a = requests.get(url)
@@ -16,18 +29,10 @@ def download_test_file():
         downloaded_file.close()
     return downloaded_file.name
 
-# @pytest.fixture
-# def mock_EV():
-#     with patch('show.EV') as mock:
-#         instance = mock.return_value
-#         instance = MagicMock(side_effect=Exception('Mocked exception'))
-
-#         yield mock
-
 @pytest.fixture
 def template():
-    with patch('show.EV') as hmmm:
-        hmmm = MagicMock(side_effect=Exception('Mocked exception'))
+    
+    with patch.dict('os.environ', env_vars):
         test = TLShow()
         test.show = 'Delete Me'
         test.show_filename = 'delete_me'
