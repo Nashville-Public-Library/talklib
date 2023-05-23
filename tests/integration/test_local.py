@@ -27,8 +27,7 @@ def download_test_file():
 @pytest.fixture
 def template():
     with patch('show.EV') as hmmm:
-        instance = hmmm.return_value
-        instance = MagicMock(side_effect=Exception('Mocked exception'))
+        hmmm = MagicMock(side_effect=Exception('Mocked exception'))
         test = TLShow()
         test.show = 'Delete Me'
         test.show_filename = 'delete_me'
