@@ -65,6 +65,7 @@ class TLShow(EV):
         self.twilio_enable = twilio_enable
         self.ff_level = ff_level
         self.syslog_enable = True
+        self.destinations = EV().destinations
 
         EV.__init__(self)
     
