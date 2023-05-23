@@ -17,17 +17,17 @@ url = 'https://feeds.npr.org/500005/podcast.xml'
 def template():
     with patch.dict('os.environ', env_vars):
         test = TLShow()
-        test.show = 'Delete Me'
-        test.show_filename = 'delete_me'
-        test.url = url
+    test.show = 'Delete Me'
+    test.show_filename = 'delete_me'
+    test.url = url
 
-        test.destinations = mock.mock_destinations()
+    test.destinations = mock.mock_destinations()
 
-        # disable notifications for testing. Need separate tests for these!
-        test.notifications = False
-        test.syslog_enable = False
-        
-        yield test
+    # disable notifications for testing. Need separate tests for these!
+    test.notifications = False
+    test.syslog_enable = False
+    
+    yield test
 
     mock.remove_destinations()
 

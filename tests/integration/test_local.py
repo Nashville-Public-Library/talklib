@@ -23,18 +23,18 @@ def template():
     
     with patch.dict('os.environ', env_vars):
         test = TLShow()
-        test.show = 'Delete Me'
-        test.show_filename = 'delete_me'
-        test.local_file = download_test_file()
-        test.is_local = True
+    test.show = 'Delete Me'
+    test.show_filename = 'delete_me'
+    test.local_file = download_test_file()
+    test.is_local = True
 
-        test.destinations = mock.mock_destinations()
+    test.destinations = mock.mock_destinations()
 
-        # disable notifications for testing. Need separate tests for these!
-        test.notifications = False
-        test.syslog_enable = False
+    # disable notifications for testing. Need separate tests for these!
+    test.notifications = False
+    test.syslog_enable = False
 
-        yield test
+    yield test
     
     # teardown stuff
 

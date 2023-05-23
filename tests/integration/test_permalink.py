@@ -11,17 +11,17 @@ url = 'https://pnsne.ws/3mVuTax'
 def template():
     with patch.dict('os.environ', env_vars):
         test = TLShow()
-        test.show = 'Delete Me'
-        test.show_filename = 'delete_me'
-        test.url = url
-        test.is_permalink = True
+    test.show = 'Delete Me'
+    test.show_filename = 'delete_me'
+    test.url = url
+    test.is_permalink = True
 
-        test.destinations = mock.mock_destinations()
-        # disable notifications for testing. Need separate tests for these!
-        test.notifications = False
-        test.syslog_enable = False
+    test.destinations = mock.mock_destinations()
+    # disable notifications for testing. Need separate tests for these!
+    test.notifications = False
+    test.syslog_enable = False
 
-        yield test
+    yield test
 
     mock.remove_destinations()
 

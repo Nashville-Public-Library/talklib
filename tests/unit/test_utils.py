@@ -1,35 +1,29 @@
-# import os
-# import pytest
-# from unittest.mock import patch, MagicMock
+import os
+import pytest
+from unittest.mock import patch, MagicMock
+from.mock import env_vars
+with patch.dict('os.environ', env_vars):
+    from ... import utils
 
-# from ... import utils
+cwd = os.getcwd()
 
-# cwd = os.getcwd()
 
-# @pytest.fixture
-# def mock_EV():
-#     with patch('utils.EV') as mock:
-#         instance = mock.return_value
-#         instance = MagicMock(side_effect=Exception('Mocked exception'))
+# talklib.utils
 
-#         yield mock
+def test_get_timestamp():
+    'should be string, not datetime object'
+    assert type(utils.get_timestamp()) == str
 
-# # talklib.utils
+def test_today_is_weekday():
+    'should be boolean'
+    assert type(utils.today_is_weekday()) == bool
 
-# def test_get_timestamp(mock_EV):
-#     'should be string, not datetime object'
-#     assert type(utils.get_timestamp()) == str
+def test_send_sms():
+    'should raise error if argument not passed'
+    with pytest.raises(TypeError):
+        utils.send_sms()
 
-# def test_today_is_weekday(mock_EV):
-#     'should be boolean'
-#     assert type(utils.today_is_weekday()) == bool
-
-# def test_send_sms(mock_EV):
-#     'should raise error if argument not passed'
-#     with pytest.raises(TypeError):
-#         utils.send_sms()
-
-# def test_send_call(mock_EV):
-#     'should raise error if argument not passed'
-#     with pytest.raises(TypeError):
-#         utils.send_call()
+def test_send_call():
+    'should raise error if argument not passed'
+    with pytest.raises(TypeError):
+        utils.send_call()
