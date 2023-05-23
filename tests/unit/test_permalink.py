@@ -1,11 +1,18 @@
 import pytest
+from unittest.mock import patch, MagicMock
 
-try:
-    from ...show import TLShow
-except KeyError:
-    pass
+from ...show import TLShow
+
 
 url = 'https://pnsne.ws/3mVuTax'
+
+@pytest.fixture
+def mock_EV():
+    with patch('show.EV') as mock:
+        instance = mock.return_value
+        instance = MagicMock(side_effect=Exception('Mocked exception'))
+
+        yield mock
 
 @pytest.fixture
 def template():
@@ -22,62 +29,62 @@ def template():
 
 # ---------- check attributes ----------
 
-def test_attrib_1a(template: TLShow):
+def test_attrib_1a(template: TLShow, mock_EV):
     template.show = None
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_1b(template: TLShow):
+def test_attrib_1b(template: TLShow, mock_EV):
     template.show = 5
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_1c(template: TLShow):
+def test_attrib_1c(template: TLShow, mock_EV):
     template.show = True
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_1d(template: TLShow):
+def test_attrib_1d(template: TLShow, mock_EV):
     template.show = ''
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_2a(template: TLShow):
+def test_attrib_2a(template: TLShow, mock_EV):
     template.show_filename = None
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_2b(template: TLShow):
+def test_attrib_2b(template: TLShow, mock_EV):
     template.show_filename = 5
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_2c(template: TLShow):
+def test_attrib_2c(template: TLShow, mock_EV):
     template.show_filename = True
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_2d(template: TLShow):
+def test_attrib_2d(template: TLShow, mock_EV):
     template.show_filename = ''
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_3a(template: TLShow):
+def test_attrib_3a(template: TLShow, mock_EV):
     template.url = 5
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_3b(template: TLShow):
+def test_attrib_3b(template: TLShow, mock_EV):
     template.url = True
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_4b(template: TLShow):
+def test_attrib_4b(template: TLShow, mock_EV):
     template.is_permalink = 5
     with pytest.raises(Exception):
         template.check_attributes_are_valid()
 
-def test_attrib_4c(template: TLShow):
+def test_attrib_4c(template: TLShow, mock_EV):
     template.is_permalink = 'not boolean'
     with pytest.raises(Exception):
         template.check_attributes_are_valid()

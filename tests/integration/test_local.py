@@ -3,7 +3,7 @@ import requests
 from unittest.mock import patch, MagicMock
 import os
 
-from ...show import TLShow, EV
+from ...show import TLShow
 from . import mock
 
 url = 'https://pnsne.ws/3mVuTax'
@@ -17,9 +17,12 @@ def download_test_file():
     return downloaded_file.name
 
 @pytest.fixture
-def EV_mock():
-    EV = MagicMock(return_value=None)
-    yield
+def mock_EV():
+    with patch('show.EV') as mock:
+        instance = mock.return_value
+        instance = MagicMock(side_effect=Exception('Mocked exception'))
+
+        yield mock
 
 @pytest.fixture
 def template():
@@ -49,37 +52,37 @@ def template():
 
 # ---------- full run ---------- # 
 
-def test_run(template: TLShow, EV_mock):
+def test_run(template: TLShow, mock_EV):
     '''asserts no exception is raised for normal/correct case'''
     template.run()
 
 
-def test_run_no_file(template: TLShow, EV_mock):
+def test_run_no_file(template: TLShow, mock_EV):
     '''check exception is raised with incorrect file name/path'''
     template.local_file = 'nofile'
     with pytest.raises(FileNotFoundError):
         template.run()
  
-def test_run_no_URL_OR_local(template: TLShow, EV_mock):
+def test_run_no_URL_OR_local(template: TLShow, mock_EV):
     '''should raise an exception if neither URL NOR local is declared'''
     template.url = None
     template.is_local = None
     with pytest.raises(Exception):
         template.run()
 
-def test_run_remove_source(template: TLShow, EV_mock):
+def test_run_remove_source(template: TLShow, mock_EV):
     '''source file should be removed if this attribute is declared'''
     template.remove_source = True
     template.run()
     assert os.path.exists(input_file) == False
 
-def test_check_length(template: TLShow, EV_mock):
+def test_check_length(template: TLShow, mock_EV):
     ''''''
     template.check_if_above = 10
     template.check_if_below = 5
     assert type(template.check_length(fileToCheck=template.local_file)) == float
 
-def test_convert(template: TLShow, EV_mock):
+def test_convert(template: TLShow, mock_EV):
     assert template.convert(template.local_file) == f'{template.show_filename}.wav'
     
 
@@ -91,7 +94,7 @@ when called for it. This is ugly and I'm sorry, but I do not want to lose the in
 since it is a needed reminder to the user that something bad has happened!
 '''
 @patch('builtins.input', side_effect=['11', '13', 'Bob'])
-def test_run_none_file(self, template: TLShow, EV_mock):
+def test_run_none_file(self, template: TLShow, mock_EV):
     template.local_file = None
     with pytest.raises(FileNotFoundError):
         template.run()
