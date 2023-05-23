@@ -16,29 +16,32 @@ def download_test_file():
         downloaded_file.close()
     return downloaded_file.name
 
-@pytest.fixture
-def mock_EV():
-    with patch('show.EV') as mock:
-        instance = mock.return_value
-        instance = MagicMock(side_effect=Exception('Mocked exception'))
+# @pytest.fixture
+# def mock_EV():
+#     with patch('show.EV') as mock:
+#         instance = mock.return_value
+#         instance = MagicMock(side_effect=Exception('Mocked exception'))
 
-        yield mock
+#         yield mock
 
 @pytest.fixture
 def template():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.local_file = download_test_file()
-    test.is_local = True
+    with patch('show.EV') as hmmm:
+        instance = hmmm.return_value
+        instance = MagicMock(side_effect=Exception('Mocked exception'))
+        test = TLShow()
+        test.show = 'Delete Me'
+        test.show_filename = 'delete_me'
+        test.local_file = download_test_file()
+        test.is_local = True
 
-    test.destinations = mock.mock_destinations()
+        test.destinations = mock.mock_destinations()
 
-    # disable notifications for testing. Need separate tests for these!
-    test.notifications = False
-    test.syslog_enable = False
+        # disable notifications for testing. Need separate tests for these!
+        test.notifications = False
+        test.syslog_enable = False
 
-    yield test
+        yield test
     
     # teardown stuff
 
@@ -52,37 +55,37 @@ def template():
 
 # ---------- full run ---------- # 
 
-def test_run(template: TLShow, mock_EV):
+def test_run(template: TLShow):
     '''asserts no exception is raised for normal/correct case'''
     template.run()
 
 
-def test_run_no_file(template: TLShow, mock_EV):
+def test_run_no_file(template: TLShow):
     '''check exception is raised with incorrect file name/path'''
     template.local_file = 'nofile'
     with pytest.raises(FileNotFoundError):
         template.run()
  
-def test_run_no_URL_OR_local(template: TLShow, mock_EV):
+def test_run_no_URL_OR_local(template: TLShow):
     '''should raise an exception if neither URL NOR local is declared'''
     template.url = None
     template.is_local = None
     with pytest.raises(Exception):
         template.run()
 
-def test_run_remove_source(template: TLShow, mock_EV):
+def test_run_remove_source(template: TLShow):
     '''source file should be removed if this attribute is declared'''
     template.remove_source = True
     template.run()
     assert os.path.exists(input_file) == False
 
-def test_check_length(template: TLShow, mock_EV):
+def test_check_length(template: TLShow):
     ''''''
     template.check_if_above = 10
     template.check_if_below = 5
     assert type(template.check_length(fileToCheck=template.local_file)) == float
 
-def test_convert(template: TLShow, mock_EV):
+def test_convert(template: TLShow):
     assert template.convert(template.local_file) == f'{template.show_filename}.wav'
     
 
@@ -94,7 +97,7 @@ when called for it. This is ugly and I'm sorry, but I do not want to lose the in
 since it is a needed reminder to the user that something bad has happened!
 '''
 @patch('builtins.input', side_effect=['11', '13', 'Bob'])
-def test_run_none_file(self, template: TLShow, mock_EV):
+def test_run_none_file(self, template: TLShow):
     template.local_file = None
     with pytest.raises(FileNotFoundError):
         template.run()
