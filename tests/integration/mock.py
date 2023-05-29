@@ -1,6 +1,8 @@
 import os
 import shutil
 
+permalink = 'https://pnsne.ws/3mVuTax'
+
 env_vars = {
         'OnAirPC': 'nothing',
         'ProductionPC': 'mocked_value2',

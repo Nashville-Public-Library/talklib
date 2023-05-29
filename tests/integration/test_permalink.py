@@ -3,9 +3,8 @@ from unittest.mock import patch, MagicMock
 
 from ...show import TLShow
 from . import mock
-from .mock import env_vars
+from .mock import env_vars, permalink
 
-url = 'https://pnsne.ws/3mVuTax'
 
 @pytest.fixture
 def template():
@@ -13,7 +12,7 @@ def template():
         test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    test.url = url
+    test.url = permalink
     test.is_permalink = True
 
     test.destinations = mock.mock_destinations()
