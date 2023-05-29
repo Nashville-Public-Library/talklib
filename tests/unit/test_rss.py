@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from ...show import TLShow
-from.mock import env_vars
+from ..mock import env_vars
 
 import xml.etree.ElementTree as ET
 

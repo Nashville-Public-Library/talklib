@@ -1,7 +1,7 @@
 import os
 import pytest
 from unittest.mock import patch, MagicMock
-from.mock import env_vars
+from ..mock import env_vars
 with patch.dict('os.environ', env_vars):
     from ... import utils
 
