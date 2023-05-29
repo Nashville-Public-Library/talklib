@@ -4,8 +4,8 @@ from unittest.mock import patch, MagicMock
 import os
 
 from ...show import TLShow
-from . import mock
-from .mock import env_vars, permalink
+from .. import mock
+from ..mock import env_vars, permalink
 
 '''
 We need to test 'local' files - meaning files we already have downloaded. But we don't want

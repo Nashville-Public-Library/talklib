@@ -2,8 +2,8 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from ...show import TLShow
-from . import mock
-from .mock import env_vars, permalink
+from .. import mock
+from ..mock import env_vars, permalink
 
 
 @pytest.fixture
