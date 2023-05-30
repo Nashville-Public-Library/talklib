@@ -7,15 +7,8 @@ from ...show import TLShow
 from .. import mock
 from ..mock import env_vars, permalink
 
-'''
-We need to test 'local' files - meaning files we already have downloaded. But we don't want
-to have to put an audio file into Git. So we're using this static URL to download first,
-to mock a local file. Downloading the file itself it just setting up the test.
 
-This static link was chosen because it's reliably available and the file is small/short.
-'''
 input_file = 'input.mp3'  # name the file we download
-
 
 def download_test_file():
     with open (input_file, mode='wb') as downloaded_file:
