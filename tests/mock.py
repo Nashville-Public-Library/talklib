@@ -1,6 +1,16 @@
 import os
 import shutil
 
+
+'''
+We need to test 'local' files - meaning files we already have downloaded. But we don't want
+to have to put an audio file into Git. So we're using this static URL to download first,
+to mock a local file. Downloading the file itself it just setting up the test.
+
+This static link was chosen because it's reliably available and the file is small/short.
+'''
+permalink = 'https://pnsne.ws/3mVuTax'
+
 env_vars = {
         'OnAirPC': 'nothing',
         'ProductionPC': 'mocked_value2',

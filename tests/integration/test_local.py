@@ -4,16 +4,15 @@ from unittest.mock import patch, MagicMock
 import os
 
 from ...show import TLShow
-from . import mock
-from .mock import env_vars
+from .. import mock
+from ..mock import env_vars, permalink
 
-url = 'https://pnsne.ws/3mVuTax'
+
 input_file = 'input.mp3'  # name the file we download
-
 
 def download_test_file():
     with open (input_file, mode='wb') as downloaded_file:
-        a = requests.get(url)
+        a = requests.get(permalink)
         downloaded_file.write(a.content)
         downloaded_file.close()
     return downloaded_file.name

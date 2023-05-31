@@ -4,7 +4,7 @@ import os
 from unittest.mock import patch, MagicMock
 
 from ...show import TLShow
-from.mock import env_vars
+from ..mock import env_vars
 
 url = 'https://pnsne.ws/3mVuTax'
 cwd = os.getcwd()

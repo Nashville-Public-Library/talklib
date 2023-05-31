@@ -5,8 +5,8 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from ...show import TLShow
-from . import mock
-from .mock import env_vars
+from .. import mock
+from ..mock import env_vars
 
 # this RSS feed chosen as test feed because it is reliably updated every day 
 # (many times per day) and because the audio file is short/small!
