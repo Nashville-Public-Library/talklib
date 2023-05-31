@@ -1,9 +1,8 @@
 '''
 getting started with some general tests for the talklib module via Pytest.
 '''
-import xml.etree.ElementTree as ET
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from ...show import TLShow
 from .. import mock

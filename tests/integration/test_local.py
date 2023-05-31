@@ -1,6 +1,6 @@
 import pytest
 import requests
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import os
 
 from ...show import TLShow
