@@ -1,6 +1,7 @@
 '''
 getting started with some general tests for the talklib module via Pytest.
 '''
+import xml.etree.ElementTree as ET
 import pytest
 from unittest.mock import patch, MagicMock
 
@@ -47,3 +48,11 @@ def test_run3(template: TLShow):
     template.url = 'https://pnsne.ws/3mVuTax'
     with pytest.raises(Exception):
         template.run()
+
+def test_run_bad_feed(template: TLShow):
+    '''asserts an exception is raised for a non-updated feed'''
+    bad_feed = 'https://www.pythonpodcast.com/rss' # hasn't been updated in a while.
+    template.url = bad_feed
+    with pytest.raises(Exception):
+        with patch('builtins.input', return_value='y'):
+            template.run()
