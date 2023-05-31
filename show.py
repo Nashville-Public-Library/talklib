@@ -28,7 +28,7 @@ from utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday
 cwd = os.getcwd()
 
 
-class TLShow(EV):
+class TLShow():
     '''TODO write something here'''
     def __init__(
         self, 
@@ -215,7 +215,7 @@ Yesterday's file will remain.\n\n\
             port = int('514')
             my_logger = logging.getLogger('MyLogger')
             my_logger.setLevel(logging.DEBUG)
-            handler = SysLogHandler(address=(self.syslog_host, port))
+            handler = SysLogHandler(address=(EV().syslog_host, port))
             my_logger.addHandler(handler)
 
             my_logger.info(f'{self.show}: {message}')
@@ -229,10 +229,10 @@ Yesterday's file will remain.\n\n\
         format = EmailMessage()
         format.set_content(message)
         format['Subject'] = f'{subject}: {self.show}'
-        format['From'] = self.fromEmail
-        format['To'] = self.toEmail
+        format['From'] = EV().fromEmail
+        format['To'] = EV().toEmail
 
-        mail = smtplib.SMTP(host=self.mail_server)
+        mail = smtplib.SMTP(host=EV().mail_server)
         mail.send_message(format)
         mail.quit()
 
