@@ -180,9 +180,9 @@ class TLShow():
         '''TODO explain'''
         try:
             filesize = os.path.getsize(fileToCheck)
-        except FileNotFoundError as e:
-            TLShow.notify(self, message=f'It looks like the file does not exist. Here is the error: {e}', subject='Error')
-            raise e
+        except FileNotFoundError as error:
+            TLShow.notify(self, message=f'It looks like the file does not exist. Here is the error: {error}', subject='Error')
+            raise error
             
         is_not_empty = False
         while how_many_attempts < 3:
@@ -196,10 +196,11 @@ class TLShow():
                 TLShow.download_file(self)
                 TLShow.check_downloaded_file(self, fileToCheck=fileToCheck, how_many_attempts=how_many_attempts)
         if not is_not_empty:
-            toSend = (f"There was a problem with {self.show}.\n\n\
-It looks like the downloaded file is empty. Please check manually! \
-Yesterday's file will remain.\n\n\
-{get_timestamp()}")
+            toSend = (
+f"There was a problem with {self.show}.\n\n\
+It looks like the downloaded file is empty. Please check manually! Yesterday's file will remain.\n\n\
+{get_timestamp()}"
+)
             TLShow.notify(self, message=toSend, subject='Error')
             TLShow.remove(self, fileToDelete=fileToCheck)
             raise Exception (toSend)
@@ -321,10 +322,12 @@ This is unusual and could indicate a problem with the file. Please check manuall
             rssfeed = ET.fromstring(rssfeed)
             return rssfeed
         except Exception as a:
-            to_send = f"There's a Problem with {self.show}. It looks like the \
-issue is with the URL/feed. Here's the error: {a}\n\n\
+            to_send = (
+f"There's a Problem with {self.show}. It looks like the issue is with the URL/feed. \
+Here's the error: {a}\n\n\
 Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 {get_timestamp()}"
+                )
             TLShow.notify(self, subject='Error', message=to_send)
             raise Exception (a)
 
@@ -507,10 +510,11 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.remove(self, fileToDelete=downloaded_file)
             TLShow.copy(self, fileToCopy=output_file)
         else:
-            toSend = (f"There was a problem with {self.show}. \n\n\
-    It looks like today's file hasn't yet been posted. \
-    Please check and download manually! Yesterday's file will remain.\n\n\
-    {get_timestamp()}")
+            toSend = (
+f"There was a problem with {self.show}.\n\n\
+It looks like today's file hasn't yet been posted. Please check and download manually! Yesterday's file will remain.\n\n\
+{get_timestamp()}"
+                )
             TLShow.notify(self, message=toSend, subject='Error')
             print_to_screen(message=toSend)
     
@@ -522,10 +526,11 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.remove(self, fileToDelete=self.local_file)
             TLShow.copy(self, fileToCopy=output_file)
         else:
-            to_send = (f"There was a problem with {self.show}. \n\n\
-It looks like the source file doesn't exist. \
-Please check manually! Yesterday's file will remain.\n\n\
-{get_timestamp()}")
+            to_send = (
+f"There was a problem with {self.show}.\n\n\
+It looks like the source file doesn't exist. Please check manually! Yesterday's file will remain.\n\n\
+{get_timestamp()}"
+                )
             TLShow.notify(self, message=to_send, subject='Error')
             print_to_screen(message=to_send)
             raise FileNotFoundError
