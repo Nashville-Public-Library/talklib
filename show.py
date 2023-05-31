@@ -344,7 +344,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         for t in root.findall('channel'):
             item = t.find('item')  # 'find' only returns the first match!
             pub_date = item.find('pubDate').text
-            today = datetime.now().strftime("%a, %d %b")
+            today = datetime.now().strftime("%a, %d %b %Y")
             if today in pub_date:
                 TLShow.syslog(self, message='The feed is updated.')
                 return True
@@ -365,14 +365,16 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         It's being cached, or something...? So we are checking it 3 times, for good measure.
         '''
         i = 0
+        feed_updated = False
         while i < 3:
             TLShow.syslog(self, message=f'Attempt {i} to check feed.')
             feed_updated = TLShow.check_feed_updated(self)
-            if feed_updated == True:
-                return feed_updated
+            if feed_updated:
+                break
             else:
                 time.sleep(1)
                 i = i+1
+        return feed_updated
 
     def countdown(self):
         '''
@@ -517,6 +519,7 @@ It looks like today's file hasn't yet been posted. Please check and download man
                 )
             TLShow.notify(self, message=toSend, subject='Error')
             print_to_screen(message=toSend)
+            raise Exception
     
     def run_local(self):
         if self.local_file:
