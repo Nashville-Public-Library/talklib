@@ -1,5 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+# More information on this workflow: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: talklib
 
@@ -29,8 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -r requirements.txt
 
     - name: Test with pytest
       run: |
