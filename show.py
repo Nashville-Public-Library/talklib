@@ -21,7 +21,6 @@ from datetime import datetime
 
 import requests
 
-# import talklib.ev as tlev
 from ev import EV
 from utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
 
@@ -173,7 +172,7 @@ class TLShow():
             downloaded_file.write(a.content)
             downloaded_file.close()
         
-        TLShow.syslog(self, message=f'File downloaded successfully in {cwd}.')
+        TLShow.syslog(self, message=f'File downloaded successfully in {os.getcwd()}.')
         return downloaded_file.name
 
     def check_downloaded_file(self, fileToCheck, how_many_attempts):
@@ -206,10 +205,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             raise Exception (toSend)
             
     def syslog(self, message):
-        '''
-        send message to syslog server.
-        'syslog_host' variable is pulled from global vars up top
-        '''
+        '''send message to syslog server'''
         if not self.syslog_enable:
             pass
         else:
@@ -223,10 +219,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             my_logger.removeHandler(handler) # don't forget this after you send the message!
 
     def send_mail(self, message, subject):
-        '''
-        send email to TL gmail account via relay address.
-        Several of these variables are environment variables, declared up top.
-        '''
+        '''send email to TL gmail account via relay address'''
         format = EmailMessage()
         format.set_content(message)
         format['Subject'] = f'{subject}: {self.show}'
@@ -238,9 +231,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
         mail.quit()
 
     def send_sms_if_enabled(self, message):
-        '''
-        send sms via twilio IF twilio_enable is set to true (default).
-        '''
+        '''send sms via twilio IF twilio_enable is set to True'''
         if self.twilio_enable:
             send_sms(message=message)
 
