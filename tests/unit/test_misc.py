@@ -170,12 +170,42 @@ def test_check_downloaded_file_3(template_permalink: TLShow):
 
 # ----- get feed -----
 
-def test_get_feed(template_rss: TLShow):
+def test_get_feed_1(template_rss: TLShow):
     '''check whether return object is an instance of ET.Element class'''
     assert (isinstance(template_rss.get_feed(), ET.Element))
 
-def test_get_feed_fails_with_invalid_url(template_rss: TLShow):
+def test_get_feed_fails_with_invalid_url_1(template_rss: TLShow):
     '''check an exception is raised when an invalid url is used'''
     template_rss.url = 'nourl'
     with pytest.raises(Exception):
         template_rss.get_feed()
+
+# ----- check feed updated -----
+
+def test_check_feed_updated_1(template_rss: TLShow):
+    assert template_rss.check_feed_updated()
+
+def test_check_feed_updated_2(template_rss: TLShow):
+    assert type(template_rss.check_feed_updated()) == bool
+
+def test_check_feed_updated_3(template_rss: TLShow):
+    '''if invalid feed passed, exception should be raised'''
+    template_rss.url = 'no_url'
+    with pytest.raises(Exception):
+        template_rss.check_feed_updated()
+
+# ----- check feed loop -----
+
+def test_check_feed_loop_1(template_rss: TLShow):
+    '''valid URL should return True'''
+    template_rss.check_feed_loop() == True
+
+def test_check_feed_loop_2(template_rss: TLShow):
+    '''Exception should be raised if bad URL is passed'''
+    template_rss.url = 'no_url'
+    with pytest.raises(Exception):
+        template_rss.check_feed_loop()
+
+def test_check_feed_loop_3(template_rss: TLShow):
+    '''should be bool type'''
+    assert type(template_rss.check_feed_loop()) == bool
