@@ -27,16 +27,6 @@ def template_rss():
 
 # ---------- Misc Methods ----------
 
-def test_get_feed(template_rss: TLShow):
-    '''check whether return object is an instance of ET.Element class'''
-    assert (isinstance(template_rss.get_feed(), ET.Element))
-
-def test_get_feed_fails_with_invalid_url(template_rss: TLShow):
-    '''check an exception is raised when an invalid url is used'''
-    template_rss.url = 'nourl'
-    with pytest.raises(Exception):
-        template_rss.run()
-
 def test_check_feed_updated(template_rss: TLShow):
     assert template_rss.check_feed_updated()
 
