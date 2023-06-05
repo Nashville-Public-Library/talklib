@@ -127,7 +127,7 @@ class TLShow():
             else:
                 return False
 
-    def remove(self, fileToDelete, is_output_file=False):
+    def remove(self, fileToDelete, is_output_file: bool=False):
         '''TODO explain'''
         if TLShow.decide_whether_to_remove(self) or is_output_file:
             TLShow.syslog(self, message=f'Deleting {fileToDelete}')
@@ -207,7 +207,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             TLShow.remove(self, fileToDelete=fileToCheck)
             raise Exception (toSend)
             
-    def syslog(self, message):
+    def syslog(self, message: str):
         '''send message to syslog server'''
         if not self.syslog_enable:
             pass
@@ -221,7 +221,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             my_logger.info(f'{self.show}: {message}')
             my_logger.removeHandler(handler) # don't forget this after you send the message!
 
-    def send_mail(self, message, subject):
+    def send_mail(self, message: str, subject: str):
         '''send email to TL gmail account via relay address'''
         format = EmailMessage()
         format.set_content(message)
@@ -233,12 +233,12 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
         mail.send_message(format)
         mail.quit()
 
-    def send_sms_if_enabled(self, message):
+    def send_sms_if_enabled(self, message: str):
         '''send sms via twilio IF twilio_enable is set to True'''
         if self.twilio_enable:
             send_sms(message=message)
 
-    def notify(self, message, subject):
+    def notify(self, message: str, subject: str):
         '''we generally only want to send SMS via Twilio if today is on a weekend'''
         if self.notifications:
             if today_is_weekday():
