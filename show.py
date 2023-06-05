@@ -72,10 +72,14 @@ class TLShow():
     def __str__(self) -> str:
         return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
     
+    def six_digit_date_string(self):
+        date = datetime.now().strftime("%m%d%y")
+        return date
+    
     def create_output_filename(self):
         '''returns the audio filename to use depending on whether we should include the date'''
         if self.include_date:
-            date = datetime.now().strftime("%m%d%y")
+            date = TLShow.six_digit_date_string(self)
             outputFile = (f"{self.show_filename}-{date}.wav")
         else:
             outputFile = (f'{self.show_filename}.wav')
@@ -96,7 +100,7 @@ class TLShow():
         TLShow.syslog(self, message='Conversion complete')
         return outputFile
 
-    def copy(self, fileToCopy):
+    def copy_then_remove(self, fileToCopy):
         '''TODO explain'''
         
         for destination in self.destinations:
@@ -105,7 +109,7 @@ class TLShow():
 
         #this is the file we're copying, so it is the file already converted. we always want to remove this.
         TLShow.remove(self, fileToDelete=fileToCopy, is_output_file=True)
-        TLShow.check_file_transferred(self, fileToCheck=fileToCopy)
+        # TLShow.check_file_transferred(self, fileToCheck=fileToCopy)
 
     def decide_whether_to_remove(self):
         '''
@@ -137,7 +141,6 @@ class TLShow():
         delete yesterday's files from destinations. 
         OK to use glob wildcards since there should only ever be one file
         '''
-
         if self.remove_yesterday:
             for destination in self.destinations:
                 matched_filenames = glob.glob(f'{destination}/{self.show_filename}*.wav')
@@ -181,7 +184,7 @@ class TLShow():
             filesize = os.path.getsize(fileToCheck)
         except FileNotFoundError as error:
             TLShow.notify(self, message=f'It looks like the file does not exist. Here is the error: {error}', subject='Error')
-            raise error
+            raise FileNotFoundError
             
         is_not_empty = False
         while how_many_attempts < 3:
@@ -491,7 +494,8 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
                 output_file = TLShow.convert(self, input=downloaded_file)
             TLShow.check_length(self, fileToCheck=output_file)
             TLShow.remove(self, fileToDelete=downloaded_file)
-            TLShow.copy(self, fileToCopy=output_file)
+            TLShow.copy_then_remove(self, fileToCopy=output_file)
+            TLShow.check_file_transferred(self, fileToCheck=output_file)
 
     def run_URL_RSS(self):
         if TLShow.check_feed_loop(self):
@@ -501,7 +505,8 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
                 output_file = TLShow.convert(self, input=downloaded_file)
             TLShow.check_length(self, fileToCheck=output_file)
             TLShow.remove(self, fileToDelete=downloaded_file)
-            TLShow.copy(self, fileToCopy=output_file)
+            TLShow.copy_then_remove(self, fileToCopy=output_file)
+            TLShow.check_file_transferred(self, fileToCheck=output_file)
         else:
             toSend = (
 f"There was a problem with {self.show}.\n\n\
@@ -518,7 +523,8 @@ It looks like today's file hasn't yet been posted. Please check and download man
                 output_file = TLShow.convert(self, input=self.local_file)
             TLShow.check_length(self, fileToCheck=output_file)
             TLShow.remove(self, fileToDelete=self.local_file)
-            TLShow.copy(self, fileToCopy=output_file)
+            TLShow.copy_then_remove(self, fileToCopy=output_file)
+            TLShow.check_file_transferred(self, fileToCheck=output_file)
         else:
             to_send = (
 f"There was a problem with {self.show}.\n\n\
