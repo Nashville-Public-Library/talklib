@@ -26,7 +26,7 @@ def template_local():
         test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    test.local_file = 'some_file.mp3'
+    test.local_file = input_file
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
     test.notifications = False 
@@ -76,7 +76,7 @@ def template_rss():
     except:
         pass
 
-# ----- six digit date string
+# ----- six digit date string -----
 
 def test_six_digit_date_string_1(template_local: TLShow):
     '''should be of type str'''
@@ -148,7 +148,12 @@ def test_convert_1(template_rss: TLShow):
     '''should convert and return name of file'''
     assert type(template_rss.convert(input='something.mp3')) == str
 
-# check downloaded file
+def test_convert_2(template_local: TLShow):
+    '''should convert and return name of file'''
+    assert template_local.convert(input=download_test_file()) == f'{template_local.show_filename}.wav'
+    os.remove(f'{template_local.show_filename}.wav') # actually converts the file so need to remove it
+
+# ----- check downloaded file -----
 
 def test_check_downloaded_file_1(template_permalink: TLShow):
     '''should raise error if file does not exist'''
@@ -168,3 +173,9 @@ def test_check_downloaded_file_3(template_permalink: TLShow):
 def test_get_feed(template_rss: TLShow):
     '''check whether return object is an instance of ET.Element class'''
     assert (isinstance(template_rss.get_feed(), ET.Element))
+
+def test_get_feed_fails_with_invalid_url(template_rss: TLShow):
+    '''check an exception is raised when an invalid url is used'''
+    template_rss.url = 'nourl'
+    with pytest.raises(Exception):
+        template_rss.run()
