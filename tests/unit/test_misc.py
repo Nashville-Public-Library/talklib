@@ -178,4 +178,4 @@ def test_get_feed_fails_with_invalid_url(template_rss: TLShow):
     '''check an exception is raised when an invalid url is used'''
     template_rss.url = 'nourl'
     with pytest.raises(Exception):
-        template_rss.run()
+        template_rss.get_feed()
