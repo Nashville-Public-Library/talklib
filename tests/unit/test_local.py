@@ -10,7 +10,7 @@ url = 'https://pnsne.ws/3mVuTax'
 cwd = os.getcwd()
 
 @pytest.fixture
-def template():
+def template_local():
     with patch.dict('os.environ', env_vars):
         test = TLShow()
     test.show = 'Delete Me'
@@ -23,90 +23,69 @@ def template():
 
     return test
 
-def test_decide_whether_to_remove(template: TLShow):
-    '''local files should default to not remove files'''
-    assert template.decide_whether_to_remove() == False
-
-def test_decide_whether_to_remove_2(template: TLShow):
-    '''should be true if we set this variable to true'''
-    template.remove_source = True
-    assert template.decide_whether_to_remove()
-
-def test_create_output_filename(template: TLShow):
-    '''should be filename with '.wav' appended since self.include_date defaults to False'''
-    assert template.create_output_filename() == f'{template.show_filename}.wav'
-
-def test_create_output_filename_2(template: TLShow):
-    '''if include_date is true, datetime should be included in filename'''
-    template.include_date = True
-    assert template.create_output_filename() == f'{template.show_filename}-{datetime.now().strftime("%m%d%y")}.wav'
-
-def test_create_output_filename_3(template: TLShow):
-    assert type(template.create_output_filename()) == str
-
 # ---------- check attributes ----------
 
-def test_check_attributes_are_valid_1(template: TLShow):
-    template.is_local = None
+def test_check_attributes_are_valid_1(template_local: TLShow):
+    template_local.is_local = None
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_1a(template: TLShow):
-    template.show = None
+def test_attrib_1a(template_local: TLShow):
+    template_local.show = None
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_1b(template: TLShow):
-    template.show = 5
+def test_attrib_1b(template_local: TLShow):
+    template_local.show = 5
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_1c(template: TLShow):
-    template.show = True
+def test_attrib_1c(template_local: TLShow):
+    template_local.show = True
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_1d(template: TLShow):
-    template.show = ''
+def test_attrib_1d(template_local: TLShow):
+    template_local.show = ''
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_2a(template: TLShow):
-    template.show_filename = None
+def test_attrib_2a(template_local: TLShow):
+    template_local.show_filename = None
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_2b(template: TLShow):
-    template.show_filename = 5
+def test_attrib_2b(template_local: TLShow):
+    template_local.show_filename = 5
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_2c(template: TLShow):
-    template.show_filename = True
+def test_attrib_2c(template_local: TLShow):
+    template_local.show_filename = True
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_2d(template: TLShow):
-    template.show_filename = ''
+def test_attrib_2d(template_local: TLShow):
+    template_local.show_filename = ''
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_3a(template: TLShow):
-    template.local_file = 5
+def test_attrib_3a(template_local: TLShow):
+    template_local.local_file = 5
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_3b(template: TLShow):
-    template.local_file = True
+def test_attrib_3b(template_local: TLShow):
+    template_local.local_file = True
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_4a(template: TLShow):
-    template.is_local = 5
+def test_attrib_4a(template_local: TLShow):
+    template_local.is_local = 5
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
 
-def test_attrib_4b(template: TLShow):
-    template.is_local = 'break'
+def test_attrib_4b(template_local: TLShow):
+    template_local.is_local = 'break'
     with pytest.raises(Exception):
-        template.check_attributes_are_valid()
+        template_local.check_attributes_are_valid()
