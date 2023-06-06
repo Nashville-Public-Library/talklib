@@ -94,7 +94,8 @@ class TLShow():
 
         return command
     
-    def build_output_commands(self, output_file):
+    def build_output_commands(self):
+        output_file = TLShow.create_output_filename(self)
         command = {}
         command.update({'ar': '44100'})
         command.update({'ac': '1'})
@@ -108,9 +109,9 @@ class TLShow():
 
     def convert(self, input):
         '''convert file with ffmpeg and return filename'''
-        outputFile = TLShow.create_output_filename(self)
+        output_file = TLShow.create_output_filename(self)
         input_commands = TLShow.build_input_commands(self, input_file=input)
-        output_commands = TLShow.build_output_commands(self, output_file=outputFile)
+        output_commands = TLShow.build_output_commands(self)
 
         stream = ffmpeg.input(**input_commands)
         stream = ffmpeg.output(stream, **output_commands)
@@ -121,7 +122,7 @@ class TLShow():
         ffmpeg.run(stream)
         TLShow.syslog(self, message='Conversion complete!')
 
-        return outputFile
+        return output_file
 
     def copy_then_remove(self, fileToCopy):
         '''TODO explain'''
