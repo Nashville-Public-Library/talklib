@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import pytest
 import os
 import requests
+import subprocess
 from unittest.mock import patch
 
 from ...show import TLShow
@@ -146,12 +147,22 @@ def test_decide_whether_to_remove_rss_3(template_rss: TLShow):
 
 def test_convert_1(template_rss: TLShow):
     '''should convert and return name of file'''
-    assert type(template_rss.convert(input='something.mp3')) == str
+    assert type(template_rss.convert(input=download_test_file())) == str
 
 def test_convert_2(template_local: TLShow):
     '''should convert and return name of file'''
     assert template_local.convert(input=download_test_file()) == f'{template_local.show_filename}.wav'
     os.remove(f'{template_local.show_filename}.wav') # actually converts the file so need to remove it
+
+def test_convert_3(template_permalink: TLShow):
+    '''testing whether the breakaway functionality works as intended'''
+    template_permalink.breakaway = 30
+    test_file = template_permalink.convert(input=(download_test_file()))
+    duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {test_file}")
+    duration = float(duration)
+    duration = round(duration, 2)
+    assert duration == 30
+    os.remove(test_file)
 
 # ----- check downloaded file -----
 
