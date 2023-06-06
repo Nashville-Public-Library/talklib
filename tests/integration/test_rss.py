@@ -50,8 +50,8 @@ def test_run3(template: TLShow):
 
 def test_run_bad_feed(template: TLShow):
     '''asserts an exception is raised for a non-updated feed'''
-    bad_feed = 'https://www.pythonpodcast.com/rss' # hasn't been updated in a while.
-    template.url = bad_feed
+    non_updated_feed = 'https://www.pythonpodcast.com/rss' # hasn't been updated in a while.
+    template.url = non_updated_feed
     with pytest.raises(Exception):
         with patch('builtins.input', return_value='y'):
             template.run()
