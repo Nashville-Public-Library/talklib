@@ -19,6 +19,7 @@ import logging.handlers
 from logging.handlers import SysLogHandler
 from datetime import datetime
 
+import ffmpeg
 import requests
 
 from ev import EV
@@ -84,20 +85,42 @@ class TLShow():
         else:
             outputFile = (f'{self.show_filename}.wav')
         return outputFile
+    
+    def build_input_commands(self, input_file):
+        command = {}
+        command.update({'hide_banner': None})
+        command.update({'loglevel': 'quiet'})
+        command.update({'filename': input_file})
+
+        return command
+    
+    def build_output_commands(self, output_file):
+        command = {}
+        command.update({'ar': '44100'})
+        command.update({'ac': '1'})
+        command.update({'af': 'loudnorm=I=-18'})
+        if self.breakaway:
+            command.update({'t': self.breakaway})
+        command.update({'y': None})
+        command.update({'filename': output_file})
+
+        return command
 
     def convert(self, input):
         '''convert file with ffmpeg and return filename'''
         outputFile = TLShow.create_output_filename(self)
+        input_commands = TLShow.build_input_commands(self, input_file=input)
+        output_commands = TLShow.build_output_commands(self, output_file=outputFile)
+
+        stream = ffmpeg.input(**input_commands)
+        stream = ffmpeg.output(stream, **output_commands)
+        ffmpeg_commands = ffmpeg.get_args(stream)
+
+        TLShow.syslog(self, message=f'FFmpeg commands: {ffmpeg_commands}')
         TLShow.syslog(self, message='Converting to TL format...')
+        ffmpeg.run(stream)
+        TLShow.syslog(self, message='Conversion complete!')
 
-        if self.breakaway:
-            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 \
-                -t {self.breakaway} -af loudnorm=I=-{self.ff_level} -y {outputFile}', shell=True)
-        else:
-            subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i {input} -ar 44100 -ac 1 \
-                -af loudnorm=I=-{self.ff_level} -y {outputFile}', shell=True)
-
-        TLShow.syslog(self, message='Conversion complete')
         return outputFile
 
     def copy_then_remove(self, fileToCopy):
