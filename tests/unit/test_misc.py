@@ -6,7 +6,7 @@ import requests
 import subprocess
 from unittest.mock import patch
 
-from ...show import TLShow
+from talklib import TLShow
 from ..mock import env_vars
 
 permalink_URL = 'https://pnsne.ws/3mVuTax'
