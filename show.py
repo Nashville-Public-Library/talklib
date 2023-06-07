@@ -99,7 +99,7 @@ class TLShow():
         command = {}
         command.update({'ar': '44100'})
         command.update({'ac': '1'})
-        command.update({'af': 'loudnorm=I=-18'})
+        command.update({'af': f'loudnorm=I=-{self.ff_level}'})
         if self.breakaway:
             command.update({'t': self.breakaway})
         command.update({'y': None})
