@@ -1,4 +1,3 @@
-from datetime import datetime
 import xml.etree.ElementTree as ET
 import pytest
 import os
