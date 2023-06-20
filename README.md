@@ -15,7 +15,7 @@ Use this module to process the following types of shows/segments:
 
 ---
 
-## Dependencies
+## Requirements
 
 ### -[Python](https://www.python.org/downloads/)
 Use Python 3.10.1 or above.
@@ -23,7 +23,7 @@ Use Python 3.10.1 or above.
 ### -[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)
 You need Windows binaries for FFmpeg & FFprobe installed on the PC and added to the PATH:
 
-To repeat, **this module will not work without FFmpeg and FFprobe**. 
+To repeat, **this package will not work without FFmpeg and FFprobe**. 
 
 FFmpeg and FFprobe should be two separate binaries.
 
@@ -42,22 +42,11 @@ The entire list of these is in the ev.py file. Make sure to set all of these on 
 ---
 ## Installation
 
-### Download
-- download this repository 
-- unzip it
-- remove the "-main" from the directory name (it should just be called "talklib")
-- copy the directory to the `site-packages` directory inside the Python directory
-- If it exists, DO overwrite the existing directory.
-
-Depending on how you installed Python, the `site-packages` directory could be somewhere like: `C:\Users\<username>\AppData\Local\Programs\Python\Python###\Lib\site-packages`
-
-### Install Python Packages
-- open a terminal window
-- cd into the talklib directory
-- run `pip install -r requirements.txt` 
-    - This will download all the 3rd party Python packages we're using
-    - Please note, this will install things globally. For the TL, that's likely what you want
-    - If you only want to install things locally (for testing, etc.), use a virtual environment.
+- open a terminal/command prompt
+- run `pip install git+https://github.com/talkinglibrary/talklib.git`
+    - depending on your OS, instead of `pip` you may need to use `pip3`
+- That's it! 
+    - This will install the package globally. If you're a TL user just trying to install the package for everyday use, that's likely what you want to do. If you want to install it locally (for testing, etc.), see the [development](#development) section below.
 
 ---
 
@@ -345,3 +334,27 @@ WK.include_date = True
 
 WK.run()
 ````
+
+-----
+## Development
+
+- Clone this repository
+    - `git clone https://github.com/talkinglibrary/talklib.git`
+- cd into the folder
+    - `cd talklib`
+- Create a virtual environment
+    - `py -m venv venv`
+    - depending on your OS, instead of `py` you may need to use `python` or `python3`
+- Activate virtual environment
+    - On Windows: `venv\Scripts\activate`
+    - On Mac: `source venv/bin/activate`
+- Update pip
+    - `py -m pip install --upgrade pip`
+    - depending on your OS, instead of `pip` you may need to run `pip3`
+- Install the package into your virtual environment
+    - `pip install -e .`
+- Run Pytest
+    - `pytest`
+    - The tests can take a while to run. Watch the terminal output for progress.
+    - If the tests fail, you may have installed something incorrectly. 
+
