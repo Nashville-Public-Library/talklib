@@ -6,3 +6,4 @@ coverage
 .coverage
 
 venv
+talklib.egg-info
