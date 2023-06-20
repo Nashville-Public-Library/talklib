@@ -1,3 +1,14 @@
+Metadata-Version: 2.1
+Name: talklib
+Version: 0.0.1
+Summary: A package to automate processing of shows/segments airing on the TL
+Author-email: Ben Weddle <ben.weddle@gmail.com>
+License: © Nashville Public Library
+        © Ben Weddle is to blame for this code. Anyone is free to use it.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+
 # talklib
 
 ## A package to automate processing of shows/segments airing on the TL

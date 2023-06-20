@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 
-from ...show import TLShow
+from talklib import TLShow
 from .. import mock
 from ..mock import env_vars, permalink
 

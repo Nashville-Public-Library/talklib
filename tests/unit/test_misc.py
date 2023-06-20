@@ -1,4 +1,3 @@
-from datetime import datetime
 import xml.etree.ElementTree as ET
 import pytest
 import os
@@ -6,7 +5,7 @@ import requests
 import subprocess
 from unittest.mock import patch
 
-from ...show import TLShow
+from talklib import TLShow
 from ..mock import env_vars
 
 permalink_URL = 'https://pnsne.ws/3mVuTax'
