@@ -5,6 +5,7 @@ name: talklib
 on:
   push:
     branches: [ "main" ]
+    branches: [ "src" ]
   pull_request:
     branches: [ "main" ]
 
