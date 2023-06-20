@@ -1,6 +1,6 @@
 # talklib
 
-## A module to automate processing of shows/segments airing on the TL
+## A package to automate processing of shows/segments airing on the TL
 
 [Skip to Examples](#examples)
 
