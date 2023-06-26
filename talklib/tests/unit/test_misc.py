@@ -219,3 +219,9 @@ def test_check_feed_loop_2(template_rss: TLShow):
 def test_check_feed_loop_3(template_rss: TLShow):
     '''should be bool type'''
     assert type(template_rss.check_feed_loop()) == bool
+
+# ----- old import method -----
+
+def test_old_import_method():
+    '''previous method to import the class. don't deprecate this as many scripts rely on it'''
+    from talklib.show import TLShow
