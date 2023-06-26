@@ -1,4 +1,2 @@
-import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-
-from show import TLShow
-import utils
+from talklib.show import TLShow
+import talklib.utils
