@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from ..mock import env_vars
 with patch.dict('os.environ', env_vars):
-    from talklib import utils
+    from src import utils
 
 cwd = os.getcwd()
 

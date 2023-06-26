@@ -4,7 +4,7 @@ getting started with some general tests for the talklib module via Pytest.
 import pytest
 from unittest.mock import patch
 
-from talklib import TLShow
+from src import TLShow
 from .. import mock
 from ..mock import env_vars
 

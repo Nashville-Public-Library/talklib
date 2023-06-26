@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 from twilio.rest import Client
 
-from talklib.ev import EV
+from src.ev import EV
 
 def get_timestamp():
     timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')

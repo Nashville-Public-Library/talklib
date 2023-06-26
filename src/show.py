@@ -22,8 +22,8 @@ from datetime import datetime
 import ffmpeg
 import requests
 
-from talklib.ev import EV
-from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
+from src.ev import EV
+from src.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
 
 cwd = os.getcwd()
 

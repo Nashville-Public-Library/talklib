@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 
-from talklib import TLShow
+from src import TLShow
 from ..mock import env_vars
 
 

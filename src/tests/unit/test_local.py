@@ -3,7 +3,7 @@ import pytest
 import os
 from unittest.mock import patch, MagicMock
 
-from talklib import TLShow
+from src import TLShow
 from ..mock import env_vars
 
 url = 'https://pnsne.ws/3mVuTax'

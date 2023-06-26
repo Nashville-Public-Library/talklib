@@ -3,7 +3,7 @@ import requests
 from unittest.mock import patch
 import os
 
-from talklib import TLShow
+from src import TLShow
 from .. import mock
 from ..mock import env_vars, permalink
 
