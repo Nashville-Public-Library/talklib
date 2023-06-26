@@ -37,4 +37,4 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["talklib"]
 namespaces = false
-exclude = ["tests*"]
+exclude = [".tests*"]
