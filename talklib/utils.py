@@ -1,5 +1,7 @@
 from datetime import datetime
 import os
+import subprocess
+
 from twilio.rest import Client
 
 from talklib.ev import EV
@@ -50,3 +52,14 @@ def send_sms(message):
         to=EV().twilio_to
     )
     message.sid
+
+def get_length_in_seconds(file_to_check):
+    duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 {file_to_check}")
+    
+    # convert the number to something more usable/readable
+    duration = float(duration)
+    duration = duration/60
+    duration = round(duration, 2)
+
+    return duration

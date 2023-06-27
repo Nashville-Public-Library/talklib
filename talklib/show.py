@@ -23,7 +23,7 @@ import ffmpeg
 import requests
 
 from talklib.ev import EV
-from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms
+from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms, get_length_in_seconds
 
 cwd = os.getcwd()
 
@@ -306,13 +306,7 @@ Please check manually!\n\n\
             TLShow.syslog(self, message=f'Checking whether length is between \
 {self.check_if_below} and {self.check_if_above}')
 
-            duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
-            -of default=noprint_wrappers=1:nokey=1 {fileToCheck}")
-
-            # convert the number to something more usable/readable
-            duration = float(duration)
-            duration = duration/60
-            duration = round(duration, 2)
+            duration = get_length_in_seconds(file_to_check=fileToCheck)
 
             if duration > self.check_if_above:
                 toSend = (f"Today's {self.show} is {duration} minutes long! \

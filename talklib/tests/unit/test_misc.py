@@ -163,6 +163,14 @@ def test_convert_3(template_permalink: TLShow):
     assert duration == 30
     os.remove(test_file)
 
+# ----- check length -----
+'''need to test other things here...'''
+def test_check_length(template_local: TLShow):
+    
+    template_local.check_if_above = 2
+    template_local.check_if_below = 1
+    assert type(template_local.check_length(fileToCheck=download_test_file())) == float
+
 # ----- check downloaded file -----
 
 def test_check_downloaded_file_1(template_permalink: TLShow):
