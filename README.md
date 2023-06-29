@@ -4,6 +4,8 @@
 
 [Skip to Examples](#examples)
 
+*THIS README IS INTENDED TO ASSIST TL STAFF IN INSTALLING AND USING THIS PACKAGE*
+
 Use this module to process the following types of shows/segments:
 - Shows and segments we receive via RSS feed
     - Shows such as New York Times, Wall Street Journal,  etc.
@@ -45,7 +47,6 @@ The entire list of these is in the ev.py file. Make sure to set all of these on 
 - open a terminal/command prompt
 - run `pip install git+https://github.com/talkinglibrary/talklib.git`
     - depending on your OS, instead of `pip` you may need to use `pip3`
-- That's it! 
     - This will install the package globally. If you're a TL user just trying to install the package for everyday use, that's likely what you want to do. If you want to install it locally (for testing, etc.), see the [development](#development) section below.
 
 ---
@@ -81,11 +82,11 @@ You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 
 Import the class to your script like this:
 
-`from talklib.show import TLShow`
-
-You can also use:
-
 `from talklib import TLShow`
+
+This is also fine:
+
+`from talklib.show import TLShow`
 
 Create an instance like this: 
 
@@ -178,6 +179,7 @@ optional
 - used strictly for notification purposes
 - if these are not set, the checks will not be run
 - again, these values are in **minutes**, not seconds
+- currently, if you set one of these, you must set both of them. All or nothing.
 
 `remove_source`
 
@@ -269,7 +271,7 @@ The minimum attributes you must set are `show`, `show_filename`, and `url`.
 Here is an example script:
 
 ````python
-from talklib.show import TLShow
+from talklib import TLShow
 
 SD = TLShow()
 
@@ -294,7 +296,7 @@ The minimum attributes you must set are: `show`, `show_filename`, `is_local`, an
 Here is an example script:
 
 ````python
-from talklib.show import TLShow
+from talklib import TLShow
 
 MWB = TLShow()
 
@@ -319,7 +321,7 @@ The minimum attributes you must set are: `show`, `show_filename`, `url`, and `is
 Here is an example script:
 
 ````python
-from talklib.show import TLShow
+from talklib import TLShow
 
 WK = TLShow()
 
