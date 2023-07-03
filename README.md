@@ -67,8 +67,8 @@ Here is what an example directory structure should look like:
 ````
 D:\wireready
     \Washington Post
-        \WP.bat
-        \WP.py
+        -WP.bat
+        -WP.py
 ````
 You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 
