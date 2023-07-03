@@ -66,8 +66,6 @@ class TLShow():
         self.ff_level = ff_level
         self.syslog_enable = True
         self.destinations = EV().destinations
-
-        EV.__init__(self)
     
     
     def __str__(self) -> str:
