@@ -8,5 +8,5 @@
 :: change to current directory (directory of batch file)
 CD /d "%~dp0"
 
-:: run python script
-py %CD%\SomeFile.py
+:: run the script(s) in current directory
+FOR %%A in (*.py) DO py %%A
