@@ -1,4 +1,6 @@
 from datetime import datetime
+import logging
+from logging.handlers import SysLogHandler
 import os
 import subprocess
 
@@ -52,6 +54,17 @@ def send_sms(message):
         to=EV().twilio_to
     )
     message.sid
+
+def send_syslog(message: str):
+    '''send message to syslog server'''
+    port = int('514')
+    my_logger = logging.getLogger('MyLogger')
+    my_logger.setLevel(logging.DEBUG)
+    handler = SysLogHandler(address=(EV().syslog_host, port))
+    my_logger.addHandler(handler)
+
+    my_logger.info(message)
+    my_logger.removeHandler(handler) # don't forget this after you send the message!
 
 def get_length_in_seconds(file_to_check):
     duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \

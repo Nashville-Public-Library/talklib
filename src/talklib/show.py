@@ -6,24 +6,20 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
-import xml.etree.ElementTree as ET
-import subprocess
-import shutil
-import os
-import time
-import glob
-import smtplib
 from email.message import EmailMessage
-import logging
-import logging.handlers
-from logging.handlers import SysLogHandler
 from datetime import datetime
+import glob
+import os
+import shutil
+import smtplib
+import time
+import xml.etree.ElementTree as ET
 
 import ffmpeg
 import requests
 
 from talklib.ev import EV
-from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms, get_length_in_seconds
+from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms, get_length_in_seconds, send_syslog
 
 cwd = os.getcwd()
 
@@ -115,10 +111,10 @@ class TLShow():
         stream = ffmpeg.output(stream, **output_commands)
         ffmpeg_commands = ffmpeg.get_args(stream)
 
-        TLShow.syslog(self, message=f'FFmpeg commands: {ffmpeg_commands}')
-        TLShow.syslog(self, message='Converting to TL format...')
+        TLShow.prep_syslog(self, message=f'FFmpeg commands: {ffmpeg_commands}')
+        TLShow.prep_syslog(self, message='Converting to TL format...')
         ffmpeg.run(stream)
-        TLShow.syslog(self, message='Conversion complete!')
+        TLShow.prep_syslog(self, message='Conversion complete!')
 
         return output_file
 
@@ -126,7 +122,7 @@ class TLShow():
         '''TODO explain'''
         
         for destination in self.destinations:
-            TLShow.syslog(self, message=f'Copying {fileToCopy} to {destination}...')
+            TLShow.prep_syslog(self, message=f'Copying {fileToCopy} to {destination}...')
             shutil.copy(fileToCopy, destination)
 
         #this is the file we're copying, so it is the file already converted. we always want to remove this.
@@ -152,11 +148,11 @@ class TLShow():
     def remove(self, fileToDelete, is_output_file: bool=False):
         '''TODO explain'''
         if TLShow.decide_whether_to_remove(self) or is_output_file:
-            TLShow.syslog(self, message=f'Deleting {fileToDelete}')
+            TLShow.prep_syslog(self, message=f'Deleting {fileToDelete}')
             try:
                 os.remove(fileToDelete)
             except Exception as e:
-                self.syslog(message=e)
+                self.prep_syslog(message=e)
 
     def remove_yesterday_files(self):
         '''
@@ -168,10 +164,10 @@ class TLShow():
                 matched_filenames = glob.glob(f'{destination}/{self.show_filename}*.wav')
                 if matched_filenames:
                     for file in matched_filenames:
-                        TLShow.syslog(self, message=f'Deleting {file}')
+                        TLShow.prep_syslog(self, message=f'Deleting {file}')
                         os.remove(f'{file}')
                 else:
-                    TLShow.syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destination}. Continuing...")
+                    TLShow.prep_syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destination}. Continuing...")
 
     def download_file(self):
         '''
@@ -190,14 +186,14 @@ class TLShow():
         else:
             download_URL = TLShow.get_RSS_audio_url(self)
 
-        TLShow.syslog(self, message=f'Attempting to download audio file.')
+        TLShow.prep_syslog(self, message=f'Attempting to download audio file.')
         input_file = 'input.mp3'  # name the file we download
         with open (input_file, mode='wb') as downloaded_file:
             a = requests.get(download_URL)
             downloaded_file.write(a.content)
             downloaded_file.close()
         
-        TLShow.syslog(self, message=f'File downloaded successfully in {os.getcwd()}.')
+        TLShow.prep_syslog(self, message=f'File downloaded successfully in {os.getcwd()}.')
         return downloaded_file.name
 
     def check_downloaded_file(self, fileToCheck, how_many_attempts):
@@ -211,11 +207,11 @@ class TLShow():
         is_not_empty = False
         while how_many_attempts < 3:
             if filesize > 0:
-                TLShow.syslog(self, message='File is not empty. Continuing...')
+                TLShow.prep_syslog(self, message='File is not empty. Continuing...')
                 is_not_empty = True
                 return True
             else:
-                TLShow.syslog(self, message=f'File is empty. Will download again. Attempt # {how_many_attempts}.')
+                TLShow.prep_syslog(self, message=f'File is empty. Will download again. Attempt # {how_many_attempts}.')
                 how_many_attempts = how_many_attempts+1
                 TLShow.download_file(self)
                 TLShow.check_downloaded_file(self, fileToCheck=fileToCheck, how_many_attempts=how_many_attempts)
@@ -229,19 +225,14 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             TLShow.remove(self, fileToDelete=fileToCheck)
             raise Exception (toSend)
             
-    def syslog(self, message: str):
+    def prep_syslog(self, message: str):
         '''send message to syslog server'''
         if not self.syslog_enable:
             pass
         else:
-            port = int('514')
-            my_logger = logging.getLogger('MyLogger')
-            my_logger.setLevel(logging.DEBUG)
-            handler = SysLogHandler(address=(EV().syslog_host, port))
-            my_logger.addHandler(handler)
+            message = f'{self.show}: {message}'
+            send_syslog(message=message)
 
-            my_logger.info(f'{self.show}: {message}')
-            my_logger.removeHandler(handler) # don't forget this after you send the message!
 
     def send_mail(self, message: str, subject: str):
         '''send email to TL gmail account via relay address'''
@@ -265,11 +256,11 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
         if self.notifications:
             if today_is_weekday():
                 TLShow.send_mail(self, message=message, subject=subject)
-                TLShow.syslog(self, message=message)
+                TLShow.prep_syslog(self, message=message)
             else:
                 TLShow.send_sms_if_enabled(self, message=message)
                 TLShow.send_mail(self, message=message, subject=subject)
-                TLShow.syslog(self, message=message)
+                TLShow.prep_syslog(self, message=message)
 
     def check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
@@ -278,7 +269,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
         while numberOfDestinations >= 0:
             if os.path.isfile(f'{self.destinations[numberOfDestinations]}/{fileToCheck}'):
                 numberOfDestinations = numberOfDestinations-1
-                TLShow.syslog(self, message=f'{fileToCheck} arrived at {self.destinations[numberOfDestinations]}')
+                TLShow.prep_syslog(self, message=f'{fileToCheck} arrived at {self.destinations[numberOfDestinations]}')
                 success = True
             else:
                 toSend = (f"There was a problem with {self.show}.\n\n\
@@ -299,9 +290,9 @@ Please check manually!\n\n\
         '''
         # if these are not declared, don't run this check.
         if not (self.check_if_below and self.check_if_above):
-            TLShow.syslog(self, message='The check length function is turned off.')
+            TLShow.prep_syslog(self, message='The check length function is turned off.')
         else:
-            TLShow.syslog(self, message=f'Checking whether length is between \
+            TLShow.prep_syslog(self, message=f'Checking whether length is between \
 {self.check_if_below} and {self.check_if_above}')
 
             duration = get_length_in_seconds(file_to_check=fileToCheck)
@@ -319,7 +310,7 @@ This is unusual and could indicate a problem with the file. Please check manuall
                 TLShow.notify(self, message=toSend, subject='Check Length')
 
             else:
-                TLShow.syslog(self, message=f'File is {duration} minute(s). Continuing...')
+                TLShow.prep_syslog(self, message=f'File is {duration} minute(s). Continuing...')
             
             return duration
 
@@ -356,7 +347,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             pub_date = item.find('pubDate').text
             today = datetime.now().strftime("%a, %d %b %Y")
             if today in pub_date:
-                TLShow.syslog(self, message='The feed is updated.')
+                TLShow.prep_syslog(self, message='The feed is updated.')
                 return True
 
     def get_RSS_audio_url(self):
@@ -366,7 +357,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             item = t.find('item')  # 'find' only returns the first match!
             audio_url = item.find('enclosure').attrib
             audio_url = audio_url.get('url')
-            TLShow.syslog(self, message=f'Audio URL is: {audio_url}')
+            TLShow.prep_syslog(self, message=f'Audio URL is: {audio_url}')
             return audio_url
 
     def check_feed_loop(self):
@@ -377,7 +368,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         i = 0
         feed_updated = False
         while i < 3:
-            TLShow.syslog(self, message=f'Attempt {i} to check feed.')
+            TLShow.prep_syslog(self, message=f'Attempt {i} to check feed.')
             feed_updated = TLShow.check_feed_updated(self)
             if feed_updated:
                 break
@@ -395,7 +386,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         '''
         clear_screen()
         toSend = 'All Done.'
-        TLShow.syslog(self, message=toSend)
+        TLShow.prep_syslog(self, message=toSend)
         print(f'{toSend}\n')
         number = 5
         i = 0
@@ -484,7 +475,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         '''begins to process the file'''
 
         print(f"I'm working on {self.show}. Just a moment...\n")
-        TLShow.syslog(self, message=f'Starting script')
+        TLShow.prep_syslog(self, message=f'Starting script')
 
         TLShow.check_attributes_are_valid(self)
 
