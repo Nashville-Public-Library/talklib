@@ -57,8 +57,8 @@ class TLShow():
         self.notifications = notifications
         self.twilio_enable = twilio_enable
         self.ff_level = ff_level
-        self.syslog_enable = True
-        self.destinations = EV().destinations
+        self.syslog_enable: bool = True
+        self.destinations: list = EV().destinations
     
     
     def __str__(self) -> str:
@@ -124,7 +124,6 @@ class TLShow():
 
         #this is the file we're copying, so it is the file already converted. we always want to remove this.
         TLShow.remove(self, fileToDelete=fileToCopy, is_output_file=True)
-        # TLShow.check_file_transferred(self, fileToCheck=fileToCopy)
 
     def decide_whether_to_remove(self):
         '''
