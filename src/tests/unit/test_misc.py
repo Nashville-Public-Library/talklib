@@ -1,3 +1,4 @@
+import atexit
 import xml.etree.ElementTree as ET
 import pytest
 import os
@@ -6,19 +7,12 @@ import subprocess
 from unittest.mock import patch
 
 from talklib import TLShow
-from ..mock import env_vars
+from ..mock import env_vars, download_test_file
 
 permalink_URL = 'https://pnsne.ws/3mVuTax'
 RSS_URL = 'https://feeds.npr.org/500005/podcast.xml'
 
 input_file = 'input.mp3'  # name the file we download
-
-def download_test_file():
-    with open (input_file, mode='wb') as downloaded_file:
-        a = requests.get(permalink_URL)
-        downloaded_file.write(a.content)
-        downloaded_file.close()
-    return downloaded_file.name
 
 @pytest.fixture
 def template_local():
@@ -34,11 +28,6 @@ def template_local():
 
     yield test
 
-    try:
-        os.remove(input_file)
-    except:
-        pass
-
 @pytest.fixture
 def template_permalink():
     with patch.dict('os.environ', env_vars):
@@ -53,11 +42,6 @@ def template_permalink():
 
     yield test
 
-    try:
-        os.remove(input_file)
-    except:
-        pass
-
 @pytest.fixture
 def template_rss():
     with patch.dict('os.environ', env_vars):
@@ -70,11 +54,6 @@ def template_rss():
     test.syslog_enable = False
 
     yield test
-
-    try:
-        os.remove(input_file)
-    except:
-        pass
 
 # ----- six digit date string -----
 
@@ -233,3 +212,13 @@ def test_check_feed_loop_3(template_rss: TLShow):
 def test_old_import_method():
     '''previous method to import the class. don't deprecate this as many scripts rely on it'''
     from talklib.show import TLShow
+
+
+
+def teardown():
+    try:
+        os.remove(input_file)
+    except:
+        pass
+
+atexit.register(teardown)

@@ -1,4 +1,5 @@
 import os
+import requests
 import shutil
 
 
@@ -34,3 +35,15 @@ def mock_destinations():
 def remove_destinations():
     for destination in mock_destinations():
         shutil.rmtree(destination)
+    
+def download_test_file():
+    input_file = 'input.mp3'  # name the file we download
+    downloaded_file = input_file
+    file_exists = os.path.isfile(input_file)
+    if not file_exists:
+        with open (input_file, mode='wb') as downloaded_file:
+            a = requests.get(permalink)
+            downloaded_file.write(a.content)
+            downloaded_file.close()
+            return downloaded_file.name
+    return downloaded_file

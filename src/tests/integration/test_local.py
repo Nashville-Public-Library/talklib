@@ -1,21 +1,16 @@
+import atexit
 import pytest
 import requests
 from unittest.mock import patch
 import os
 
 from talklib import TLShow
+from talklib.utils import send_syslog
 from .. import mock
-from ..mock import env_vars, permalink
+from ..mock import env_vars, permalink, download_test_file
 
 
 input_file = 'input.mp3'  # name the file we download
-
-def download_test_file():
-    with open (input_file, mode='wb') as downloaded_file:
-        a = requests.get(permalink)
-        downloaded_file.write(a.content)
-        downloaded_file.close()
-    return downloaded_file.name
 
 @pytest.fixture
 def template():
@@ -34,15 +29,6 @@ def template():
     test.syslog_enable = False
 
     yield test
-    
-    # teardown stuff
-
-    mock.remove_destinations()
-
-    if os.path.exists(input_file):
-        os.remove(input_file)
-    if os.path.exists(f'{test.show_filename}.wav'):
-        os.remove(f'{test.show_filename}.wav')
 
 
 # ---------- full run ---------- # 
@@ -93,3 +79,13 @@ def test_run_none_file(self, template: TLShow):
     template.local_file = None
     with pytest.raises(FileNotFoundError):
         template.run()
+
+def teardown():
+    mock.remove_destinations()
+    try:
+        os.remove(input_file)
+        os.remove('delete_me.wav')
+    except:
+        pass
+
+atexit.register(teardown)
