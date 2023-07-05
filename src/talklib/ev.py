@@ -15,7 +15,7 @@ import os
 
 class EV:
     def __init__(self):
-        self.destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]# where should output files go?
+        self.destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]# where should output files go? MUST BE A LIST EVEN WITH ONLY ONE
         self.syslog_host = os.environ["syslog_server"] # ip of syslog server (PC with syslog software)
         self.fromEmail = os.environ['fromEmail']  # from where should emails appear to come?
         self.toEmail = os.environ['toEmail']  # to where should emails be sent?
