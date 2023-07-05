@@ -2,7 +2,6 @@ import atexit
 import xml.etree.ElementTree as ET
 import pytest
 import os
-import requests
 import subprocess
 from unittest.mock import patch
 

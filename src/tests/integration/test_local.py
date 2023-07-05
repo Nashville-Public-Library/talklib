@@ -1,13 +1,11 @@
 import atexit
 import pytest
-import requests
 from unittest.mock import patch
 import os
 
 from talklib import TLShow
-from talklib.utils import send_syslog
 from .. import mock
-from ..mock import env_vars, permalink, download_test_file
+from ..mock import env_vars, download_test_file
 
 
 input_file = 'input.mp3'  # name the file we download
