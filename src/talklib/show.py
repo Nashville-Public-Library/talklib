@@ -20,8 +20,6 @@ from talklib.ev import EV
 from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, get_length_in_seconds
 from talklib.utils import send_sms, send_syslog, send_mail
 
-cwd = os.getcwd()
-
 
 class TLShow():
     '''TODO write something here'''
