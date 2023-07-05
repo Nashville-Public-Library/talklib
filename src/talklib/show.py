@@ -6,12 +6,10 @@ It's best to read the docs.
 © Ben Weddle is to blame for this code. Anyone is free to use it.
 '''
 
-from email.message import EmailMessage
 from datetime import datetime
 import glob
 import os
 import shutil
-import smtplib
 import time
 import xml.etree.ElementTree as ET
 
@@ -19,7 +17,8 @@ import ffmpeg
 import requests
 
 from talklib.ev import EV
-from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, send_sms, get_length_in_seconds, send_syslog
+from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, get_length_in_seconds
+from talklib.utils import send_sms, send_syslog, send_mail
 
 cwd = os.getcwd()
 
@@ -234,17 +233,10 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             send_syslog(message=message)
 
 
-    def send_mail(self, message: str, subject: str):
+    def prep_send_mail(self, message: str, subject: str):
         '''send email to TL gmail account via relay address'''
-        format = EmailMessage()
-        format.set_content(message)
-        format['Subject'] = f'{subject}: {self.show}'
-        format['From'] = EV().fromEmail
-        format['To'] = EV().toEmail
-
-        mail = smtplib.SMTP(host=EV().mail_server)
-        mail.send_message(format)
-        mail.quit()
+        subject = f'{subject}: {self.show}'
+        send_mail(subject=subject, message=message)
 
     def send_sms_if_enabled(self, message: str):
         '''send sms via twilio IF twilio_enable is set to True'''
@@ -255,11 +247,11 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
         '''we generally only want to send SMS via Twilio if today is on a weekend'''
         if self.notifications:
             if today_is_weekday():
-                TLShow.send_mail(self, message=message, subject=subject)
+                TLShow.prep_send_mail(self, message=message, subject=subject)
                 TLShow.prep_syslog(self, message=message)
             else:
                 TLShow.send_sms_if_enabled(self, message=message)
-                TLShow.send_mail(self, message=message, subject=subject)
+                TLShow.prep_send_mail(self, message=message, subject=subject)
                 TLShow.prep_syslog(self, message=message)
 
     def check_file_transferred(self, fileToCheck):
