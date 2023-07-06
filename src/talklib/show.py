@@ -64,11 +64,11 @@ class TLShow():
     def __str__(self) -> str:
         return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
     
-    def six_digit_date_string(self):
+    def six_digit_date_string(self) -> str:
         date = datetime.now().strftime("%m%d%y")
         return date
     
-    def create_output_filename(self):
+    def create_output_filename(self) -> str:
         '''returns the audio filename to use depending on whether we should include the date'''
         if self.include_date:
             date = TLShow.six_digit_date_string(self)
@@ -125,7 +125,7 @@ class TLShow():
         #this is the file we're copying, so it is the file already converted. we always want to remove this.
         TLShow.remove(self, fileToDelete=fileToCopy, is_output_file=True)
 
-    def decide_whether_to_remove(self):
+    def decide_whether_to_remove(self) -> bool:
         '''
         url shows should always remove the "source" files,
         since these are the files downloaded from the internet.
@@ -321,7 +321,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.notify(self, subject='Error', message=to_send)
             raise Exception (a)
 
-    def check_feed_updated(self):
+    def check_feed_updated(self) -> bool:
         '''
         get the ET object from the get_feed function, 
         then parse through it to check whether there is an entry with today's date.
@@ -339,7 +339,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
                 TLShow.prep_syslog(self, message='The feed is updated.')
                 return True
 
-    def get_RSS_audio_url(self):
+    def get_RSS_audio_url(self) -> str:
         '''TODO: explain'''
         root = TLShow.get_feed(self)
         for t in root.findall('channel'):
@@ -349,7 +349,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.prep_syslog(self, message=f'Audio URL is: {audio_url}')
             return audio_url
 
-    def check_feed_loop(self):
+    def check_feed_loop(self) -> str:
         '''
         occasionally, the first time we check the feed, it is not showing as updated.
         It's being cached, or something...? So we are checking it 3 times, for good measure.
