@@ -374,9 +374,9 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         just see the screen disappear.
         '''
         clear_screen()
-        toSend = 'All Done.'
-        TLShow.prep_syslog(self, message=toSend)
-        print(f'{toSend}\n')
+        to_send = 'All Done.'
+        TLShow.prep_syslog(self, message=to_send)
+        print(f'{to_send}\n')
         number = 5
         i = 0
         while i < number:
