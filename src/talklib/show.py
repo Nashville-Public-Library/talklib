@@ -77,7 +77,7 @@ class TLShow():
             outputFile = (f'{self.show_filename}.wav')
         return outputFile
     
-    def build_input_commands(self, input_file):
+    def build_input_commands(self, input_file) -> dict:
         command = {}
         command.update({'hide_banner': None})
         command.update({'loglevel': 'quiet'})
@@ -85,7 +85,7 @@ class TLShow():
 
         return command
     
-    def build_output_commands(self):
+    def build_output_commands(self) -> dict:
         output_file = TLShow.create_output_filename(self)
         command = {}
         command.update({'ar': '44100'})
