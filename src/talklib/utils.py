@@ -80,7 +80,7 @@ def send_mail(message: str, subject: str):
     mail.send_message(format)
     mail.quit()
 
-def get_length_in_seconds(file_to_check):
+def get_length_in_minutes(file_to_check):
     duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
             -of default=noprint_wrappers=1:nokey=1 {file_to_check}")
     

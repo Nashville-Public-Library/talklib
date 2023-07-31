@@ -17,7 +17,7 @@ import ffmpeg
 import requests
 
 from talklib.ev import EV
-from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, get_length_in_seconds
+from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, get_length_in_minutes
 from talklib.utils import send_sms, send_syslog, send_mail
 
 
@@ -284,7 +284,7 @@ Please check manually!\n\n\
             TLShow.prep_syslog(self, message=f'Checking whether length is between \
 {self.check_if_below} and {self.check_if_above}')
 
-            duration = get_length_in_seconds(file_to_check=fileToCheck)
+            duration = get_length_in_minutes(file_to_check=fileToCheck)
 
             if duration > self.check_if_above:
                 toSend = (f"Today's {self.show} is {duration} minutes long! \
