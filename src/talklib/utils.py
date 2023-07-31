@@ -1,5 +1,6 @@
 from datetime import datetime
 from email.message import EmailMessage
+import ffmpeg
 import logging
 from logging.handlers import SysLogHandler
 import os
@@ -81,8 +82,8 @@ def send_mail(message: str, subject: str):
     mail.quit()
 
 def get_length_in_minutes(file_to_check):
-    duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration \
-            -of default=noprint_wrappers=1:nokey=1 {file_to_check}")
+    duration = ffmpeg.probe(filename=file_to_check)
+    duration = duration['format']['duration']
     
     # convert the number to something more usable/readable
     duration = float(duration)
