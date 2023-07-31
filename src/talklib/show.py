@@ -160,10 +160,10 @@ class TLShow():
                 matched_filenames = glob.glob(f'{destination}/{self.show_filename}*.wav')
                 if matched_filenames:
                     for file in matched_filenames:
-                        TLShow.prep_syslog(self, message=f'Deleting {file}')
+                        TLShow.prep_syslog(self, message=f'Deleting existing matched file: {file}')
                         os.remove(f'{file}')
                 else:
-                    TLShow.prep_syslog(self, message=f"{self.show}: Cannot find yesterday's files in {destination}. Continuing...")
+                    TLShow.prep_syslog(self, message=f"{self.show}: Cannot find existing matched files in {destination}. Continuing...")
 
     def download_file(self):
         '''
