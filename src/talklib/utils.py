@@ -22,7 +22,7 @@ def clear_screen():
     else:
         os.system('clear')
 
-def print_to_screen(message):
+def print_to_screen(message: str):
     '''clear terminal and print message to screen.'''
     clear_screen()
     print(f'{message}\n')  # get user's attention!
@@ -37,7 +37,7 @@ def today_is_weekday() -> bool:
     else:
         return False
 
-def send_call(message):
+def send_call(message: str):
     '''send voice call via twilio'''
     client = Client(EV().twilio_sid, EV().twilio_token)
 
@@ -48,7 +48,7 @@ def send_call(message):
                         )
     call.sid
 
-def send_sms(message):
+def send_sms(message: str):
     '''send sms via twilio. '''
     client = Client(EV().twilio_sid, EV().twilio_token)
     message = client.messages.create(
