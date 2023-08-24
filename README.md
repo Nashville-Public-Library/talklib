@@ -44,10 +44,11 @@ The entire list of these is in the ev.py file. Make sure to set all of these on 
 ---
 ## Installation
 
-- open a terminal/command prompt
-- run `pip install git+https://github.com/talkinglibrary/talklib.git`
-    - depending on your OS, instead of `pip` you may need to use `pip3`
+- Open a terminal/command prompt
+- Run `pip install git+https://github.com/talkinglibrary/talklib.git`
+    - Depending on your OS, instead of `pip` you may need to use `pip3`
     - This will install the package globally. If you're a TL user just trying to install the package for everyday use, that's likely what you want to do. If you want to install it locally (for testing, etc.), see the [development](#development) section below.
+- (you must have [Git](https://git-scm.com/) installed for this to work)
 
 ---
 
