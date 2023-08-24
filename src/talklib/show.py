@@ -384,7 +384,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             number = number-1
             time.sleep(1)
 
-    def check_str_and_bool_type(attrib_to_check, type_to_check, attrib_return: str):
+    def check_str_and_bool_type(attrib_to_check, type_to_check: str | bool, attrib_return: str):
         '''
         we are checking whether an attribute is either type str or bool, depending on what is passed in.
         
