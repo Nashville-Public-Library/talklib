@@ -407,6 +407,8 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         Run some checks on the attributes the user has set. I.E. the required
         attributes have been set, they are the right type, etc.
         '''
+        TLShow.prep_syslog(self, message='checking user defined attributes')
+
         if not self.show:
             raise Exception ('Sorry, you need to specify a name for the show.')
         else:
@@ -463,19 +465,22 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
     def run(self):
         '''begins to process the file'''
 
-        print(f"I'm working on {self.show}. Just a moment...\n")
         TLShow.prep_syslog(self, message=f'Starting script')
+        print(f"I'm working on {self.show}. Just a moment...\n")
 
         TLShow.check_attributes_are_valid(self)
 
         if self.url and self.is_permalink:
+            TLShow.prep_syslog(self, message='permalink show detected')
             TLShow.run_URL_permalink(self)
 
         # if url but not permalink, it must be an RSS feed...right?
         elif self.url:
+            TLShow.prep_syslog(self, message='URL show detected')
             TLShow.run_URL_RSS(self)
 
         elif self.is_local:
+            TLShow.prep_syslog(self, message='local show detected')
             TLShow.run_local(self)
                    
         else:
