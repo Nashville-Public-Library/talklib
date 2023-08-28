@@ -22,7 +22,7 @@ def clear_screen():
     else:
         os.system('clear')
 
-def print_to_screen(message: str):
+def print_to_screen_and_wait(message: str):
     '''clear terminal and print message to screen.'''
     clear_screen()
     print(f'{message}\n')  # get user's attention!

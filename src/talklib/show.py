@@ -17,7 +17,7 @@ import ffmpeg
 import requests
 
 from talklib.ev import EV
-from talklib.utils import get_timestamp, clear_screen, print_to_screen, today_is_weekday, get_length_in_minutes
+from talklib.utils import get_timestamp, clear_screen, print_to_screen_and_wait, today_is_weekday, get_length_in_minutes
 from talklib.utils import send_sms, send_syslog, send_mail
 
 
@@ -266,7 +266,7 @@ It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually!\n\n\
 {get_timestamp()}")
                 TLShow.notify(self, message=toSend, subject='Error')
-                print_to_screen(message=toSend)
+                print_to_screen_and_wait(message=toSend)
                 break
         if success:
             TLShow.countdown(self)
@@ -515,7 +515,7 @@ It looks like today's file hasn't yet been posted. Please check and download man
 {get_timestamp()}"
                 )
             TLShow.notify(self, message=toSend, subject='Error')
-            print_to_screen(message=toSend)
+            print_to_screen_and_wait(message=toSend)
             raise Exception
     
     def run_local(self):
@@ -533,5 +533,5 @@ It looks like the source file doesn't exist. Please check manually! Yesterday's 
 {get_timestamp()}"
                 )
             TLShow.notify(self, message=to_send, subject='Error')
-            print_to_screen(message=to_send)
+            print_to_screen_and_wait(message=to_send)
             raise FileNotFoundError
