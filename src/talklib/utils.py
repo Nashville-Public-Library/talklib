@@ -5,7 +5,6 @@ import logging
 from logging.handlers import SysLogHandler
 import os
 import smtplib
-import subprocess
 
 from twilio.rest import Client
 
