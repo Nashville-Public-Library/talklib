@@ -23,40 +23,23 @@ from talklib.utils import send_sms, send_syslog, send_mail
 
 class TLShow():
     '''TODO write something here'''
-    def __init__(
-        self, 
-        show: str = None, 
-        show_filename: str = None, 
-        url: str = None, 
-        is_permalink: bool = False, 
-        breakaway: int | float = 0, # either int or float is fine
-        include_date: bool = False, 
-        remove_yesterday: bool = False, 
-        is_local: bool = False, 
-        local_file: str = None,
-        remove_source: bool = False, 
-        check_if_above: int | float = 0, # either int or float is fine
-        check_if_below: int | float = 0, # either int or float is fine
-        notifications: bool = True, 
-        twilio_enable: bool = True, 
-        ff_level: int | float = 21 # either int or float is fine
-        ):
+    def __init__(self):
 
-        self.show = show
-        self.show_filename = show_filename
-        self.url = url
-        self.is_permalink = is_permalink
-        self.breakaway = breakaway
-        self.include_date = include_date
-        self.remove_yesterday = remove_yesterday
-        self.is_local = is_local
-        self.local_file = local_file
-        self.remove_source = remove_source
-        self.check_if_above = check_if_above    
-        self.check_if_below = check_if_below
-        self.notifications = notifications
-        self.twilio_enable = twilio_enable
-        self.ff_level = ff_level
+        self.show:str = None
+        self.show_filename: str = None
+        self.url: str = None
+        self.is_permalink: int | float = 0
+        self.breakaway: int | float = 0
+        self.include_date: bool = False
+        self.remove_yesterday: bool = False
+        self.is_local: str = None
+        self.local_file: str = None
+        self.remove_source: bool = False
+        self.check_if_above: int | float = 0    
+        self.check_if_below: int | float = 0
+        self.notifications: bool = True
+        self.twilio_enable: bool = True
+        self.ff_level: int | float = 21
         self.syslog_enable: bool = True
         self.destinations: list = EV().destinations
     
