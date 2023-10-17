@@ -50,12 +50,12 @@ def send_call(message: str):
 def send_sms(message: str):
     '''send sms via twilio. '''
     client = Client(EV().twilio_sid, EV().twilio_token)
-    message = client.messages.create(
+    SMS = client.messages.create(
         body=message,
         from_=EV().twilio_from,
         to=EV().twilio_to
     )
-    message.sid
+    SMS.sid
 
 def send_syslog(message: str):
     '''send message to syslog server'''
