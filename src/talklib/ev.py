@@ -24,3 +24,5 @@ class EV:
         self.twilio_token = os.environ['twilio_token']# locate by logging in to Twilio website
         self.twilio_from = os.environ['twilio_from'] # locate by logging in to Twilio website
         self.twilio_to = os.environ['twilio_to'] # to where should texts/calls be sent
+        self.icecast_user = os.environ['icecast_user']
+        self.icecast_pass = os.environ['icecast_pass']
