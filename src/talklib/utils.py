@@ -14,14 +14,14 @@ def get_timestamp() -> str:
     timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
     return timestamp
 
-def clear_screen():
+def clear_screen() -> None:
     '''clears the terminal'''
     if os.name == 'nt':
         os.system('cls')
     else:
         os.system('clear')
 
-def print_to_screen_and_wait(message: str):
+def print_to_screen_and_wait(message: str) -> None:
     '''clear terminal and print message to screen.'''
     clear_screen()
     print(f'{message}\n')  # get user's attention!
@@ -36,7 +36,7 @@ def today_is_weekday() -> bool:
     else:
         return False
 
-def send_call(message: str):
+def send_call(message: str) -> None:
     '''send voice call via twilio'''
     client = Client(EV().twilio_sid, EV().twilio_token)
 
@@ -47,7 +47,7 @@ def send_call(message: str):
                         )
     call.sid
 
-def send_sms(message: str):
+def send_sms(message: str) -> None:
     '''send sms via twilio. '''
     client = Client(EV().twilio_sid, EV().twilio_token)
     SMS = client.messages.create(
@@ -57,7 +57,7 @@ def send_sms(message: str):
     )
     SMS.sid
 
-def send_syslog(message: str):
+def send_syslog(message: str) -> None:
     '''send message to syslog server'''
     port = int('514')
     my_logger = logging.getLogger('MyLogger')
@@ -68,7 +68,7 @@ def send_syslog(message: str):
     my_logger.info(message)
     my_logger.removeHandler(handler) # don't forget this after you send the message!
 
-def send_mail(message: str, subject: str):
+def send_mail(message: str, subject: str) -> None:
     '''send email to TL gmail account via relay address'''
     format = EmailMessage()
     format.set_content(message)
