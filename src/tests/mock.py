@@ -23,6 +23,8 @@ env_vars = {
         'twilio_token': 'mocked_value2',
         'twilio_from': 'mocked_value2',
         'twilio_to': 'mocked_value2',
+        'icecast_user': 'mahhhh',
+        'icecast_pass': 'mahhhhh'
     }
 
 def mock_destinations():
