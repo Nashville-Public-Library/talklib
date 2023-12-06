@@ -2,6 +2,7 @@ import atexit
 import xml.etree.ElementTree as ET
 import pytest
 import os
+import requests
 import subprocess
 from unittest.mock import patch
 
@@ -141,13 +142,14 @@ def test_convert_3(template_permalink: TLShow):
     assert duration == 30
     os.remove(test_file)
 
-# ----- check length -----
-'''need to test other things here...'''
-def test_check_length(template_local: TLShow):
-    
-    template_local.check_if_above = 2
-    template_local.check_if_below = 1
-    assert type(template_local.check_length(fileToCheck=download_test_file())) == float
+def test_convert_4(template_permalink: TLShow):
+    '''assert an exception is raised when ffmpeg tries to convert a non-audio file'''
+    with open('test.mp3', mode='wb') as test_file:
+            a = requests.get('https://library.nashville.org/themes/custom/npl/logo.svg') #not an audio file
+            test_file.write(a.content)
+    with pytest.raises(Exception):
+        template_permalink.convert(input=test_file.name)
+    os.remove(test_file.name)
 
 # ----- check downloaded file -----
 
@@ -163,6 +165,14 @@ def test_check_downloaded_file_2(template_permalink: TLShow):
 def test_check_downloaded_file_3(template_permalink: TLShow):
     '''should return True if valid file is passed'''
     assert type(template_permalink.check_downloaded_file(fileToCheck=download_test_file(), how_many_attempts=0)) == bool
+
+# ----- check length -----
+'''need to test other things here...'''
+def test_check_length_1(template_local: TLShow):
+    
+    template_local.check_if_above = 1
+    template_local.check_if_below = .5
+    assert type(template_local.check_length(fileToCheck=download_test_file())) == float
 
 # ----- get feed -----
 

@@ -93,8 +93,13 @@ class TLShow():
 
         TLShow.prep_syslog(self, message=f'FFmpeg commands: {ffmpeg_commands}')
         TLShow.prep_syslog(self, message='Converting to TL format...')
-        ffmpeg.run(stream)
-        TLShow.prep_syslog(self, message='Conversion complete!')
+        try:
+            ffmpeg.run(stream)
+            TLShow.prep_syslog(self, message='Conversion complete!')
+        except Exception as ffmpeg_exception:
+            to_send = f'There was a problem. FFmpeg could not convert the file. The error is: {ffmpeg_exception}'
+            TLShow.notify(self, message=to_send, subject='Error')
+            raise Exception (ffmpeg_exception)
 
         return output_file
 
