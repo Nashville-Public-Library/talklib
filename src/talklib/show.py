@@ -19,6 +19,7 @@ import requests
 from talklib.ev import EV
 from talklib.utils import get_timestamp, clear_screen, print_to_screen_and_wait, today_is_weekday, get_length_in_minutes
 from talklib.utils import send_sms, send_syslog, send_mail
+from talklib.ffmpeg import FFMPEG
 
 
 class TLShow():
@@ -59,49 +60,10 @@ class TLShow():
         else:
             outputFile = (f'{self.show_filename}.wav')
         return outputFile
-    
-    def build_input_commands(self, input_file) -> dict:
-        command = {}
-        command.update({'hide_banner': None})
-        command.update({'loglevel': 'quiet'})
-        command.update({'filename': input_file})
-
-        return command
-    
-    def build_output_commands(self) -> dict:
-        output_file = TLShow.create_output_filename(self)
-        command = {}
-        command.update({'ar': '44100'})
-        command.update({'ac': '1'})
-        command.update({'af': f'loudnorm=I=-{self.ff_level}'})
-        if self.breakaway:
-            command.update({'t': self.breakaway})
-        command.update({'y': None})
-        command.update({'filename': output_file})
-
-        return command
 
     def convert(self, input):
-        '''convert file with ffmpeg and return filename'''
-        output_file = TLShow.create_output_filename(self)
-        input_commands = TLShow.build_input_commands(self, input_file=input)
-        output_commands = TLShow.build_output_commands(self)
-
-        stream = ffmpeg.input(**input_commands)
-        stream = ffmpeg.output(stream, **output_commands)
-        ffmpeg_commands = ffmpeg.get_args(stream)
-
-        TLShow.prep_syslog(self, message=f'FFmpeg commands: {ffmpeg_commands}')
-        TLShow.prep_syslog(self, message='Converting to TL format...')
-        try:
-            ffmpeg.run(stream)
-            TLShow.prep_syslog(self, message='Conversion complete!')
-        except Exception as ffmpeg_exception:
-            to_send = f'There was a problem. FFmpeg could not convert the file. The error is: {ffmpeg_exception}'
-            TLShow.notify(self, message=to_send, subject='Error')
-            raise Exception (ffmpeg_exception)
-
-        return output_file
+        file = FFMPEG(input_file=input, output_file=self.create_output_filename())
+        return file.convert()
 
     def copy_then_remove(self, fileToCopy):
         '''TODO explain'''

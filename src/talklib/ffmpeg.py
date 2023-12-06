@@ -1,0 +1,50 @@
+import ffmpeg
+
+class FFMPEG:
+    def __init__(self, input_file: str, 
+                 output_file: str, 
+                 ):
+
+        self.input_file = input_file
+        self.output_file = output_file
+        self.breakaway: int | float = 0
+        self.ff_level: int | float = 21
+
+    def build_input_commands(self) -> dict:
+        command = {}
+        command.update({'hide_banner': None})
+        command.update({'loglevel': 'quiet'})
+        command.update({'filename': self.input_file})
+
+        return command
+    
+    def build_output_commands(self) -> dict:
+        output_file = self.output_file
+        command = {}
+        command.update({'ar': '44100'})
+        command.update({'ac': '1'})
+        command.update({'af': f'loudnorm=I=-{self.ff_level}'})
+        if self.breakaway:
+            command.update({'t': self.breakaway})
+        command.update({'y': None})
+        command.update({'filename': output_file})
+
+        return command
+
+    def convert(self):
+        '''convert file with ffmpeg and return filename'''
+        input_commands = self.build_input_commands()
+        output_commands = self.build_output_commands()
+
+        stream = ffmpeg.input(**input_commands)
+        stream = ffmpeg.output(stream, **output_commands)
+        ffmpeg_commands = ffmpeg.get_args(stream)
+
+
+
+        try:
+            ffmpeg.run(stream, capture_stderr=True)
+        except Exception as ffmpeg_exception:
+            raise Exception (ffmpeg_exception)
+
+        return self.output_file
