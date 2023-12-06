@@ -1,14 +1,21 @@
 import ffmpeg
 
 class FFMPEG:
-    def __init__(self, input_file: str, 
-                 output_file: str, 
+    def __init__(self, 
+                input_file: str = None,
+                output_file: str = None,
+                breakaway: int|float = 0,
+                compression_level: int|float = 21,
+                sample_rate: int = 441000,
+                audio_channels: int = 1
                  ):
 
         self.input_file = input_file
         self.output_file = output_file
-        self.breakaway: int | float = 0
-        self.ff_level: int | float = 21
+        self.breakaway = breakaway
+        self.compression_level = compression_level
+        self.sample_rate = sample_rate
+        self.audio_channels = audio_channels
 
     def build_input_commands(self) -> dict:
         command = {}
@@ -21,9 +28,9 @@ class FFMPEG:
     def build_output_commands(self) -> dict:
         output_file = self.output_file
         command = {}
-        command.update({'ar': '44100'})
-        command.update({'ac': '1'})
-        command.update({'af': f'loudnorm=I=-{self.ff_level}'})
+        command.update({'ar': self.sample_rate})
+        command.update({'ac': self.audio_channels})
+        command.update({'af': f'loudnorm=I=-{self.compression_level}'})
         if self.breakaway:
             command.update({'t': self.breakaway})
         command.update({'y': None})

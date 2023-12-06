@@ -69,12 +69,12 @@ def test_check_attributes_are_valid_3(template_rss: TLShow):
         template_rss.check_attributes_are_valid()
 
 def test_check_attributes_are_valid_6(template_rss: TLShow):
-    template_rss.breakaway = True
+    template_rss.ffmpeg.breakaway = True
     with pytest.raises(Exception):
         template_rss.check_attributes_are_valid()
 
 def test_check_attributes_are_valid_7(template_rss: TLShow):
-    template_rss.ff_level = True
+    template_rss.ffmpeg.compression_level = True
     with pytest.raises(Exception):
         template_rss.check_attributes_are_valid()
 

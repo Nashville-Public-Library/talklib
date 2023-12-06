@@ -30,7 +30,6 @@ class TLShow():
         self.show_filename: str = None
         self.url: str = None
         self.is_permalink: int | float = 0
-        self.breakaway: int | float = 0
         self.include_date: bool = False
         self.remove_yesterday: bool = False
         self.is_local: str = None
@@ -40,7 +39,7 @@ class TLShow():
         self.check_if_below: int | float = 0
         self.notifications: bool = True
         self.twilio_enable: bool = True
-        self.ff_level: int | float = 21
+        self.ffmpeg = FFMPEG()
         self.syslog_enable: bool = True
         self.destinations: list = EV().destinations
     
@@ -62,8 +61,12 @@ class TLShow():
         return outputFile
 
     def convert(self, input):
-        file = FFMPEG(input_file=input, output_file=self.create_output_filename())
-        return file.convert()
+        # file = FFMPEG(input_file=input, output_file=self.create_output_filename())
+        # return file.convert()
+        ffmpeg = self.ffmpeg
+        ffmpeg.input_file = input
+        ffmpeg.output_file = self.create_output_filename()
+        return ffmpeg.convert()
 
     def copy_then_remove(self, fileToCopy):
         '''TODO explain'''
@@ -388,11 +391,11 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.local_file:
             TLShow.check_str_and_bool_type(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
         
-        if self.breakaway:
-            TLShow.check_int_and_float_type(attrib_to_check=self.breakaway, attrib_return='breakaway')
+        if self.ffmpeg.breakaway:
+            TLShow.check_int_and_float_type(attrib_to_check=self.ffmpeg.breakaway, attrib_return='breakaway')
         
-        if self.ff_level:
-            TLShow.check_int_and_float_type(attrib_to_check=self.ff_level, attrib_return='fflevel')
+        if self.ffmpeg.compression_level:
+            TLShow.check_int_and_float_type(attrib_to_check=self.ffmpeg.compression_level, attrib_return='fflevel')
 
         if self.is_permalink:
             TLShow.check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
