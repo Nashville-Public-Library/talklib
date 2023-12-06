@@ -5,7 +5,7 @@ from talklib import TLShow
 from ..mock import env_vars
 
 
-url = 'https://pnsne.ws/3mVuTax'
+url = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
 
 @pytest.fixture

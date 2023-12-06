@@ -10,7 +10,7 @@ to mock a local file. Downloading the file itself it just setting up the test.
 
 This static link was chosen because it's reliably available and the file is small/short.
 '''
-permalink = 'https://pnsne.ws/3mVuTax'
+permalink = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
 env_vars = {
         'OnAirPC': 'nothing',
