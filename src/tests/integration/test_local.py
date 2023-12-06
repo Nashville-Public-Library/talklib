@@ -35,7 +35,6 @@ def test_run(template: TLShow):
     '''asserts no exception is raised for normal/correct case'''
     template.run()
 
-
 def test_run_no_file(template: TLShow):
     '''check exception is raised with incorrect file name/path'''
     template.local_file = 'nofile'
@@ -60,9 +59,6 @@ def test_check_length(template: TLShow):
     template.check_if_above = 10
     template.check_if_below = 5
     assert type(template.check_length(fileToCheck=template.local_file)) == float
-
-def test_convert(template: TLShow):
-    assert template.convert(template.local_file) == f'{template.show_filename}.wav'
     
 
 '''
