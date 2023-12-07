@@ -6,7 +6,7 @@ class FFMPEG:
                 output_file: str = None,
                 breakaway: int|float = 0,
                 compression_level: int|float = 21,
-                sample_rate: int = 441000,
+                sample_rate: int = 44100,
                 audio_channels: int = 1
                  ):
 
