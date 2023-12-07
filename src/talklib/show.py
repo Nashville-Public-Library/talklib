@@ -402,13 +402,13 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             TLShow.check_int_and_float_type(attrib_to_check=self.check_if_below, attrib_return='check_if_below')
         
         if self.notifications.syslog_enable:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications, type_to_check=bool, attrib_return='notifications')
+            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.syslog_enable, type_to_check=bool, attrib_return='notifications')
 
         if self.notifications.twilio_enable:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
+            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
         
         if self.notifications.email_enable:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
+            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.email_enable, type_to_check=bool, attrib_return='twilio_enable')
 
     def run(self):
         '''begins to process the file'''
