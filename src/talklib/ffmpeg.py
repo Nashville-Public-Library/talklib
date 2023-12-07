@@ -47,8 +47,6 @@ class FFMPEG:
         stream = ffmpeg.output(stream, **output_commands)
         ffmpeg_commands = ffmpeg.get_args(stream)
 
-
-
         try:
             ffmpeg.run(stream, capture_stderr=True)
         except Exception as ffmpeg_exception:
