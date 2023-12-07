@@ -38,7 +38,6 @@ class TLShow():
         self.check_if_above: int | float = 0    
         self.check_if_below: int | float = 0
         self.notifications = Notify()
-        self.twilio_enable: bool = True
         self.ffmpeg = FFMPEG()
         self.destinations: list = EV().destinations
     
