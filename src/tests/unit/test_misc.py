@@ -23,8 +23,9 @@ def template_local():
     test.local_file = input_file
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False 
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     yield test
 
@@ -37,8 +38,9 @@ def template_permalink():
     test.url = permalink_URL
     test.is_permalink = True
     # disable notifications for template. Need separate templates for these!
-    test.notifications = False
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     yield test
 
@@ -50,8 +52,9 @@ def template_rss():
     test.show_filename = 'delete_me'
     test.url = RSS_URL
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     yield test
 

@@ -17,8 +17,9 @@ def template_permalink():
     test.url = url
     test.is_permalink = True
     # disable notifications for template. Need separate templates for these!
-    test.notifications = False
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     return test
 
