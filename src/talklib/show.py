@@ -406,6 +406,9 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 
         if self.notifications.twilio_enable:
             TLShow.check_str_and_bool_type(attrib_to_check=self.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
+        
+        if self.notifications.email_enable:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
 
     def run(self):
         '''begins to process the file'''
