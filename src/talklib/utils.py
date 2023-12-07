@@ -29,13 +29,12 @@ def print_to_screen_and_wait(message: str) -> None:
 
 def today_is_weekday() -> bool:
     '''crude mechanism for determining if today is a weekday.'''
-    # today = datetime.now().strftime('%a')
-    # weekend = ['Sat', 'Sun']
-    # if today not in weekend:
-    #     return True
-    # else:
-    #     return False
-    return False
+    today = datetime.now().strftime('%a')
+    weekend = ['Sat', 'Sun']
+    if today not in weekend:
+        return True
+    else:
+        return False
 
 def get_length_in_minutes(file_to_check) -> float:
     duration = ffmpeg.probe(filename=file_to_check)
