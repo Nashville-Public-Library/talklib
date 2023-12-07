@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from talklib import TLShow
 from ..mock import env_vars
@@ -20,8 +20,9 @@ def template_rss():
     test.show_filename = 'delete_me'
     test.url = url
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     return test
 
@@ -51,7 +52,7 @@ def test_check_attributes_are_valid_1(template_rss: TLShow):
 def test_gen(template_rss: TLShow):
     assert type(template_rss.create_output_filename()) == str
 
-# now, start deliberatly triggering exceptions with invalid attributes.
+# now, start deliberately triggering exceptions with invalid attributes.
 
 def test_check_attributes_are_valid_1a(template_rss: TLShow):
     template_rss.show = 42
@@ -89,12 +90,12 @@ def test_check_attributes_are_valid_9(template_rss: TLShow):
         template_rss.run()
 
 def test_check_attributes_are_valid_10(template_rss: TLShow):
-    template_rss.notifications = 5
+    template_rss.notifications.email_enable = 5
     with pytest.raises(Exception):
         template_rss.run()
 
 def test_check_attributes_are_valid_11(template_rss: TLShow):
-    template_rss.twilio_enable = 4.5
+    template_rss.notifications.syslog_enable = 4.5
     with pytest.raises(Exception):
         template_rss.run()
  
