@@ -29,56 +29,13 @@ def print_to_screen_and_wait(message: str) -> None:
 
 def today_is_weekday() -> bool:
     '''crude mechanism for determining if today is a weekday.'''
-    today = datetime.now().strftime('%a')
-    weekend = ['Sat', 'Sun']
-    if today not in weekend:
-        return True
-    else:
-        return False
-
-def send_call(message: str) -> None:
-    '''send voice call via twilio'''
-    client = Client(EV().twilio_sid, EV().twilio_token)
-
-    call = client.calls.create(
-                            twiml=f'<Response><Say>{message}</Say></Response>',
-                            to=EV().twilio_to,
-                            from_=EV().twilio_from
-                        )
-    call.sid
-
-def send_sms(message: str) -> None:
-    '''send sms via twilio. '''
-    client = Client(EV().twilio_sid, EV().twilio_token)
-    SMS = client.messages.create(
-        body=message,
-        from_=EV().twilio_from,
-        to=EV().twilio_to
-    )
-    SMS.sid
-
-def send_syslog(message: str) -> None:
-    '''send message to syslog server'''
-    port = int('514')
-    my_logger = logging.getLogger('MyLogger')
-    my_logger.setLevel(logging.DEBUG)
-    handler = SysLogHandler(address=(EV().syslog_host, port))
-    my_logger.addHandler(handler)
-
-    my_logger.info(message)
-    my_logger.removeHandler(handler) # don't forget this after you send the message!
-
-def send_mail(message: str, subject: str) -> None:
-    '''send email to TL gmail account via relay address'''
-    format = EmailMessage()
-    format.set_content(message)
-    format['Subject'] = subject
-    format['From'] = EV().fromEmail
-    format['To'] = EV().toEmail
-
-    mail = smtplib.SMTP(host=EV().mail_server)
-    mail.send_message(format)
-    mail.quit()
+    # today = datetime.now().strftime('%a')
+    # weekend = ['Sat', 'Sun']
+    # if today not in weekend:
+    #     return True
+    # else:
+    #     return False
+    return False
 
 def get_length_in_minutes(file_to_check) -> float:
     duration = ffmpeg.probe(filename=file_to_check)
