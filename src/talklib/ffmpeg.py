@@ -26,7 +26,6 @@ class FFMPEG:
         return command
     
     def build_output_commands(self) -> dict:
-        output_file = self.output_file
         command = {}
         command.update({'ar': self.sample_rate})
         command.update({'ac': self.audio_channels})
@@ -34,7 +33,7 @@ class FFMPEG:
         if self.breakaway:
             command.update({'t': self.breakaway})
         command.update({'y': None})
-        command.update({'filename': output_file})
+        command.update({'filename': self.output_file})
 
         return command
 
