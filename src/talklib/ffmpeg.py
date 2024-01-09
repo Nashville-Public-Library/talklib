@@ -36,16 +36,21 @@ class FFMPEG:
         command.update({'filename': self.output_file})
 
         return command
+    
+    def get_commands(self):
+        input_commands = self.build_input_commands()
+        output_commands = self.build_output_commands()
+        stream = ffmpeg.input(**input_commands)
+        stream = ffmpeg.output(stream, **output_commands)
+        ffmpeg_commands = ffmpeg.get_args(stream)
+        return ffmpeg_commands
 
     def convert(self):
         '''convert file with ffmpeg and return filename'''
         input_commands = self.build_input_commands()
         output_commands = self.build_output_commands()
-
         stream = ffmpeg.input(**input_commands)
         stream = ffmpeg.output(stream, **output_commands)
-        ffmpeg_commands = ffmpeg.get_args(stream)
-
         try:
             ffmpeg.run(stream, capture_stderr=True)
         except Exception as ffmpeg_exception:

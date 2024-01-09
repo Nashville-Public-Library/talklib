@@ -62,7 +62,12 @@ class TLShow():
         ffmpeg = self.ffmpeg
         ffmpeg.input_file = input
         ffmpeg.output_file = self.create_output_filename()
-        return ffmpeg.convert()
+        self.prep_syslog(message='preparing to convert')
+        ffmpeg_commands = ffmpeg.get_commands()
+        self.prep_syslog(message=f'FFmpeg commands: {ffmpeg_commands}')
+        file = ffmpeg.convert()
+        self.prep_syslog(message='file converted successfully')
+        return file
 
     def copy_then_remove(self, fileToCopy):
         '''TODO explain'''
