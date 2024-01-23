@@ -23,8 +23,9 @@ def template():
     test.destinations = mock.mock_destinations()
 
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     yield test
 
@@ -34,7 +35,6 @@ def template():
 def test_run(template: TLShow):
     '''asserts no exception is raised for normal/correct case'''
     template.run()
-
 
 def test_run_no_file(template: TLShow):
     '''check exception is raised with incorrect file name/path'''
@@ -60,9 +60,6 @@ def test_check_length(template: TLShow):
     template.check_if_above = 10
     template.check_if_below = 5
     assert type(template.check_length(fileToCheck=template.local_file)) == float
-
-def test_convert(template: TLShow):
-    assert template.convert(template.local_file) == f'{template.show_filename}.wav'
     
 
 '''

@@ -1,6 +1,6 @@
 '''
 These are all of the environment variables we're calling from the PC.
-They'll be imported into the other files in this module.
+They'll be imported into the other files in this package.
 
 We're using the file so we have one central place from which
 to reference them.
@@ -8,7 +8,7 @@ to reference them.
 If you're installing the talklib module on a PC for the first time, 
 make sure all of these are declared in the PC's environment variables.
 
-If you need to change them, change them at the PC level, not here.
+If you need to change them, you probably want to change them at the PC level, not here.
 '''
 
 import os
@@ -24,5 +24,5 @@ class EV:
         self.twilio_token = os.environ['twilio_token']# locate by logging in to Twilio website
         self.twilio_from = os.environ['twilio_from'] # locate by logging in to Twilio website
         self.twilio_to = os.environ['twilio_to'] # to where should texts/calls be sent
-        self.icecast_user = os.environ['icecast_user']
-        self.icecast_pass = os.environ['icecast_pass']
+        self.icecast_user = os.environ['icecast_user'] # our icecast username
+        self.icecast_pass = os.environ['icecast_pass'] # our icecast password

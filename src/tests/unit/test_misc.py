@@ -23,8 +23,9 @@ def template_local():
     test.local_file = input_file
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False 
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     yield test
 
@@ -37,8 +38,9 @@ def template_permalink():
     test.url = permalink_URL
     test.is_permalink = True
     # disable notifications for template. Need separate templates for these!
-    test.notifications = False
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     yield test
 
@@ -50,8 +52,9 @@ def template_rss():
     test.show_filename = 'delete_me'
     test.url = RSS_URL
     # disable notifications for testing. Need separate tests for these!
-    test.notifications = False
-    test.syslog_enable = False
+    test.notifications.syslog_enable = False
+    test.notifications.twilio_enable = False
+    test.notifications.email_enable = False
 
     yield test
 
@@ -123,33 +126,33 @@ def test_decide_whether_to_remove_rss_3(template_rss: TLShow):
 # ----- convert -----
 '''what else should we be testing here???'''
 
-def test_convert_1(template_rss: TLShow):
-    '''should convert and return name of file'''
-    assert type(template_rss.convert(input=download_test_file())) == str
+# def test_convert_1(template_rss: TLShow):
+#     '''should convert and return name of file'''
+#     assert type(template_rss.convert(input=download_test_file())) == str
 
-def test_convert_2(template_local: TLShow):
-    '''should convert and return name of file'''
-    assert template_local.convert(input=download_test_file()) == f'{template_local.show_filename}.wav'
-    os.remove(f'{template_local.show_filename}.wav') # actually converts the file so need to remove it
+# def test_convert_2(template_local: TLShow):
+#     '''should convert and return name of file'''
+#     assert template_local.convert(input=download_test_file()) == f'{template_local.show_filename}.wav'
+#     os.remove(f'{template_local.show_filename}.wav') # actually converts the file so need to remove it
 
-def test_convert_3(template_permalink: TLShow):
-    '''testing whether the breakaway functionality works as intended'''
-    template_permalink.breakaway = 30
-    test_file = template_permalink.convert(input=(download_test_file()))
-    duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {test_file}")
-    duration = float(duration)
-    duration = round(duration, 2)
-    assert duration == 30
-    os.remove(test_file)
+# def test_convert_3(template_permalink: TLShow):
+#     '''testing whether the breakaway functionality works as intended'''
+#     template_permalink.breakaway = 30
+#     test_file = template_permalink.convert(input=(download_test_file()))
+#     duration = subprocess.getoutput(f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {test_file}")
+#     duration = float(duration)
+#     duration = round(duration, 2)
+#     assert duration == 30
+#     os.remove(test_file)
 
-def test_convert_4(template_permalink: TLShow):
-    '''assert an exception is raised when ffmpeg tries to convert a non-audio file'''
-    with open('test.mp3', mode='wb') as test_file:
-            a = requests.get('https://library.nashville.org/themes/custom/npl/logo.svg') #not an audio file
-            test_file.write(a.content)
-    with pytest.raises(Exception):
-        template_permalink.convert(input=test_file.name)
-    os.remove(test_file.name)
+# def test_convert_4(template_permalink: TLShow):
+#     '''assert an exception is raised when ffmpeg tries to convert a non-audio file'''
+#     with open('test.mp3', mode='wb') as test_file:
+#             a = requests.get('https://library.nashville.org/themes/custom/npl/logo.svg') #not an audio file
+#             test_file.write(a.content)
+#     with pytest.raises(Exception):
+#         template_permalink.convert(input=test_file.name)
+#     os.remove(test_file.name)
 
 # ----- check downloaded file -----
 

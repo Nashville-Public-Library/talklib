@@ -17,8 +17,9 @@ import ffmpeg
 import requests
 
 from talklib.ev import EV
+from talklib.notify import Notify
 from talklib.utils import get_timestamp, clear_screen, print_to_screen_and_wait, today_is_weekday, get_length_in_minutes
-from talklib.utils import send_sms, send_syslog, send_mail
+from talklib.ffmpeg import FFMPEG
 
 
 class TLShow():
@@ -29,7 +30,6 @@ class TLShow():
         self.show_filename: str = None
         self.url: str = None
         self.is_permalink: int | float = 0
-        self.breakaway: int | float = 0
         self.include_date: bool = False
         self.remove_yesterday: bool = False
         self.is_local: str = None
@@ -37,10 +37,8 @@ class TLShow():
         self.remove_source: bool = False
         self.check_if_above: int | float = 0    
         self.check_if_below: int | float = 0
-        self.notifications: bool = True
-        self.twilio_enable: bool = True
-        self.ff_level: int | float = 21
-        self.syslog_enable: bool = True
+        self.notifications = Notify()
+        self.ffmpeg = FFMPEG()
         self.destinations: list = EV().destinations
     
     
@@ -59,49 +57,17 @@ class TLShow():
         else:
             outputFile = (f'{self.show_filename}.wav')
         return outputFile
-    
-    def build_input_commands(self, input_file) -> dict:
-        command = {}
-        command.update({'hide_banner': None})
-        command.update({'loglevel': 'quiet'})
-        command.update({'filename': input_file})
-
-        return command
-    
-    def build_output_commands(self) -> dict:
-        output_file = TLShow.create_output_filename(self)
-        command = {}
-        command.update({'ar': '44100'})
-        command.update({'ac': '1'})
-        command.update({'af': f'loudnorm=I=-{self.ff_level}'})
-        if self.breakaway:
-            command.update({'t': self.breakaway})
-        command.update({'y': None})
-        command.update({'filename': output_file})
-
-        return command
 
     def convert(self, input):
-        '''convert file with ffmpeg and return filename'''
-        output_file = TLShow.create_output_filename(self)
-        input_commands = TLShow.build_input_commands(self, input_file=input)
-        output_commands = TLShow.build_output_commands(self)
-
-        stream = ffmpeg.input(**input_commands)
-        stream = ffmpeg.output(stream, **output_commands)
-        ffmpeg_commands = ffmpeg.get_args(stream)
-
-        TLShow.prep_syslog(self, message=f'FFmpeg commands: {ffmpeg_commands}')
-        TLShow.prep_syslog(self, message='Converting to TL format...')
-        try:
-            ffmpeg.run(stream)
-            TLShow.prep_syslog(self, message='Conversion complete!')
-        except Exception as ffmpeg_exception:
-            to_send = f'There was a problem. FFmpeg could not convert the file. The error is: {ffmpeg_exception}'
-            TLShow.notify(self, message=to_send, subject='Error')
-            raise Exception (ffmpeg_exception)
-
-        return output_file
+        ffmpeg = self.ffmpeg
+        ffmpeg.input_file = input
+        ffmpeg.output_file = self.create_output_filename()
+        self.prep_syslog(message='preparing to convert')
+        ffmpeg_commands = ffmpeg.get_commands()
+        self.prep_syslog(message=f'FFmpeg commands: {ffmpeg_commands}')
+        file = ffmpeg.convert()
+        self.prep_syslog(message='file converted successfully')
+        return file
 
     def copy_then_remove(self, fileToCopy):
         '''TODO explain'''
@@ -185,7 +151,7 @@ class TLShow():
         try:
             filesize = os.path.getsize(fileToCheck)
         except FileNotFoundError as error:
-            TLShow.notify(self, message=f'It looks like the file does not exist. Here is the error: {error}', subject='Error')
+            TLShow.send_notifications(self, message=f'It looks like the file does not exist. Here is the error: {error}', subject='Error')
             raise FileNotFoundError
             
         is_not_empty = False
@@ -205,39 +171,34 @@ f"There was a problem with {self.show}.\n\n\
 It looks like the downloaded file is empty. Please check manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}"
 )
-            TLShow.notify(self, message=toSend, subject='Error')
+            TLShow.send_notifications(self, message=toSend, subject='Error')
             TLShow.remove(self, fileToDelete=fileToCheck)
             raise Exception (toSend)
             
     def prep_syslog(self, message: str):
         '''send message to syslog server'''
-        if not self.syslog_enable:
-            pass
-        else:
-            message = f'{self.show}: {message}'
-            send_syslog(message=message)
+        message = f'{self.show}: {message}'
+        self.notifications.send_syslog(message=message)
 
 
     def prep_send_mail(self, message: str, subject: str):
         '''send email to TL gmail account via relay address'''
         subject = f'{subject}: {self.show}'
-        send_mail(subject=subject, message=message)
+        self.notifications.send_mail(subject=subject, message=message)
 
     def send_sms_if_enabled(self, message: str):
         '''send sms via twilio IF twilio_enable is set to True'''
-        if self.twilio_enable:
-            send_sms(message=message)
+        self.notifications.send_sms(message=message)
 
-    def notify(self, message: str, subject: str):
+    def send_notifications(self, message: str, subject: str):
         '''we generally only want to send SMS via Twilio if today is on a weekend'''
-        if self.notifications:
-            if today_is_weekday():
-                TLShow.prep_send_mail(self, message=message, subject=subject)
-                TLShow.prep_syslog(self, message=message)
-            else:
-                TLShow.send_sms_if_enabled(self, message=message)
-                TLShow.prep_send_mail(self, message=message, subject=subject)
-                TLShow.prep_syslog(self, message=message)
+        if today_is_weekday():
+            TLShow.prep_send_mail(self, message=message, subject=subject)
+            TLShow.prep_syslog(self, message=message)
+        else:
+            TLShow.send_sms_if_enabled(self, message=message)
+            TLShow.prep_send_mail(self, message=message, subject=subject)
+            TLShow.prep_syslog(self, message=message)
 
     def check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
@@ -253,7 +214,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
 It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually!\n\n\
 {get_timestamp()}")
-                TLShow.notify(self, message=toSend, subject='Error')
+                TLShow.send_notifications(self, message=toSend, subject='Error')
                 print_to_screen_and_wait(message=toSend)
                 break
         if success:
@@ -278,13 +239,13 @@ Please check manually!\n\n\
                 toSend = (f"Today's {self.show} is {duration} minutes long! \
 Please check manually and make edits to bring it below {self.check_if_above} minutes.\n\n\
 {get_timestamp()}")
-                TLShow.notify(self, message=toSend, subject='Check Length')
+                TLShow.send_notifications(self, message=toSend, subject='Check Length')
 
             elif duration < self.check_if_below:
                 toSend = (f"Today's {self.show} is only {duration} minutes long! \
 This is unusual and could indicate a problem with the file. Please check manually!\n\n\
 {get_timestamp()}")
-                TLShow.notify(self, message=toSend, subject='Check Length')
+                TLShow.send_notifications(self, message=toSend, subject='Check Length')
 
             else:
                 TLShow.prep_syslog(self, message=f'File is {duration} minute(s). Continuing...')
@@ -306,7 +267,7 @@ Here's the error: {a}\n\n\
 Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 {get_timestamp()}"
                 )
-            TLShow.notify(self, subject='Error', message=to_send)
+            TLShow.send_notifications(self, subject='Error', message=to_send)
             raise Exception (a)
 
     def check_feed_updated(self) -> bool:
@@ -426,11 +387,11 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.local_file:
             TLShow.check_str_and_bool_type(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
         
-        if self.breakaway:
-            TLShow.check_int_and_float_type(attrib_to_check=self.breakaway, attrib_return='breakaway')
+        if self.ffmpeg.breakaway:
+            TLShow.check_int_and_float_type(attrib_to_check=self.ffmpeg.breakaway, attrib_return='breakaway')
         
-        if self.ff_level:
-            TLShow.check_int_and_float_type(attrib_to_check=self.ff_level, attrib_return='fflevel')
+        if self.ffmpeg.compression_level:
+            TLShow.check_int_and_float_type(attrib_to_check=self.ffmpeg.compression_level, attrib_return='fflevel')
 
         if self.is_permalink:
             TLShow.check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
@@ -444,11 +405,14 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if self.check_if_below:
             TLShow.check_int_and_float_type(attrib_to_check=self.check_if_below, attrib_return='check_if_below')
         
-        if self.notifications:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications, type_to_check=bool, attrib_return='notifications')
+        if self.notifications.syslog_enable:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.syslog_enable, type_to_check=bool, attrib_return='notifications')
 
-        if self.twilio_enable:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
+        if self.notifications.twilio_enable:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
+        
+        if self.notifications.email_enable:
+            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.email_enable, type_to_check=bool, attrib_return='twilio_enable')
 
     def run(self):
         '''begins to process the file'''
@@ -502,7 +466,7 @@ f"There was a problem with {self.show}.\n\n\
 It looks like today's file hasn't yet been posted. Please check and download manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}"
                 )
-            TLShow.notify(self, message=toSend, subject='Error')
+            TLShow.send_notifications(self, message=toSend, subject='Error')
             print_to_screen_and_wait(message=toSend)
             raise Exception
     
@@ -520,6 +484,6 @@ f"There was a problem with {self.show}.\n\n\
 It looks like the source file doesn't exist. Please check manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}"
                 )
-            TLShow.notify(self, message=to_send, subject='Error')
+            TLShow.send_notifications(self, message=to_send, subject='Error')
             print_to_screen_and_wait(message=to_send)
             raise FileNotFoundError
