@@ -12,13 +12,13 @@ class Notify:
                   syslog_enable: bool = True,
                   twilio_enable: bool = True,
                   email_enable: bool = True,
-                  EV = EV()
+                  ev = EV()
                   ):
         
         self.syslog_enable = syslog_enable
         self.twilio_enable = twilio_enable
         self.email_enable = email_enable
-        self.EV = EV
+        self.EV = ev
 
     def send_syslog(self, message: str) -> None:
         '''send message to syslog server'''
