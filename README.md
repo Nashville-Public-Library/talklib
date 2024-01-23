@@ -34,7 +34,7 @@ Twilio is used for SMS and phone call notifications.
 
 Access our TL Twilio info (token, etc.) by [logging in](https://www.twilio.com/login) to Twilio.
 
-See the "Usage" section below for how to disable Twilio.
+See [below](#disable-twilio) for how to disable Twilio.
 
 ### -Environment Variables
 Several global variables used here are pulled from environment variables. This gives the module more portability, and keeps sensitive info separated.
@@ -63,6 +63,7 @@ Before we begin, a general note:
 - Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file).
 - Ensure the Batch & Python scripts are in the same directory.
 - A sample `.bat` file (`Example.bat`) is included in this repo. 
+- PLEASE NOTE: the `.bat` file will run all Python files in the folder. This is one reason it is best to separate your Python files into different folders, each with its own `.bat` file.
 
 Here is what an example directory structure should look like:
 ````
@@ -193,44 +194,37 @@ optional
 
 `notifications`
 
-*boolean*
+*object*
 
 optional
-- whether you want to enable notifications (email, SMS)
-- if disabled, you do not need to also disable twilio.
-- True = enable, False = disable
-- default is `True`
+- this is its own object with the following attributes: 
+    - `syslog_enable`
+    - `twilio_enable`
+    - `email_enable`
+- to disable any one of these, set them like this: `object.notifications.twilio_enable = False`
+- default for all of them is `True`
+- more [examples](#examples) below
 
-`breakaway`
+`ffmpeg`
 
-*number*
+*object*
 
-optional
-- if you only want to convert/output the audio file up to a certain point, set this to the number of seconds at which point you want it to stop.
-- again, this number is in **seconds**, not minutes
-- perhaps the only time you need to set this is for shows like PNS where there is an expected "breakaway" time.
-- default is to convert the entire file
+- this is its own object with various attributes. The ones you might want to change are `breakaway` and `compression_level`
+    - `breakaway`
+        - if you only want to convert/output the audio file up to a certain point, set this to the number of seconds at which point you want it to stop.
+        - change it like this: `object.ffmpeg.breakaway = 120`. This will cut the audio at 2 minutes.
+        - again, this number is in seconds (not minutes)
+        - perhaps the only time you need to set this is for shows like PNS where there is an expected "breakaway" time.
+        - default is to convert the entire file
 
-`twilio_enable`
-
-*boolean*
-
-optional
-- whether you want to enable twilio (SMS) notifications
-- True = enable, False = disable
-- default is `True`
-
-`ff_level`
-
-*number*
-
-optional
-- sets the level for FFmpeg's compression/normalization
-- this is the EBU R128 LUFS "integrated loudness" standard
-- the smaller the number, the more compression is applied (17 is more compressed than 18)
-- the max is 5 (do not set to 1, 2, 3, or 4)!
-- **be careful with this!**
-- default is 21
+    - `compression_level`
+        - sets the level for FFmpeg's compression/normalization
+        - this is the EBU R128 LUFS "integrated loudness" standard
+        - change it like this: `object.ffmpeg.compression_level = 18`
+        - the smaller the number, the more compression is applied (17 is more compressed than 18)
+        - the max is 5 (do not set to 1, 2, 3, or 4)!
+        - be careful with this!
+        - default is 21
 
 ### Notes about formatting:
 
@@ -336,6 +330,44 @@ WK.notifications = False
 WK.include_date = True
 
 WK.run()
+````
+
+### Misc. Examples
+
+Here are some examples of how to access/modify certain attributes. 
+
+### Disable Twilio
+
+To disable Twilio notifications, simply add a line like this:
+
+````python
+from talklib import TLShow
+
+SD = TLShow()
+
+SD.show = 'Skywalker Daily News'
+SD.show_filename = 'SDN'
+SD.url = 'https://somesite.org/sdn-feed.rss'
+SD.notifications.twilio_enable = False
+
+SD.run()
+````
+
+### Adjust FFmpeg compression
+
+To adjust the level of compression applied with FFmppeg, add a line like this:
+
+````python
+from talklib import TLShow
+
+SD = TLShow()
+
+SD.show = 'Skywalker Daily News'
+SD.show_filename = 'SDN'
+SD.url = 'https://somesite.org/sdn-feed.rss'
+SD.ffmpeg.compression_level = 18
+
+SD.run()
 ````
 
 -----
