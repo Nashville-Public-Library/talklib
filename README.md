@@ -392,4 +392,5 @@ SD.run()
     - `pytest`
     - The tests can take a while to run. Watch the terminal output for progress.
     - If the tests fail, you may have installed something incorrectly. 
+    - You must be connected to the internet to run the tests
 
