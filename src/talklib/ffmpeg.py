@@ -51,9 +51,5 @@ class FFMPEG:
         output_commands = self.build_output_commands()
         stream = ffmpeg.input(**input_commands)
         stream = ffmpeg.output(stream, **output_commands)
-        try:
-            ffmpeg.run(stream, capture_stderr=True)
-        except Exception as ffmpeg_exception:
-            raise Exception (ffmpeg_exception)
-
+        ffmpeg.run(stream, capture_stderr=True)
         return self.output_file

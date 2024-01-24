@@ -65,9 +65,15 @@ class TLShow():
         self.prep_syslog(message='preparing to convert')
         ffmpeg_commands = ffmpeg.get_commands()
         self.prep_syslog(message=f'FFmpeg commands: {ffmpeg_commands}')
-        file = ffmpeg.convert()
-        self.prep_syslog(message='file converted successfully')
-        return file
+        try:
+            file = ffmpeg.convert()
+            self.prep_syslog(message='file converted successfully')
+            return file
+        except Exception as ffmpeg_exception:
+            self.send_notifications(message=ffmpeg_exception, subject='Error')
+            self.prep_syslog(message=f'conversion failed: {ffmpeg_exception}')
+            raise Exception (ffmpeg_exception)
+
 
     def copy_then_remove(self, fileToCopy):
         '''TODO explain'''
