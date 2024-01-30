@@ -21,15 +21,9 @@ class Notify:
 
     def send_syslog(self, message: str) -> None:
         '''send message to syslog server'''
-        if self.syslog_enable:
-            port = int('514')
-            my_logger = logging.getLogger('MyLogger')
-            my_logger.setLevel(logging.DEBUG)
-            handler = SysLogHandler(address=(self.EV.syslog_host, port))
-            my_logger.addHandler(handler)
-
-            my_logger.info(message)
-            my_logger.removeHandler(handler) # don't forget this after you send the message!
+        if not self.syslog_enable:
+            return
+        Syslog().send_syslog_message(message=message)
     
     def send_call(self, message: str) -> None:
         '''send voice call via twilio'''
@@ -66,3 +60,21 @@ class Notify:
             mail = smtplib.SMTP(host=self.EV.mail_server)
             mail.send_message(format)
             mail.quit()
+
+class Syslog:
+    def __init__ (
+        self,
+        syslog_host: str = EV().syslog_host,
+        syslog_port: int = 514,
+                  ):
+        self.syslog_host = syslog_host
+        self.syslog_port = syslog_port
+
+    def send_syslog_message(self, message: str):
+        my_logger = logging.getLogger('MyLogger')
+        my_logger.setLevel(logging.DEBUG)
+        handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
+        my_logger.addHandler(handler)
+
+        my_logger.info(message)
+        my_logger.removeHandler(handler) # don't forget this after you send the message!
