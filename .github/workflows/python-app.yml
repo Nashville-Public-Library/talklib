@@ -38,7 +38,7 @@ jobs:
   build-n-publish:
     name: Build and publish to PyPI
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.test.conclusion == 'success' }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
