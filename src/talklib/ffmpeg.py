@@ -51,5 +51,5 @@ class FFMPEG:
         output_commands = self.build_output_commands()
         stream = ffmpeg.input(**input_commands)
         stream = ffmpeg.output(stream, **output_commands)
-        ffmpeg.run(stream, capture_stderr=True)
+        ffmpeg.run(stream, capture_stdout=True)
         return self.output_file
