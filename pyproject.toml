@@ -4,11 +4,21 @@ version = "1.0.3"
 description = "A package to automate processing of shows/segments airing on the TL"
 license = {file = "LICENSE.txt"}
 readme = "README.md"
-authors = [{name = "Ben Weddle", email = "ben.weddle@gmail.com"}]
+authors = [
+    {name = "Ben Weddle", email = "ben.weddle@gmail.com"}
+]
+maintainers = [
+    {name = "Ben Weddle", email = "ben.weddle@gmail.com"}
+]
+license = {file = "LICENSE.txt"}
 requires-python = ">=3.10"
 dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+
+[project.urls]
+Repository = "https://github.com/talkinglibrary/talklib"
+Issues = "https://github.com/talkinglibrary/talklib/issues"
 
 [build-system]
 requires = ["setuptools"]
