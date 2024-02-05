@@ -39,7 +39,6 @@ requests==2.28.1
 requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.7.0
--e git+https://github.com/talkinglibrary/talklib.git@9f675838a34fdca050ad38bc0cb908be30ad500f#egg=talklib
 tomli==2.0.1
 twilio==7.15.3
 twine==4.0.2
