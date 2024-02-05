@@ -32,13 +32,14 @@ jobs:
         pip install -e .
 
     - name: Test with pytest
+      id: test
       run: |
         pytest
 
   build-n-publish:
     name: Build and publish to PyPI
     runs-on: ubuntu-latest
-    if: ${{ github.event.test.conclusion == 'success' }}
+    if: steps.build.outcome == 'success'
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
