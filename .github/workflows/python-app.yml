@@ -35,17 +35,7 @@ jobs:
       id: testing
       run: |
         pytest
-
-  if: steps.testing.outcome == 'success'
-  build-n-publish:
-    name: Build and publish to PyPI
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.10'
+      if: steps.testing.outcome == 'success'
     - name: Build a binary wheel
       run: |
         pip install --upgrade build
