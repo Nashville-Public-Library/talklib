@@ -207,7 +207,7 @@ def test_check_feed_loop_2(template_rss: TLShow):
 
 def test_check_feed_loop_3(template_rss: TLShow):
     '''should be bool type'''
-    assert type(template_rss.check_feed_loop()) == bool
+    assert type(template_rss.check_feed_loop()) == str
 
 # ----- old import method -----
 
