@@ -35,14 +35,6 @@ jobs:
       run: |
         pytest
 
-name: Publish to PyPI
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
   build-n-publish:
     name: Build and publish to PyPI
     runs-on: ubuntu-18.04
