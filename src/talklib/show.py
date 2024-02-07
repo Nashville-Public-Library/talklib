@@ -1,11 +1,3 @@
-'''
-TL library for processing RSS shows and other segments.
-It's best to read the docs.
-
-© Nashville Public Library
-© Ben Weddle is to blame for this code. Anyone is free to use it.
-'''
-
 from datetime import datetime
 import glob
 import os
