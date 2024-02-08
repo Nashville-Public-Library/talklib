@@ -35,8 +35,12 @@ jobs:
       id: testing
       run: |
         pytest
+
+  build_and_deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
     - name: Build a binary wheel
-      if: steps.testing.outcome == 'success'
       run: |
         pip install --upgrade build
         python -m build
