@@ -53,3 +53,14 @@ class FFMPEG:
         stream = ffmpeg.output(stream, **output_commands)
         ffmpeg.run(stream, capture_stdout=True)
         return self.output_file
+    
+    def get_length_in_minutes(self) -> float:
+        duration = ffmpeg.probe(filename=self.input_file)
+        duration = duration['format']['duration']
+        
+        # convert the number to something more usable/readable
+        duration = float(duration)
+        duration = duration/60
+        duration = round(duration, 2)
+
+        return duration

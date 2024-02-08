@@ -231,7 +231,7 @@ Please check manually!\n\n\
             TLShow.prep_syslog(self, message=f'Checking whether length is between \
 {self.check_if_below} and {self.check_if_above}')
 
-            duration = get_length_in_minutes(file_to_check=fileToCheck)
+            duration = FFMPEG(input_file=fileToCheck).get_length_in_minutes()
 
             if duration > self.check_if_above:
                 toSend = (f"Today's {self.show} is {duration} minutes long! \

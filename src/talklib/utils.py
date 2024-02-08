@@ -35,14 +35,3 @@ def today_is_weekday() -> bool:
         return True
     else:
         return False
-
-def get_length_in_minutes(file_to_check) -> float:
-    duration = ffmpeg.probe(filename=file_to_check)
-    duration = duration['format']['duration']
-    
-    # convert the number to something more usable/readable
-    duration = float(duration)
-    duration = duration/60
-    duration = round(duration, 2)
-
-    return duration
