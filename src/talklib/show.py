@@ -10,7 +10,7 @@ import requests
 
 from talklib.ev import EV
 from talklib.notify import Notify
-from talklib.utils import get_timestamp, clear_screen, print_to_screen_and_wait, today_is_weekday, get_length_in_minutes
+from talklib.utils import get_timestamp, clear_screen, print_to_screen_and_wait, today_is_weekday
 from talklib.ffmpeg import FFMPEG
 
 
