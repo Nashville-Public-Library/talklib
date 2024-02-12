@@ -439,49 +439,49 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
     def run_URL_permalink(self):
         # if url is declared, it's either an RSS or permalink show
         if self.url and self.is_permalink:
-            TLShow.remove_yesterday_files(self)
-            downloaded_file = TLShow.download_file(self)
-            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, how_many_attempts=0):
-                output_file = TLShow.convert(self, input=downloaded_file)
-            TLShow.check_length(self, fileToCheck=output_file)
-            TLShow.remove(self, fileToDelete=downloaded_file)
-            TLShow.copy_then_remove(self, fileToCopy=output_file)
-            TLShow.check_file_transferred(self, fileToCheck=output_file)
+            self.remove_yesterday_files()
+            downloaded_file = self.download_file()
+            if self.check_downloaded_file(fileToCheck=downloaded_file, how_many_attempts=0):
+                output_file = self.convert(input=downloaded_file)
+            self.check_length(fileToCheck=output_file)
+            self.remove(fileToDelete=downloaded_file)
+            self.copy_then_remove(fileToCopy=output_file)
+            self.check_file_transferred(fileToCheck=output_file)
 
     def run_URL_RSS(self):
-        if TLShow.check_feed_loop(self):
-            TLShow.remove_yesterday_files(self)
-            downloaded_file = TLShow.download_file(self)
-            if TLShow.check_downloaded_file(self, fileToCheck=downloaded_file, how_many_attempts=0):
-                output_file = TLShow.convert(self, input=downloaded_file)
-            TLShow.check_length(self, fileToCheck=output_file)
-            TLShow.remove(self, fileToDelete=downloaded_file)
-            TLShow.copy_then_remove(self, fileToCopy=output_file)
-            TLShow.check_file_transferred(self, fileToCheck=output_file)
+        if self.check_feed_loop():
+            self.remove_yesterday_files()
+            downloaded_file = self.download_file()
+            if self.check_downloaded_file(fileToCheck=downloaded_file, how_many_attempts=0):
+                output_file = self.convert(input=downloaded_file)
+            self.check_length(fileToCheck=output_file)
+            self.remove(fileToDelete=downloaded_file)
+            self.copy_then_remove(fileToCopy=output_file)
+            self.check_file_transferred(fileToCheck=output_file)
         else:
             toSend = (
 f"There was a problem with {self.show}.\n\n\
 It looks like today's file hasn't yet been posted. Please check and download manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}"
                 )
-            TLShow.send_notifications(self, message=toSend, subject='Error')
+            self.send_notifications(message=toSend, subject='Error')
             print_to_screen_and_wait(message=toSend)
             raise Exception
     
     def run_local(self):
         if self.local_file:
-            if TLShow.check_downloaded_file(self, fileToCheck=self.local_file, how_many_attempts=0):
-                output_file = TLShow.convert(self, input=self.local_file)
-            TLShow.check_length(self, fileToCheck=output_file)
-            TLShow.remove(self, fileToDelete=self.local_file)
-            TLShow.copy_then_remove(self, fileToCopy=output_file)
-            TLShow.check_file_transferred(self, fileToCheck=output_file)
+            if self.check_downloaded_file(fileToCheck=self.local_file, how_many_attempts=0):
+                output_file = self.convert(input=self.local_file)
+            self.check_length(fileToCheck=output_file)
+            self.remove(fileToDelete=self.local_file)
+            self.copy_then_remove(fileToCopy=output_file)
+            self.check_file_transferred(fileToCheck=output_file)
         else:
             to_send = (
 f"There was a problem with {self.show}.\n\n\
 It looks like the source file doesn't exist. Please check manually! Yesterday's file will remain.\n\n\
 {get_timestamp()}"
                 )
-            TLShow.send_notifications(self, message=to_send, subject='Error')
+            self.send_notifications(message=to_send, subject='Error')
             print_to_screen_and_wait(message=to_send)
             raise FileNotFoundError
