@@ -331,7 +331,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             number = number-1
             time.sleep(1)
 
-    def check_str_and_bool_type(attrib_to_check, type_to_check: str | bool, attrib_return: str):
+    def check_str_and_bool_type(self, attrib_to_check, type_to_check: str | bool, attrib_return: str):
         '''
         we are checking whether an attribute is either type str or bool, depending on what is passed in.
         
@@ -342,7 +342,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         if  type(attrib_to_check) != type_to_check:
             raise Exception (f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}.")
 
-    def check_int_and_float_type(attrib_to_check, attrib_return: str):
+    def check_int_and_float_type(self, attrib_to_check, attrib_return: str):
         '''
         Attributes passed here can be either int or float.
         '''
@@ -354,17 +354,17 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         Run some checks on the attributes the user has set. I.E. the required
         attributes have been set, they are the right type, etc.
         '''
-        TLShow.prep_syslog(self, message='checking user defined attributes')
+        self.prep_syslog(message='checking user defined attributes')
 
         if not self.show:
             raise Exception ('Sorry, you need to specify a name for the show.')
         else:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
+            self.check_str_and_bool_type(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
 
         if not self.show_filename:
             raise Exception ('Sorry, you need to specify a filename for the show.')
         else:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
+            self.check_str_and_bool_type(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
 
         if not self.url:
             if not self.is_local:
@@ -377,40 +377,40 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
 
         if self.url:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
+            self.check_str_and_bool_type(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
         
         if self.is_local:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.is_local, type_to_check=bool, attrib_return='is_local')
+            self.check_str_and_bool_type(attrib_to_check=self.is_local, type_to_check=bool, attrib_return='is_local')
 
         if self.local_file:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
+            self.check_str_and_bool_type(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
         
         if self.ffmpeg.breakaway:
-            TLShow.check_int_and_float_type(attrib_to_check=self.ffmpeg.breakaway, attrib_return='breakaway')
+            self.check_int_and_float_type(attrib_to_check=self.ffmpeg.breakaway, attrib_return='breakaway')
         
         if self.ffmpeg.compression_level:
-            TLShow.check_int_and_float_type(attrib_to_check=self.ffmpeg.compression_level, attrib_return='fflevel')
+            self.check_int_and_float_type(attrib_to_check=self.ffmpeg.compression_level, attrib_return='fflevel')
 
         if self.is_permalink:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
+            self.check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
 
         if not (self.check_if_above and self.check_if_below):
             print('\n(You did not specify check_if_below and/or check_if_above. These checks will not be run.')
         
         if self.check_if_above:
-            TLShow.check_int_and_float_type(attrib_to_check=self.check_if_above, attrib_return='check_if_above')
+            self.check_int_and_float_type(attrib_to_check=self.check_if_above, attrib_return='check_if_above')
         
         if self.check_if_below:
-            TLShow.check_int_and_float_type(attrib_to_check=self.check_if_below, attrib_return='check_if_below')
+            self.check_int_and_float_type(attrib_to_check=self.check_if_below, attrib_return='check_if_below')
         
         if self.notifications.syslog_enable:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.syslog_enable, type_to_check=bool, attrib_return='notifications')
+            self.check_str_and_bool_type(attrib_to_check=self.notifications.syslog_enable, type_to_check=bool, attrib_return='notifications')
 
         if self.notifications.twilio_enable:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
+            self.check_str_and_bool_type(attrib_to_check=self.notifications.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
         
         if self.notifications.email_enable:
-            TLShow.check_str_and_bool_type(attrib_to_check=self.notifications.email_enable, type_to_check=bool, attrib_return='twilio_enable')
+            self.check_str_and_bool_type(attrib_to_check=self.notifications.email_enable, type_to_check=bool, attrib_return='twilio_enable')
 
     def run(self):
         '''begins to process the file'''
