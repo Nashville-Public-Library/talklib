@@ -1,14 +1,5 @@
 from datetime import datetime
-from email.message import EmailMessage
-import ffmpeg
-import logging
-from logging.handlers import SysLogHandler
 import os
-import smtplib
-
-from twilio.rest import Client
-
-from talklib.ev import EV
 
 def get_timestamp() -> str:
     timestamp = datetime.now().strftime('%H:%M:%S on %d %b %Y')
