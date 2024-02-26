@@ -113,7 +113,7 @@ class TLShow():
                 if matched_filenames:
                     for file in matched_filenames:
                         self.prep_syslog(message=f'Deleting existing matched file: {file}')
-                        os.remove(f'{file}')
+                        os.remove(file)
                 else:
                     self.prep_syslog(message=f"{self.show}: Cannot find existing matched files in {destination}. Continuing...")
 
