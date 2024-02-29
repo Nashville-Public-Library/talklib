@@ -1,5 +1,7 @@
 # talklib
 
+![tests](https://github.com/talkinglibrary/talklib/actions/workflows/python-app.yml/badge.svg)
+
 ## A package to automate processing of shows/segments airing on the TL
 
 [Skip to Examples](#examples)
