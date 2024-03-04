@@ -260,7 +260,7 @@ this should be the only method/function you call directly from an outside script
 
 
 ----
-## Examples
+## Examples<a id="Examples"></a>
 ### RSS Example
 
 The minimum attributes you must set are `show`, `show_filename`, and `url`.
@@ -373,7 +373,7 @@ SD.run()
 ````
 
 -----
-## Development
+## Development<a id="Development"></a>
 
 - Clone this repository
     - `git clone https://github.com/talkinglibrary/talklib.git`
