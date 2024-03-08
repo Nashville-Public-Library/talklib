@@ -64,7 +64,7 @@ Before we begin, a general note:
 - These are some of the reasons why we do not run `.py` files directly from WR.
 - Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file).
 - Ensure the Batch & Python scripts are in the same directory.
-- A sample `.bat` file (`Example.bat`) is included in this repo. 
+- A sample `.bat` file (`Example.bat`) is included in the [misc](https://github.com/talkinglibrary/misc/tree/main/talklib_examples) repo. 
 - PLEASE NOTE: the `.bat` file will run all Python files in the folder. This is one reason it is best to separate your Python files into different folders, each with its own `.bat` file.
 
 Here is what an example directory structure should look like:
