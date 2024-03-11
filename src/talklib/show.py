@@ -278,8 +278,8 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         a standards organization. Most podcasts/RSS feeds follow this standard.
         '''
         root = self.get_feed()
-        for t in root.findall('channel'):
-            item = t.find('item')  # 'find' only returns the first match!
+        for channel in root.findall('channel'):
+            item = channel.find('item')  # 'find' only returns the first match!
             pub_date = item.find('pubDate').text
             today = datetime.now().strftime("%a, %d %b %Y")
             if today in pub_date:
@@ -289,8 +289,8 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
     def get_RSS_audio_url(self) -> str:
         '''TODO: explain'''
         root = self.get_feed()
-        for t in root.findall('channel'):
-            item = t.find('item')  # 'find' only returns the first match!
+        for channel in root.findall('channel'):
+            item = channel.find('item')  # 'find' only returns the first match!
             audio_url = item.find('enclosure').attrib
             audio_url = audio_url.get('url')
             self.prep_syslog(message=f'Audio URL is: {audio_url}')
