@@ -301,16 +301,16 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         occasionally, the first time we check the feed, it is not showing as updated.
         It's being cached, or something...? So we are checking it 3 times, for good measure.
         '''
-        i = 0
+        count = 0
         feed_updated = False
-        while i < 3:
-            self.prep_syslog(message=f'Attempt {i} to check feed.')
+        while count < 3:
+            self.prep_syslog(message=f'Attempt {count} to check feed.')
             feed_updated = self.check_feed_updated()
             if feed_updated:
                 break
             else:
                 time.sleep(1)
-                i = i+1
+                count = count+1
         return feed_updated
 
     def countdown(self):
@@ -322,7 +322,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         '''
         clear_screen()
         to_send = 'All Done.'
-        TLShow.prep_syslog(self, message=to_send)
+        self.prep_syslog(message=to_send)
         print(f'{to_send}\n')
         number = 5
         i = 0
@@ -415,23 +415,23 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
     def run(self):
         '''begins to process the file'''
 
-        TLShow.prep_syslog(self, message=f'Starting script')
+        self.prep_syslog(message=f'Starting script')
         print(f"I'm working on {self.show}. Just a moment...\n")
 
-        TLShow.check_attributes_are_valid(self)
+        self.check_attributes_are_valid()
 
         if self.url and self.is_permalink:
-            TLShow.prep_syslog(self, message='permalink show detected')
-            TLShow.run_URL_permalink(self)
+            self.prep_syslog(message='permalink show detected')
+            self.run_URL_permalink()
 
         # if url but not permalink, it must be an RSS feed...right?
         elif self.url:
-            TLShow.prep_syslog(self, message='URL show detected')
-            TLShow.run_URL_RSS(self)
+            self.prep_syslog(message='URL show detected')
+            self.run_URL_RSS()
 
         elif self.is_local:
-            TLShow.prep_syslog(self, message='local show detected')
-            TLShow.run_local(self)
+            self.prep_syslog(message='local show detected')
+            self.run_local()
                    
         else:
             raise Exception ('Sorry, something bad happened')
