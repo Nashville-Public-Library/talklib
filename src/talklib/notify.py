@@ -10,7 +10,6 @@ from talklib.ev import EV
 class Syslog:
     def __init__ (
         self,
-        # syslog_host: str = EV().syslog_host,
         syslog_port: int = 514,
                   ):
         self.syslog_host = EV().syslog_host
