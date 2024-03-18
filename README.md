@@ -276,11 +276,6 @@ SD.show = 'Skywalker Daily News'
 SD.show_filename = 'SDN'
 SD.url = 'https://somesite.org/sdn-feed.rss'
 
-# these are optional
-SD.remove_yesterday = True
-SD.check_if_above = 59
-SD.check_if_below = 55
-
 SD.run()
 ````
 ---
@@ -301,10 +296,6 @@ MWB.show = 'Magical World of Bees'
 MWB.show_filename = 'MWB'
 MWB.is_local = True
 MWB.local_file = 'D:Production\path\to\the\file.wav'
-
-# these are optional
-MWB.remove_source = True
-MBW.twilio_enable = False
 
 MWB.run()
 ````
@@ -327,10 +318,6 @@ WK.show_filename = 'WhoKnows'
 WK.url = 'https://somesite.org/who-knows-static'
 WK.is_permalink = True
 
-# these are optional
-WK.notifications = False
-WK.include_date = True
-
 WK.run()
 ````
 
@@ -338,7 +325,7 @@ WK.run()
 
 Here are some examples of how to access/modify certain attributes. 
 
-### Disable Twilio
+### Disable Twilio<a id="disable-twilio"></a>
 
 To disable Twilio notifications, simply add a line like this:
 
@@ -380,13 +367,13 @@ SD.run()
 - cd into the folder
     - `cd talklib`
 - Create a virtual environment
-    - `py -m venv venv`
-    - depending on your OS, instead of `py` you may need to use `python` or `python3`
+    - `python -m venv venv`
+    - depending on your OS, instead of `python`you may need to use `python3`
 - Activate virtual environment
     - On Windows: `venv\Scripts\activate`
     - On Mac: `source venv/bin/activate`
 - Update pip
-    - `py -m pip install --upgrade pip`
+    - `pip install --upgrade pip`
     - depending on your OS, instead of `pip` you may need to run `pip3`
 - Install the package into your virtual environment
     - `pip install -e .`
