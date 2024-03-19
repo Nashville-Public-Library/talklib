@@ -173,10 +173,10 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             self.remove(fileToDelete=fileToCheck)
             raise Exception (toSend)
             
-    def prep_syslog(self, message: str):
+    def prep_syslog(self, message: str, level: str = 'info'):
         '''send message to syslog server'''
         message = f'{self.show}: {message}'
-        self.notifications.send_syslog(message=message)
+        self.notifications.send_syslog(message=message, level=level)
 
 
     def prep_send_mail(self, message: str, subject: str):

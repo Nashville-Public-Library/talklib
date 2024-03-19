@@ -15,7 +15,7 @@ class Syslog:
         self.syslog_host = EV().syslog_host
         self.syslog_port = syslog_port
 
-    def get_level(self, level: str = 'info'):
+    def get_level(self, level: str):
         if level == 'info':
             return logging.INFO
         if level == 'debug':
@@ -49,11 +49,11 @@ class Notify:
         self.syslog = Syslog()
         self.EV = EV()
 
-    def send_syslog(self, message: str) -> None:
+    def send_syslog(self, message: str, level: str) -> None:
         '''send message to syslog server'''
         if not self.syslog_enable:
             return
-        self.syslog.send_syslog_message(message=message)
+        self.syslog.send_syslog_message(message=message, level=level)
     
     def send_call(self, message: str) -> None:
         '''send voice call via twilio'''
