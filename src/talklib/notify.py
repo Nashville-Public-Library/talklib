@@ -10,14 +10,26 @@ from talklib.ev import EV
 class Syslog:
     def __init__ (
         self,
-        syslog_port: int = 514,
+        syslog_port: int = 514
                   ):
         self.syslog_host = EV().syslog_host
         self.syslog_port = syslog_port
 
-    def send_syslog_message(self, message: str):
+    def get_level(self, level: str):
+        if level == 'info':
+            return logging.INFO
+        if level == 'debug':
+            return logging.DEBUG
+        if level == 'warning':
+            return logging.WARNING
+        if level == 'error':
+            return logging.ERROR
+        if level == 'critical':
+            return logging.CRITICAL
+
+    def send_syslog_message(self, message: str, level: str):
         my_logger = logging.getLogger('MyLogger')
-        my_logger.setLevel(logging.DEBUG)
+        my_logger.setLevel(self.get_level(level=level))
         handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
         my_logger.addHandler(handler)
 
@@ -37,11 +49,11 @@ class Notify:
         self.syslog = Syslog()
         self.EV = EV()
 
-    def send_syslog(self, message: str) -> None:
+    def send_syslog(self, message: str, level: str) -> None:
         '''send message to syslog server'''
         if not self.syslog_enable:
             return
-        self.syslog.send_syslog_message(message=message)
+        self.syslog.send_syslog_message(message=message, level=level)
     
     def send_call(self, message: str) -> None:
         '''send voice call via twilio'''
