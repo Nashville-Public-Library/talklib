@@ -10,28 +10,26 @@ from talklib.ev import EV
 class Syslog:
     def __init__ (
         self,
-        syslog_port: int = 514,
-        syslog_level: str = 'info'
+        syslog_port: int = 514
                   ):
         self.syslog_host = EV().syslog_host
         self.syslog_port = syslog_port
-        self.syslog_level = syslog_level
 
-    def get_level(self):
-        if self.syslog_level.lower() == 'info':
+    def get_level(self, level: str = 'info'):
+        if level == 'info':
             return logging.INFO
-        if self.syslog_level.lower() == 'debug':
+        if level == 'debug':
             return logging.DEBUG
-        if self.syslog_level == 'warning':
+        if level == 'warning':
             return logging.WARNING
-        if self.syslog_level == 'error':
+        if level == 'error':
             return logging.ERROR
-        if self.syslog_level == 'critical':
+        if level == 'critical':
             return logging.CRITICAL
 
-    def send_syslog_message(self, message: str):
+    def send_syslog_message(self, message: str, level: str):
         my_logger = logging.getLogger('MyLogger')
-        my_logger.setLevel(self.get_level())
+        my_logger.setLevel(self.get_level(level=level))
         handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
         my_logger.addHandler(handler)
 
