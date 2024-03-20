@@ -368,7 +368,7 @@ SD.run()
     - `cd talklib`
 - Create a virtual environment
     - `python -m venv venv`
-    - depending on your OS, instead of `python`you may need to use `python3`
+    - depending on your OS, instead of `python`you may need to use `py` or `python3`
 - Activate virtual environment
     - On Windows: `venv\Scripts\activate`
     - On Mac: `source venv/bin/activate`
