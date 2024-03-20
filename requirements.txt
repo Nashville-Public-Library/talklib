@@ -40,7 +40,7 @@ requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.7.0
 tomli==2.0.1
-twilio==9.0.0
+twilio==9.0.2
 twine==4.0.2
 urllib3==1.26.13
 yarl==1.9.2
