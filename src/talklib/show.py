@@ -63,7 +63,7 @@ class TLShow():
             return file
         except Exception as ffmpeg_exception:
             self.send_notifications(message=ffmpeg_exception, subject='Error')
-            self.prep_syslog(message=f'conversion failed: {ffmpeg_exception}')
+            self.prep_syslog(message=f'conversion failed: {ffmpeg_exception}', level='error')
             raise Exception (ffmpeg_exception)
 
 
@@ -100,7 +100,7 @@ class TLShow():
             try:
                 os.remove(fileToDelete)
             except Exception as e:
-                self.prep_syslog(message=e)
+                self.prep_syslog(message=e, level='warning')
 
     def remove_yesterday_files(self):
         '''
@@ -159,7 +159,7 @@ class TLShow():
                 is_not_empty = True
                 return True
             else:
-                self.prep_syslog(message=f'File is empty. Will download again. Attempt # {how_many_attempts}.')
+                self.prep_syslog(message=f'File is empty. Will download again. Attempt # {how_many_attempts}.', level='warning')
                 how_many_attempts = how_many_attempts+1
                 self.download_file()
                 self.check_downloaded_file(fileToCheck=fileToCheck, how_many_attempts=how_many_attempts)
