@@ -8,12 +8,9 @@ from twilio.rest import Client
 from talklib.ev import EV
 
 class Syslog:
-    def __init__ (
-        self,
-        syslog_port: int = 514
-                  ):
+    def __init__ (self):
         self.syslog_host = EV().syslog_host
-        self.syslog_port = syslog_port
+        self.syslog_port = 514
 
     def get_level(self, level: str):
         if level == 'info':
@@ -28,6 +25,10 @@ class Syslog:
             return logging.CRITICAL
 
     def send_syslog_message(self, message: str, level: str):
+        '''
+        Send message to Syslog server.
+        Levels: info (default), debug, warning, error, critical.
+        '''
         my_logger = logging.getLogger('MyLogger')
         my_logger.setLevel(self.get_level(level=level))
         handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
