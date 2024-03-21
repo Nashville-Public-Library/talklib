@@ -44,10 +44,11 @@ class TLShow():
         '''returns the audio filename to use depending on whether we should include the date'''
         if self.include_date:
             date = self.six_digit_date_string()
-            outputFile = (f"{self.show_filename}-{date}.wav")
+            output_file = (f"{self.show_filename}-{date}.wav")
         else:
-            outputFile = (f'{self.show_filename}.wav')
-        return outputFile
+            output_file = (f'{self.show_filename}.wav')
+        self.prep_syslog(message=f'Filename will be: {output_file}')
+        return output_file
 
     def convert(self, input):
         ffmpeg = self.ffmpeg
