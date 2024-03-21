@@ -5,7 +5,6 @@ import shutil
 import time
 import xml.etree.ElementTree as ET
 
-import ffmpeg
 import requests
 
 from talklib.ev import EV
