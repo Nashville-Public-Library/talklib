@@ -13,15 +13,15 @@ class Syslog:
         self.syslog_port = 514
 
     def get_level(self, level: str):
-        if level == 'info':
+        if level.lower() == 'info':
             return logging.INFO
-        if level == 'debug':
+        if level.lower() == 'debug':
             return logging.DEBUG
-        if level == 'warning':
+        if level.lower() == 'warning':
             return logging.WARNING
-        if level == 'error':
+        if level.lower() == 'error':
             return logging.ERROR
-        if level == 'critical':
+        if level.lower() == 'critical':
             return logging.CRITICAL
 
     def send_syslog_message(self, message: str, level: str):
