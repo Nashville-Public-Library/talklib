@@ -23,6 +23,7 @@ class Syslog:
             return logging.ERROR
         if level.lower() == 'critical':
             return logging.CRITICAL
+        return logging.INFO # just in case
 
     def send_syslog_message(self, message: str, level: str = 'info'):
         '''
