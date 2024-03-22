@@ -24,7 +24,7 @@ class Syslog:
         if level.lower() == 'critical':
             return logging.CRITICAL
 
-    def send_syslog_message(self, message: str, level: str):
+    def send_syslog_message(self, message: str, level: str = 'info'):
         '''
         Send message to Syslog server.
         Levels: info (default), debug, warning, error, critical.
