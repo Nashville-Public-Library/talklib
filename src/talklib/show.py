@@ -115,7 +115,7 @@ class TLShow():
                         self.prep_syslog(message=f'Deleting existing matched file: {file}')
                         os.remove(file)
                 else:
-                    self.prep_syslog(message=f"{self.show}: Cannot find existing matched files in {destination}. Continuing...")
+                    self.prep_syslog(message=f"{self.show}: Cannot find existing matched files in {destination}. Continuing...", level='warning')
 
     def download_file(self):
         '''
@@ -188,15 +188,15 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
         '''send sms via twilio IF twilio_enable is set to True'''
         self.notifications.send_sms(message=message)
 
-    def send_notifications(self, message: str, subject: str):
+    def send_notifications(self, message: str, subject: str, syslog_level: str = 'error'):
         '''we generally only want to send SMS via Twilio if today is on a weekend'''
         if today_is_weekday():
             self.prep_send_mail(message=message, subject=subject)
-            self.prep_syslog(message=message)
+            self.prep_syslog(message=message, level=syslog_level)
         else:
             self.send_sms_if_enabled(message=message)
             self.prep_send_mail(message=message, subject=subject)
-            self.prep_syslog(message=message)
+            self.prep_syslog(message=message, level=syslog_level)
 
     def check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
@@ -226,29 +226,30 @@ Please check manually!\n\n\
         '''
         # if these are not declared, don't run this check.
         if not (self.check_if_below and self.check_if_above):
-            self.prep_syslog(message='The check length function is turned off.')
-        else:
-            self.prep_syslog(message=f'Checking whether length is between \
+            self.prep_syslog(message='The check length function is turned off.', level='warning')
+            return
+        
+        self.prep_syslog(message=f'Checking whether length is between \
 {self.check_if_below} and {self.check_if_above}')
 
-            duration = FFMPEG(input_file=fileToCheck).get_length_in_minutes()
+        duration = FFMPEG(input_file=fileToCheck).get_length_in_minutes()
 
-            if duration > self.check_if_above:
-                toSend = (f"Today's {self.show} is {duration} minutes long! \
+        if duration > self.check_if_above:
+            toSend = (f"Today's {self.show} is {duration} minutes long! \
 Please check manually and make edits to bring it below {self.check_if_above} minutes.\n\n\
 {get_timestamp()}")
-                self.send_notifications(message=toSend, subject='Check Length')
+            self.send_notifications(message=toSend, subject='Check Length', syslog_level='warning')
 
-            elif duration < self.check_if_below:
-                toSend = (f"Today's {self.show} is only {duration} minutes long! \
+        elif duration < self.check_if_below:
+            toSend = (f"Today's {self.show} is only {duration} minutes long! \
 This is unusual and could indicate a problem with the file. Please check manually!\n\n\
 {get_timestamp()}")
-                self.send_notifications(message=toSend, subject='Check Length')
+            self.send_notifications(message=toSend, subject='Check Length', syslog_level='warning')
 
-            else:
-                self.prep_syslog(message=f'File is {duration} minute(s). Continuing...')
-            
-            return duration
+        else:
+            self.prep_syslog(message=f'File is {duration} minute(s). Continuing...')
+        
+        return duration
 
     def get_feed(self):
         '''get the feed and create an ET object, which can then be called from other functions.'''
