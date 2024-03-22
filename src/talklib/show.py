@@ -62,8 +62,7 @@ class TLShow():
             self.prep_syslog(message='file converted successfully')
             return file
         except Exception as ffmpeg_exception:
-            self.send_notifications(message=ffmpeg_exception, subject='Error')
-            self.prep_syslog(message=f'conversion failed: {ffmpeg_exception}', level='error')
+            self.send_notifications(message=f'FFmpeg error: {ffmpeg_exception}', subject='Error')
             raise Exception (ffmpeg_exception)
 
 
