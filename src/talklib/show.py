@@ -82,7 +82,6 @@ class TLShow():
         since these are the files downloaded from the internet.
         local shows are downloaded ahead of time. we do not necessarily 
         want to delete these.
-        delete this line (don't ask).
         '''
         if self.url:
             return True
