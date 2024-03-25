@@ -29,13 +29,26 @@ class Syslog:
         '''
         Send message to Syslog server.
         Levels: info (default), debug, warning, error, critical.
+
+        The level type and the my_logger.method() function must match!
         '''
+        handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
+
         my_logger = logging.getLogger('MyLogger')
         my_logger.setLevel(self.get_level(level=level))
-        handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
         my_logger.addHandler(handler)
 
-        my_logger.info(message)
+        if level == 'info':
+            my_logger.info(message)
+        if level == 'debug':
+            my_logger.debug(message)
+        if level == 'warning':
+            my_logger.warning(message)
+        if level == 'error':
+            my_logger.error(message)
+        if level == 'critical':
+            my_logger.critical(message)
+
         my_logger.removeHandler(handler) # don't forget this after you send the message!
 
 class Notify:
