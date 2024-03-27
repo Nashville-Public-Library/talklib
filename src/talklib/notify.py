@@ -1,4 +1,5 @@
 from email.message import EmailMessage
+from enum import Enum
 import logging
 from logging.handlers import SysLogHandler
 import smtplib
@@ -7,23 +8,17 @@ from twilio.rest import Client
 
 from talklib.ev import EV
 
+class LogLevel(Enum):
+    INFO = logging.INFO
+    DEBUG = logging.DEBUG
+    WARNING = logging.WARNING
+    ERROR = logging.ERROR
+    CRITICAL = logging.CRITICAL
+
 class Syslog:
     def __init__ (self):
         self.syslog_host = EV().syslog_host
         self.syslog_port = 514
-
-    def get_level(self, level: str):
-        if level.lower() == 'info':
-            return logging.INFO
-        if level.lower() == 'debug':
-            return logging.DEBUG
-        if level.lower() == 'warning':
-            return logging.WARNING
-        if level.lower() == 'error':
-            return logging.ERROR
-        if level.lower() == 'critical':
-            return logging.CRITICAL
-        return logging.INFO # just in case
 
     def send_syslog_message(self, message: str, level: str = 'info'):
         '''
@@ -35,20 +30,10 @@ class Syslog:
         handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
 
         my_logger = logging.getLogger('MyLogger')
-        my_logger.setLevel(self.get_level(level=level))
+        my_logger.setLevel(LogLevel[level.upper()].value)
         my_logger.addHandler(handler)
 
-        if level == 'info':
-            my_logger.info(message)
-        if level == 'debug':
-            my_logger.debug(message)
-        if level == 'warning':
-            my_logger.warning(message)
-        if level == 'error':
-            my_logger.error(message)
-        if level == 'critical':
-            my_logger.critical(message)
-
+        my_logger.log(level=LogLevel[level.upper()].value, msg=message)
         my_logger.removeHandler(handler) # don't forget this after you send the message!
 
 class Notify:
