@@ -1,4 +1,4 @@
-name: talklib_PR
+name: Test
 
 on:
   pull_request:
