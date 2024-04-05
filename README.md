@@ -200,10 +200,12 @@ optional
 
 optional
 - this is its own object with the following attributes: 
+    - `enable_all`
     - `syslog_enable`
     - `twilio_enable`
     - `email_enable`
-- to disable any one of these, set them like this: `object.notifications.twilio_enable = False`
+- to disable all notifications, set `enable_all` to false like this: `object.notifications.enable_all = False`
+- to disable a particular one of these, set them like this: `object.notifications.twilio_enable = False`
 - default for all of them is `True`
 - more [examples](#examples) below
 
@@ -338,6 +340,25 @@ SD.show = 'Skywalker Daily News'
 SD.show_filename = 'SDN'
 SD.url = 'https://somesite.org/sdn-feed.rss'
 SD.notifications.twilio_enable = False
+
+SD.run()
+````
+
+### Disable Notifications
+
+To disable ALL notifications, add a line like this:
+
+> This will disable all notifications **including** syslog messages
+
+````python
+from talklib import TLShow
+
+SD = TLShow()
+
+SD.show = 'Skywalker Daily News'
+SD.show_filename = 'SDN'
+SD.url = 'https://somesite.org/sdn-feed.rss'
+SD.notifications.enable_all = False
 
 SD.run()
 ````
