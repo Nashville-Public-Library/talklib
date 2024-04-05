@@ -59,7 +59,7 @@ def test_check_length(template: TLShow):
     ''''''
     template.check_if_above = 10
     template.check_if_below = 5
-    assert type(template.check_length(fileToCheck=template.local_file)) == float
+    assert type(template._TLShow__check_length(fileToCheck=template.local_file)) == float
     
 
 '''

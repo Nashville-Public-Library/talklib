@@ -72,67 +72,67 @@ def test_six_digit_date_string_2(template_local: TLShow):
 
 def test_create_output_filename(template_local: TLShow):
     '''should be filename with '.wav' appended since self.include_date defaults to False'''
-    assert template_local.create_output_filename() == f'{template_local.show_filename}.wav'
+    assert template_local._TLShow__create_output_filename() == f'{template_local.show_filename}.wav'
 
 def test_create_output_filename_2(template_local: TLShow):
     '''if include_date is true, datetime should be included in filename'''
     template_local.include_date = True
-    assert template_local.create_output_filename() == f'{template_local.show_filename}-{template_local.six_digit_date_string()}.wav'
+    assert template_local._TLShow__create_output_filename() == f'{template_local.show_filename}-{template_local.six_digit_date_string()}.wav'
 
 def test_create_output_filename_3(template_local: TLShow):
-    assert type(template_local.create_output_filename()) == str
+    assert type(template_local._TLShow__create_output_filename()) == str
 
 # ----- decide whether to remove -----
 
 def test_decide_whether_to_remove_local_1(template_local: TLShow):
     '''should always be bool type'''
-    assert type(template_local.decide_whether_to_remove()) == bool
+    assert type(template_local._TLShow__decide_whether_to_remove()) == bool
 
 def test_decide_whether_to_remove_permalink_1(template_permalink: TLShow):
     '''should always be bool type'''
-    assert type(template_permalink.decide_whether_to_remove()) == bool
+    assert type(template_permalink._TLShow__decide_whether_to_remove()) == bool
 
 def test_decide_whether_to_remove_rss_1(template_rss: TLShow):
     '''should always be bool type'''
-    assert type(template_rss.decide_whether_to_remove()) == bool
+    assert type(template_rss._TLShow__decide_whether_to_remove()) == bool
 
 def test_decide_whether_to_remove_local_2(template_local: TLShow):
     '''local files should default to not remove files'''
-    assert template_local.decide_whether_to_remove() == False
+    assert template_local._TLShow__decide_whether_to_remove() == False
 
 def test_decide_whether_to_remove_rss_2(template_rss: TLShow):
     '''RSS should default to True'''
-    assert template_rss.decide_whether_to_remove() == True
+    assert template_rss._TLShow__decide_whether_to_remove() == True
 
 def test_decide_whether_to_remove_permalink_2(template_permalink: TLShow):
     '''Permalink should default to True'''
-    assert template_permalink.decide_whether_to_remove() == True
+    assert template_permalink._TLShow__decide_whether_to_remove() == True
 
 def test_decide_whether_to_remove_local_3(template_local: TLShow):
     '''should be true if we set this variable to true'''
     template_local.remove_source = True
-    assert template_local.decide_whether_to_remove()
+    assert template_local._TLShow__decide_whether_to_remove()
 
 def test_decide_whether_to_remove_permalink_3(template_permalink: TLShow):
     '''this attribute is not used for permalink shows, so should still default to True even when erroneously set to False'''
     template_permalink.remove_source = False
-    assert template_permalink.decide_whether_to_remove() == True
+    assert template_permalink._TLShow__decide_whether_to_remove() == True
 
 def test_decide_whether_to_remove_rss_3(template_rss: TLShow):
     '''permalink shows should default to True'''
     template_rss.remove_source = False
-    assert template_rss.decide_whether_to_remove() == True
+    assert template_rss._TLShow__decide_whether_to_remove() == True
 
 # ----- convert -----
 '''what else should we be testing here???'''
 
 def test_convert_1(template_rss: TLShow):
     '''should convert and return name of file'''
-    assert type(template_rss.convert(input=download_test_file())) == str
+    assert type(template_rss._TLShow__convert(input=download_test_file())) == str
 
 def test_convert_2(template_local: TLShow):
     '''should convert and return name of file'''
-    assert template_local.convert(input=download_test_file()) == f'{template_local.show_filename}.wav'
+    assert template_local._TLShow__convert(input=download_test_file()) == f'{template_local.show_filename}.wav'
     os.remove(f'{template_local.show_filename}.wav') # actually converts the file so need to remove it
 
 def test_convert_4(template_permalink: TLShow):
@@ -141,7 +141,7 @@ def test_convert_4(template_permalink: TLShow):
             a = requests.get('https://library.nashville.org/themes/custom/npl/logo.svg') #not an audio file
             test_file.write(a.content)
     with pytest.raises(Exception):
-        template_permalink.convert(input=test_file.name)
+        template_permalink.__convert(input=test_file.name)
     os.remove(test_file.name)
 
 # ----- check downloaded file -----
@@ -165,49 +165,49 @@ def test_check_length_1(template_local: TLShow):
     
     template_local.check_if_above = 1
     template_local.check_if_below = .5
-    assert type(template_local.check_length(fileToCheck=download_test_file())) == float
+    assert type(template_local._TLShow__check_length(fileToCheck=download_test_file())) == float
 
 # ----- get feed -----
 
 def test_get_feed_1(template_rss: TLShow):
     '''check whether return object is an instance of ET.Element class'''
-    assert (isinstance(template_rss.get_feed(), ET.Element))
+    assert (isinstance(template_rss._TLShow__get_feed(), ET.Element))
 
 def test_get_feed_fails_with_invalid_url_1(template_rss: TLShow):
     '''check an exception is raised when an invalid url is used'''
     template_rss.url = 'nourl'
     with pytest.raises(Exception):
-        template_rss.get_feed()
+        template_rss.__get_feed()
 
 # ----- check feed updated -----
 
 def test_check_feed_updated_1(template_rss: TLShow):
-    assert template_rss.check_feed_updated()
+    assert template_rss._TLShow__check_feed_updated()
 
 def test_check_feed_updated_2(template_rss: TLShow):
-    assert type(template_rss.check_feed_updated()) == bool
+    assert type(template_rss._TLShow__check_feed_updated()) == bool
 
 def test_check_feed_updated_3(template_rss: TLShow):
     '''if invalid feed passed, exception should be raised'''
     template_rss.url = 'no_url'
     with pytest.raises(Exception):
-        template_rss.check_feed_updated()
+        template_rss._TLShow__check_feed_updated()
 
 # ----- check feed loop -----
 
 def test_check_feed_loop_1(template_rss: TLShow):
     '''valid URL should return True'''
-    template_rss.check_feed_loop() == True
+    template_rss._TLShow__check_feed_loop() == True
 
 def test_check_feed_loop_2(template_rss: TLShow):
     '''Exception should be raised if bad URL is passed'''
     template_rss.url = 'no_url'
     with pytest.raises(Exception):
-        template_rss.check_feed_loop()
+        template_rss._TLShow__check_feed_loop()
 
 def test_check_feed_loop_3(template_rss: TLShow):
     '''should be bool type'''
-    assert type(template_rss.check_feed_loop()) == bool
+    assert type(template_rss._TLShow__check_feed_loop()) == bool
 
 # ----- old import method -----
 

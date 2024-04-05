@@ -29,17 +29,17 @@ def template_rss():
 # ---------- Misc Methods ----------
 
 def test_check_feed_updated(template_rss: TLShow):
-    assert template_rss.check_feed_updated()
+    assert template_rss._TLShow__check_feed_updated()
 
 def test_get_audio_url(template_rss: TLShow):
-    assert type(template_rss.get_RSS_audio_url()) == str
+    assert type(template_rss._TLShow__get_RSS_audio_url()) == str
 
 def test_check_feed_loop(template_rss: TLShow):
-    assert type(template_rss.check_feed_loop()) == bool
+    assert type(template_rss._TLShow__check_feed_loop()) == bool
 
 def test_remove_yesterday_files(template_rss: TLShow):
     '''if we pass an invalid file to delete, it should be handled gracefully without exceptions'''
-    template_rss.remove(fileToDelete='not_a_file.wav')
+    template_rss._TLShow__remove(fileToDelete='not_a_file.wav')
 
 
 
@@ -47,37 +47,37 @@ def test_remove_yesterday_files(template_rss: TLShow):
 
 # first, make sure there are no exceptions thrown for our correctly set up instance
 def test_check_attributes_are_valid_1(template_rss: TLShow):
-    template_rss.check_attributes_are_valid()
+    template_rss._TLShow__check_attributes_are_valid()
 
 def test_gen(template_rss: TLShow):
-    assert type(template_rss.create_output_filename()) == str
+    assert type(template_rss._TLShow__create_output_filename()) == str
 
 # now, start deliberately triggering exceptions with invalid attributes.
 
 def test_check_attributes_are_valid_1a(template_rss: TLShow):
     template_rss.show = 42
     with pytest.raises(Exception):
-        template_rss.check_attributes_are_valid()
+        template_rss.__check_attributes_are_valid()
 
 def test_check_attributes_are_valid_2(template_rss: TLShow):
     template_rss.show_filename = 42
     with pytest.raises(Exception):
-        template_rss.check_attributes_are_valid()
+        template_rss.__check_attributes_are_valid()
 
 def test_check_attributes_are_valid_3(template_rss: TLShow):
     template_rss.url = 42
     with pytest.raises(Exception):
-        template_rss.check_attributes_are_valid()
+        template_rss.__check_attributes_are_valid()
 
 def test_check_attributes_are_valid_6(template_rss: TLShow):
     template_rss.ffmpeg.breakaway = True
     with pytest.raises(Exception):
-        template_rss.check_attributes_are_valid()
+        template_rss.__check_attributes_are_valid()
 
 def test_check_attributes_are_valid_7(template_rss: TLShow):
     template_rss.ffmpeg.compression_level = True
     with pytest.raises(Exception):
-        template_rss.check_attributes_are_valid()
+        template_rss.__check_attributes_are_valid()
 
 def test_check_attributes_are_valid_8(template_rss: TLShow):
     template_rss.check_if_above = [1,2]
