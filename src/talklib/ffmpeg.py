@@ -17,7 +17,7 @@ class FFMPEG:
         self.sample_rate = sample_rate
         self.audio_channels = audio_channels
 
-    def build_input_commands(self) -> dict:
+    def __build_input_commands(self) -> dict:
         command = {}
         command.update({'hide_banner': None})
         command.update({'loglevel': 'quiet'})
@@ -25,7 +25,7 @@ class FFMPEG:
 
         return command
     
-    def build_output_commands(self) -> dict:
+    def __build_output_commands(self) -> dict:
         command = {}
         command.update({'ar': self.sample_rate})
         command.update({'ac': self.audio_channels})
@@ -38,8 +38,8 @@ class FFMPEG:
         return command
     
     def get_commands(self):
-        input_commands = self.build_input_commands()
-        output_commands = self.build_output_commands()
+        input_commands = self.__build_input_commands()
+        output_commands = self.__build_output_commands()
         stream = ffmpeg.input(**input_commands)
         stream = ffmpeg.output(stream, **output_commands)
         ffmpeg_commands = ffmpeg.get_args(stream)
@@ -47,8 +47,8 @@ class FFMPEG:
 
     def convert(self):
         '''convert file with ffmpeg and return filename'''
-        input_commands = self.build_input_commands()
-        output_commands = self.build_output_commands()
+        input_commands = self.__build_input_commands()
+        output_commands = self.__build_output_commands()
         stream = ffmpeg.input(**input_commands)
         stream = ffmpeg.output(stream, **output_commands)
         ffmpeg.run(stream, capture_stdout=True)
