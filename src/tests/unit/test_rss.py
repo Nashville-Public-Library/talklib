@@ -20,9 +20,7 @@ def template_rss():
     test.show_filename = 'delete_me'
     test.url = url
     # disable notifications for testing. Need separate tests for these!
-    test.notifications.syslog_enable = False
-    test.notifications.twilio_enable = False
-    test.notifications.email_enable = False
+    test.notifications.enable_all = False
 
     return test
 

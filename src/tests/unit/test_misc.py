@@ -23,9 +23,7 @@ def template_local():
     test.local_file = input_file
     test.is_local = True
     # disable notifications for testing. Need separate tests for these!
-    test.notifications.syslog_enable = False
-    test.notifications.twilio_enable = False
-    test.notifications.email_enable = False
+    test.notifications.enable_all = False
 
     yield test
 
