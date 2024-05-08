@@ -9,7 +9,7 @@ import requests
 
 from talklib.ev import EV
 from talklib.notify import Notify
-from talklib.utils import get_timestamp, clear_screen, print_to_screen_and_wait, today_is_weekday
+from talklib.utils import get_timestamp, clear_screen, raise_exception_and_wait, today_is_weekday
 from talklib.ffmpeg import FFMPEG
 
 
@@ -211,7 +211,7 @@ It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually!\n\n\
 {get_timestamp()}")
                 self.__send_notifications(message=toSend, subject='Error')
-                print_to_screen_and_wait(message=toSend)
+                raise_exception_and_wait(message=toSend)
                 break
         if success:
             self.__countdown()
@@ -464,8 +464,7 @@ It looks like today's file hasn't yet been posted. Please check and download man
 {get_timestamp()}"
                 )
             self.__send_notifications(message=toSend, subject='Error')
-            print_to_screen_and_wait(message=toSend)
-            raise Exception
+            raise_exception_and_wait(message=toSend)
     
     def __run_local(self):
         if self.local_file:
@@ -482,5 +481,4 @@ It looks like the source file doesn't exist. Please check manually! Yesterday's 
 {get_timestamp()}"
                 )
             self.__send_notifications(message=to_send, subject='Error')
-            print_to_screen_and_wait(message=to_send)
-            raise FileNotFoundError
+            raise_exception_and_wait(message=to_send, error=FileNotFoundError)
