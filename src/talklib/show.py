@@ -339,14 +339,18 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         (I can't figure out how else to get the name of the attribute)
         '''
         if  type(attrib_to_check) != type_to_check:
-            raise Exception (f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}.")
+            message = f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}."
+            self.__send_notifications(message=message, subject="Error")
+            raise_exception_and_wait(message=message)
 
     def __check_int_and_float_type(self, attrib_to_check, attrib_return: str):
         '''
         Attributes passed here can be either int or float.
         '''
         if not (type(attrib_to_check) == int or type(attrib_to_check) == float):
-            raise Exception (f'Sorry, the {attrib_return} attribute must be a valid number (without quotes).')
+            message = f'Sorry, the {attrib_return} attribute must be a valid number (without quotes).'
+            self.__send_notifications(message=message, subject="Error")
+            raise_exception_and_wait(message=message)
 
     def __check_attributes_are_valid(self):
         '''
@@ -356,24 +360,34 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         self.__prep_syslog(message='checking user defined attributes')
 
         if not self.show:
-            raise Exception ('Sorry, you need to specify a name for the show.')
+            message = 'Sorry, you need to specify a name for the show.'
+            self.__send_notifications(message=message, subject="Error")
+            raise_exception_and_wait(message=message)
         else:
             self.__check_str_and_bool_type(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
 
         if not self.show_filename:
-            raise Exception ('Sorry, you need to specify a filename for the show.')
+            message = 'Sorry, you need to specify a filename for the show.'
+            self.__send_notifications(message=message, subject="Error")
+            raise_exception_and_wait(message=message)
         else:
             self.__check_str_and_bool_type(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
 
         if not self.url:
             if not self.is_local:
-                raise Exception('Sorry, you need to specify either a URL or a local file')
+                message = 'Sorry, you need to specify either a URL or a local file'
+                self.__send_notifications(message=message, subject="Error")
+                raise_exception_and_wait('Sorry, you need to specify either a URL or a local file')
 
         if self.url and self.is_local:
-            raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
+            message = 'Sorry, you cannot specify both a URL and a local audio file. You must choose only one.'
+            self.__send_notifications(message=message, subject="Error")
+            raise_exception_and_wait(message=message)
         
         if self.url and self.local_file:
-            raise Exception ('Sorry, you cannot specify both a URL and a local audio file. You must choose only one.')
+            message = 'Sorry, you cannot specify both a URL and a local audio file. You must choose only one.'
+            self.__send_notifications(message=message, subject="Error")
+            raise_exception_and_wait(message=message)
 
         if self.url:
             self.__check_str_and_bool_type(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
@@ -433,7 +447,9 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             self.__run_local()
                    
         else:
-            raise Exception ('Sorry, something bad happened')
+            message = "Sorry, something bad happened..."
+            self.__send_notifications(message=message, subject="Error")
+            raise_exception_and_wait(message=message)
 
     def __run_URL_permalink(self):
         # if url is declared, it's either an RSS or permalink show
