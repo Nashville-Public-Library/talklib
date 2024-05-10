@@ -90,7 +90,7 @@ class Notify:
         format.set_content(message)
         format['Subject'] = subject
         format['From'] = self.EV.fromEmail
-        format['To'] = self.EV.toEmail
+        format['To'] = "ben.weddle@nashville.gov" # PLEASE FIX ME!!
 
         mail = smtplib.SMTP(host=self.EV.mail_server)
         mail.send_message(format)

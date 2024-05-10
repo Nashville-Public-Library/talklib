@@ -63,7 +63,7 @@ class TLShow():
             return file
         except Exception as ffmpeg_exception:
             self.__send_notifications(message=f'FFmpeg error: {ffmpeg_exception}', subject='Error')
-            raise Exception (ffmpeg_exception)
+            raise_exception_and_wait(ffmpeg_exception)
 
 
     def __copy_then_remove(self, fileToCopy):
