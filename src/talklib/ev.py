@@ -15,7 +15,7 @@ import os
 
 class EV:
     def __init__(self):
-        self.destinations = [os.environ['OnAirPC'], os.environ['ProductionPC']]# where should output files go? MUST BE A LIST EVEN WITH ONLY ONE
+        self.destinations = sort_destinations() # where should output files go? MUST BE A LIST EVEN WITH ONLY ONE
         self.syslog_host = os.environ["syslog_server"] # ip of syslog server (PC with syslog software)
         self.fromEmail = os.environ['fromEmail']  # from where should emails appear to come?
         self.toEmail = os.environ['toEmail']  # to where should emails be sent?
@@ -26,3 +26,16 @@ class EV:
         self.twilio_to = os.environ['twilio_to'] # to where should texts/calls be sent
         self.icecast_user = os.environ['icecast_user'] # our icecast username
         self.icecast_pass = os.environ['icecast_pass'] # our icecast password
+
+
+def sort_destinations():
+    destinations = os.environ['destinations']
+    destinations = destinations.split(",")
+    destination_list = []
+    for destination in destinations:
+        destination = destination.split() #remove whitespace
+        # the split() above returns a list, so we need to interate through it, even though it's only one string
+        for dest in destination:
+            destination_list.append(dest)
+    return destination_list
+
