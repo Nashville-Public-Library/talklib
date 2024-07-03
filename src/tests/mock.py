@@ -13,8 +13,7 @@ This static link was chosen because it's reliably available and the file is smal
 permalink = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
 env_vars = {
-        'OnAirPC': 'nothing',
-        'ProductionPC': 'mocked_value2',
+        'destinations': 'nothing',
         'syslog_server': 'mocked_value2',
         'fromEmail': 'mocked_value2',
         'toEmail': 'mocked_value2',
