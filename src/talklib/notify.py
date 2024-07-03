@@ -61,37 +61,40 @@ class Notify:
         '''send voice call via twilio'''
         if not (self.twilio_enable and self.enable_all):
             return
-        client = Client(self.EV.twilio_sid, self.EV.twilio_token)
+        for number in self.EV.twilio_to:
+            client = Client(self.EV.twilio_sid, self.EV.twilio_token)
 
-        call = client.calls.create(
-                                twiml=f'<Response><Say>{message}</Say></Response>',
-                                to=self.EV.twilio_to,
-                                from_=self.EV.twilio_from
-                            )
-        call.sid
+            call = client.calls.create(
+                                    twiml=f'<Response><Say>{message}</Say></Response>',
+                                    to=number,
+                                    from_=self.EV.twilio_from
+                                )
+            call.sid
 
     def send_sms(self, message: str) -> None:
         '''send sms via twilio. '''
         if not (self.twilio_enable and self.enable_all):
             return
-        client = Client(self.EV.twilio_sid, self.EV.twilio_token)
-        SMS = client.messages.create(
-            body=message,
-            from_=self.EV.twilio_from,
-            to=self.EV.twilio_to
-        )
-        SMS.sid
+        for number in self.EV.twilio_to:
+            client = Client(self.EV.twilio_sid, self.EV.twilio_token)
+            SMS = client.messages.create(
+                body=message,
+                from_=self.EV.twilio_from,
+                to=number
+            )
+            SMS.sid
 
     def send_mail(self, message: str, subject: str) -> None:
         '''send email to TL gmail account via relay address'''
         if not (self.email_enable and self.enable_all):
             return
-        format = EmailMessage()
-        format.set_content(message)
-        format['Subject'] = subject
-        format['From'] = self.EV.fromEmail
-        format['To'] = self.EV.toEmail
+        for email in self.EV.toEmail:
+            format = EmailMessage()
+            format.set_content(message)
+            format['Subject'] = subject
+            format['From'] = self.EV.fromEmail
+            format['To'] = email
 
-        mail = smtplib.SMTP(host=self.EV.mail_server)
-        mail.send_message(format)
-        mail.quit()
+            mail = smtplib.SMTP(host=self.EV.mail_server)
+            mail.send_message(format)
+            mail.quit()
