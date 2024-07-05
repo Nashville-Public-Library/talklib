@@ -22,10 +22,10 @@ Use this module to process the following types of shows/segments:
 ## Requirements
 
 ### -[Python](https://www.python.org/downloads/)
-Use Python 3.10.1 or above.
+This has only been fully tested for Python 3.10
 
 ### -[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)
-You need Windows binaries for FFmpeg & FFprobe installed on the PC and added to the PATH:
+You need Windows binaries for both FFmpeg & FFprobe installed on the PC and added to the PATH:
 
 To repeat, **this package will not work without FFmpeg and FFprobe**. 
 
@@ -39,9 +39,9 @@ Access our TL Twilio info (token, etc.) by [logging in](https://www.twilio.com/l
 See [below](#disable-twilio) for how to disable Twilio.
 
 ### -Environment Variables
-Several global variables used here are pulled from environment variables. This gives the module more portability, and keeps sensitive info separated.
+Several variables are pulled from environment variables. This gives the package more portability, and keeps sensitive info separated. The entire list of these is in the `ev.py` file. Make sure to set **all** of these on your PC(s). They are case-sensitive!
 
-The entire list of these is in the ev.py file. Make sure to set all of these on your PC(s). They are case-sensitive!
+**ONCE YOU SET/CHANGE/UPDATE ENVIRONMENT VARIABLES ON YOUR PC, YOU NEED TO RESTART WIREREADY**
 
 ---
 ## Installation
