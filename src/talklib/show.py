@@ -3,9 +3,11 @@ import glob
 import os
 import shutil
 import time
+from typing import Type
 import xml.etree.ElementTree as ET
 
 import requests
+from pydantic import BaseModel, Field
 
 from talklib.ev import EV
 from talklib.notify import Notify
@@ -13,24 +15,22 @@ from talklib.utils import get_timestamp, clear_screen, raise_exception_and_wait,
 from talklib.ffmpeg import FFMPEG
 
 
-class TLShow():
+class TLShow(BaseModel):
     '''TODO write something here'''
-    def __init__(self):
-
-        self.show:str = None
-        self.show_filename: str = None
-        self.url: str = None
-        self.is_permalink: int | float = 0
-        self.include_date: bool = False
-        self.remove_yesterday: bool = False
-        self.is_local: str = None
-        self.local_file: str = None
-        self.remove_source: bool = False
-        self.check_if_above: int | float = 0    
-        self.check_if_below: int | float = 0
-        self.notifications = Notify()
-        self.ffmpeg = FFMPEG()
-        self.destinations: list = EV().destinations
+    show:str
+    show_filename: str
+    url: str = Field(default=None)
+    is_permalink: bool = Field(default=False)
+    include_date: bool = Field(default=False)
+    remove_yesterday: bool = Field(default=False)
+    is_local: bool = Field(default=False)
+    local_file: str = Field(default=None)
+    remove_source: bool = Field(default=False)
+    check_if_above: int | float = Field(default=0)
+    check_if_below: int | float = Field(default=0)
+    notifications: Type[Notify] = Notify()
+    ffmpeg: Type[FFMPEG] = FFMPEG()
+    destinations: list = EV().destinations
     
     
     def __str__(self) -> str:
@@ -330,108 +330,11 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             number = number-1
             time.sleep(1)
 
-    def __check_str_and_bool_type(self, attrib_to_check, type_to_check: str | bool, attrib_return: str):
-        '''
-        we are checking whether an attribute is either type str or bool, depending on what is passed in.
-        
-        'attrib_return' is solely for printing the message back out to the screen/log,
-        it is not needed for the actual type check.
-        (I can't figure out how else to get the name of the attribute)
-        '''
-        if  type(attrib_to_check) != type_to_check:
-            message = f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}."
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-
-    def __check_int_and_float_type(self, attrib_to_check, attrib_return: str):
-        '''
-        Attributes passed here can be either int or float.
-        '''
-        if not (type(attrib_to_check) == int or type(attrib_to_check) == float):
-            message = f'Sorry, the {attrib_return} attribute must be a valid number (without quotes).'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-
-    def __check_attributes_are_valid(self):
-        '''
-        Run some checks on the attributes the user has set. I.E. the required
-        attributes have been set, they are the right type, etc.
-        '''
-        self.__prep_syslog(message='checking user defined attributes')
-
-        if not self.show:
-            message = 'Sorry, you need to specify a name for the show.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-        else:
-            self.__check_str_and_bool_type(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
-
-        if not self.show_filename:
-            message = 'Sorry, you need to specify a filename for the show.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-        else:
-            self.__check_str_and_bool_type(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
-
-        if not self.url:
-            if not self.is_local:
-                message = 'Sorry, you need to specify either a URL or a local file'
-                self.__send_notifications(message=message, subject="Error")
-                raise_exception_and_wait('Sorry, you need to specify either a URL or a local file')
-
-        if self.url and self.is_local:
-            message = 'Sorry, you cannot specify both a URL and a local audio file. You must choose only one.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-        
-        if self.url and self.local_file:
-            message = 'Sorry, you cannot specify both a URL and a local audio file. You must choose only one.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-
-        if self.url:
-            self.__check_str_and_bool_type(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
-        
-        if self.is_local:
-            self.__check_str_and_bool_type(attrib_to_check=self.is_local, type_to_check=bool, attrib_return='is_local')
-
-        if self.local_file:
-            self.__check_str_and_bool_type(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
-        
-        if self.ffmpeg.breakaway:
-            self.__check_int_and_float_type(attrib_to_check=self.ffmpeg.breakaway, attrib_return='breakaway')
-        
-        if self.ffmpeg.compression_level:
-            self.__check_int_and_float_type(attrib_to_check=self.ffmpeg.compression_level, attrib_return='fflevel')
-
-        if self.is_permalink:
-            self.__check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
-
-        if not (self.check_if_above and self.check_if_below):
-            print('\n(You did not specify check_if_below and/or check_if_above. These checks will not be run.')
-        
-        if self.check_if_above:
-            self.__check_int_and_float_type(attrib_to_check=self.check_if_above, attrib_return='check_if_above')
-        
-        if self.check_if_below:
-            self.__check_int_and_float_type(attrib_to_check=self.check_if_below, attrib_return='check_if_below')
-        
-        if self.notifications.syslog_enable:
-            self.__check_str_and_bool_type(attrib_to_check=self.notifications.syslog_enable, type_to_check=bool, attrib_return='notifications')
-
-        if self.notifications.twilio_enable:
-            self.__check_str_and_bool_type(attrib_to_check=self.notifications.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
-        
-        if self.notifications.email_enable:
-            self.__check_str_and_bool_type(attrib_to_check=self.notifications.email_enable, type_to_check=bool, attrib_return='twilio_enable')
-
     def run(self):
         '''begins to process the file'''
 
         self.__prep_syslog(message=f'Starting script')
         print(f"I'm working on {self.show}. Just a moment...\n")
-
-        self.__check_attributes_are_valid()
 
         if self.url and self.is_permalink:
             self.__prep_syslog(message='permalink show detected')

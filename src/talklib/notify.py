@@ -3,8 +3,11 @@ from enum import Enum
 import logging
 from logging.handlers import SysLogHandler
 import smtplib
+from typing import Type
 
+from pydantic import BaseModel
 from twilio.rest import Client
+
 
 from talklib.ev import EV
 
@@ -36,20 +39,14 @@ class Syslog:
         my_logger.log(level=LogLevel[level.upper()].value, msg=message)
         my_logger.removeHandler(handler) # don't forget this after you send the message!
 
-class Notify:
-    def __init__ (self,
-                  enable_all: bool = True,
-                  syslog_enable: bool = True,
-                  twilio_enable: bool = True,
-                  email_enable: bool = True,
-                  ):
+class Notify(BaseModel):
         
-        self.enable_all = enable_all
-        self.syslog_enable = syslog_enable
-        self.twilio_enable = twilio_enable
-        self.email_enable = email_enable
-        self.syslog = Syslog()
-        self.EV = EV()
+    enable_all: bool = True
+    syslog_enable: bool = True
+    twilio_enable: bool = True
+    email_enable: bool = True
+    syslog: Type[Syslog]  = Syslog()
+    ev: Type[EV] = EV()
 
     def send_syslog(self, message: str, level: str) -> None:
         '''send message to syslog server'''
@@ -61,13 +58,13 @@ class Notify:
         '''send voice call via twilio'''
         if not (self.twilio_enable and self.enable_all):
             return
-        for number in self.EV.twilio_to:
-            client = Client(self.EV.twilio_sid, self.EV.twilio_token)
+        for number in self.ev.twilio_to:
+            client = Client(self.ev.twilio_sid, self.ev.twilio_token)
 
             call = client.calls.create(
                                     twiml=f'<Response><Say>{message}</Say></Response>',
                                     to=number,
-                                    from_=self.EV.twilio_from
+                                    from_=self.ev.twilio_from
                                 )
             call.sid
 
@@ -75,11 +72,11 @@ class Notify:
         '''send sms via twilio. '''
         if not (self.twilio_enable and self.enable_all):
             return
-        for number in self.EV.twilio_to:
-            client = Client(self.EV.twilio_sid, self.EV.twilio_token)
+        for number in self.ev.twilio_to:
+            client = Client(self.ev.twilio_sid, self.ev.twilio_token)
             SMS = client.messages.create(
                 body=message,
-                from_=self.EV.twilio_from,
+                from_=self.ev.twilio_from,
                 to=number
             )
             SMS.sid
@@ -88,13 +85,13 @@ class Notify:
         '''send email to TL gmail account via relay address'''
         if not (self.email_enable and self.enable_all):
             return
-        for email in self.EV.toEmail:
+        for email in self.ev.toEmail:
             format = EmailMessage()
             format.set_content(message)
             format['Subject'] = subject
-            format['From'] = self.EV.fromEmail
+            format['From'] = self.ev.fromEmail
             format['To'] = email
 
-            mail = smtplib.SMTP(host=self.EV.mail_server)
+            mail = smtplib.SMTP(host=self.ev.mail_server)
             mail.send_message(format)
             mail.quit()
