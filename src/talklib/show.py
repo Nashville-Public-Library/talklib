@@ -265,7 +265,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 {get_timestamp()}"
                 )
             self.__send_notifications(subject='Error', message=to_send)
-            raise Exception (a)
+            raise_exception_and_wait(message=a)
 
     def __check_feed_updated(self) -> bool:
         '''
