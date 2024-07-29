@@ -1,6 +1,8 @@
 # talklib
 
 ![tests](https://github.com/Nashville-Public-Library/talklib/actions/workflows/talklib.yml/badge.svg)
+[![GitHub issues](https://img.shields.io/github/issues/Nashville-Public-Library/talklib.png)](https://github.com/Nashville-Public-Library/talklib/issues)
+[![last-commit](https://img.shields.io/github/last-commit/Nashville-Public-Library/talklib)](https://github.com/Nashville-Public-Library/talklib/commits/master)
 
 ## A package to automate processing of shows/segments airing on the TL
 
@@ -39,7 +41,7 @@ Access our TL Twilio info (token, etc.) by [logging in](https://www.twilio.com/l
 See [below](#disable-twilio) for how to disable Twilio.
 
 ### -Environment Variables
-Several variables are pulled from environment variables. This gives the package more portability, and keeps sensitive info separated. The entire list of these is in the `ev.py` file. Make sure to set **all** of these on your PC(s). They are case-sensitive!
+This package uses Environment Variables to help with portability and keep sensitive info separated. The entire list of these is in the `ev.py` file. Make sure to set **all** of these on your PC(s). They are case-sensitive!
 
 **ONCE YOU SET/CHANGE/UPDATE ENVIRONMENT VARIABLES ON YOUR PC, YOU NEED TO RESTART WIREREADY**
 
@@ -258,10 +260,6 @@ required
 - executes the script with the attributes you set
 - should be the last line in your script
 
-this should be the only method/function you call directly from an outside script. Even if your IDE shows you all the available methods, please ignore them as most of them are not (yet) designed to be called directly.
-
-
-----
 ## Examples<a id="examples"></a>
 ### RSS Example
 
