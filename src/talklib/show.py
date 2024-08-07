@@ -7,7 +7,7 @@ from typing import Type
 import xml.etree.ElementTree as ET
 
 import requests
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from talklib.ev import EV
 from talklib.notify import Notify
@@ -31,6 +31,15 @@ class TLShow(BaseModel):
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
     destinations: list = EV().destinations
+
+    @model_validator(mode='after')
+    def check_conflicts(cls, instance: 'TLShow'):
+        if instance.url and instance.is_local:
+            raise ValueError("you cannot use a URL with a local show. set the 'local_file' attribute instead.")
+        if instance.is_local or instance.local_file:
+            if not (instance.local_file and instance.is_local):
+                raise ValueError("for local shows, you must set the 'is_local' and 'local_file'.")
+        return instance
     
     
     def __str__(self) -> str:
