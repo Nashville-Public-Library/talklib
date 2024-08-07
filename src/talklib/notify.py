@@ -5,7 +5,7 @@ from logging.handlers import SysLogHandler
 import smtplib
 from typing import Type
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from twilio.rest import Client
 
 
@@ -41,10 +41,10 @@ class Syslog:
 
 class Notify(BaseModel):
         
-    enable_all: bool = True
-    syslog_enable: bool = True
-    twilio_enable: bool = True
-    email_enable: bool = True
+    enable_all: bool = Field(default=True)
+    syslog_enable: bool = Field(default=True)
+    twilio_enable: bool = Field(default=True)
+    email_enable: bool = Field(default=True)
     syslog: Type[Syslog]  = Syslog()
     ev: Type[EV] = EV()
 
