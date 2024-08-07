@@ -17,11 +17,12 @@ input_file = 'input.mp3'  # name the file we download
 @pytest.fixture
 def template_local():
     with patch.dict('os.environ', env_vars):
-        test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.local_file = input_file
-    test.is_local = True
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            local_file = input_file,
+            is_local = True
+        )
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False
 
@@ -30,29 +31,27 @@ def template_local():
 @pytest.fixture
 def template_permalink():
     with patch.dict('os.environ', env_vars):
-        test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.url = permalink_URL
-    test.is_permalink = True
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = permalink_URL,
+            is_permalink = True
+        )
     # disable notifications for template. Need separate templates for these!
-    test.notifications.syslog_enable = False
-    test.notifications.twilio_enable = False
-    test.notifications.email_enable = False
+    test.notifications.enable_all = False
 
     yield test
 
 @pytest.fixture
 def template_rss():
     with patch.dict('os.environ', env_vars):
-        test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.url = RSS_URL
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL
+        )
     # disable notifications for testing. Need separate tests for these!
-    test.notifications.syslog_enable = False
-    test.notifications.twilio_enable = False
-    test.notifications.email_enable = False
+    test.notifications.enable_all = False
 
     yield test
 
