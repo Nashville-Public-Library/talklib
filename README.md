@@ -392,7 +392,7 @@ SD.run()
     - On Windows: `venv\Scripts\activate`
     - On Mac: `source venv/bin/activate`
 - Update pip
-    - `pip install --upgrade pip`
+    - `py -m pip install --upgrade pip`
     - depending on your OS, instead of `pip` you may need to run `pip3`
 - Install the package into your virtual environment
     - `pip install -e .`
