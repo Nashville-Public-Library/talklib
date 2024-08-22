@@ -49,10 +49,12 @@ This package uses Environment Variables to help with portability and keep sensit
 ## Installation
 
 - Open a terminal/command prompt
-- Run `pip install talklib`. That's it!
-    - Depending on your OS, instead of `pip` you may need to use `pip3`
-    - This will install the package globally. If you're a TL user just trying to install the package for everyday use, that's likely what you want to do. If you want to install it locally (for testing, etc.), see the [development](#development) section below.
-    - If you already have it installed and need to update it to the newest version, run `pip install --upgrade talklib`
+- ````bash
+    pip install talklib
+    ```` 
+- Depending on your OS, instead of `pip` you may need to use `pip3`
+- This will install the package globally. If you're a TL user just trying to install the package for everyday use, that's likely what you want to do. If you want to install it locally (for testing, etc.), see the [development](#development) section below.
+- If you already have it installed and need to update it to the newest version, run `pip install --upgrade talklib`
 
 ---
 
@@ -88,15 +90,21 @@ You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
 
 Import the class to your script like this:
 
-`from talklib import TLShow`
+````python
+from talklib import TLShow
+````
 
 This is also fine:
 
-`from talklib.show import TLShow`
+````python
+from talklib.show import TLShow
+````
 
 Create an instance like this: 
 
-`example = TLShow()`
+````python
+example = TLShow()
+````
 
 ----
 
@@ -382,23 +390,46 @@ SD.run()
 ## Development<a id="development"></a>
 
 - Clone this repository
-    - `git clone https://github.com/Nashville-Public-Library/talklib.git`
+    ````bash
+    git clone https://github.com/Nashville-Public-Library/talklib.git
+    ````
 - cd into the folder
-    - `cd talklib`
+    ````bash
+    cd talklib
+    ````
 - Create a virtual environment
-    - `python -m venv venv`
+    ````bash
+    python -m venv venv
+    ````
     - depending on your OS, instead of `python`you may need to use `py` or `python3`
 - Activate virtual environment
-    - On Windows: `venv\Scripts\activate`
-    - On Mac: `source venv/bin/activate`
+    - On Windows: 
+    
+    ````bash 
+    venv\Scripts\activate
+    ````
+    - On Mac: 
+
+    ````bash 
+    source venv/bin/activate
+    ````
 - Update pip
-    - `py -m pip install --upgrade pip`
+     ````bash
+     py -m pip install --upgrade pip
+     ````
     - depending on your OS, instead of `pip` you may need to run `pip3`
 - Install the package into your virtual environment
-    - `pip install -e .`
+    ````bash
+    pip install -e .
+    ````
 - Run Pytest
-    - `pytest`
-        - to see code coverage, use `pytest --cov=talklib`
+    ````bash
+    pytest
+    ````
+    - to see code coverage, use this instead
+    ````bash
+    pytest --cov=talklib
+    ````
     - The tests can take a while to run. Watch the terminal output for progress.
     - If the tests fail, you may have installed something incorrectly. 
     - You must be connected to the internet to run the tests
