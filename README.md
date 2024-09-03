@@ -24,7 +24,7 @@ Use this module to process the following types of shows/segments:
 ## Requirements
 
 ### -[Python](https://www.python.org/downloads/)
-This has only been fully tested for Python 3.10
+Use Python 3.10 or higher
 
 ### -[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)
 You need Windows binaries for both FFmpeg & FFprobe installed on the PC and added to the PATH:
