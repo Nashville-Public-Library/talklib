@@ -6,12 +6,10 @@ from unittest.mock import patch
 
 from talklib import TLShow
 from .. import mock
-from ..mock import env_vars
+from ..mock import env_vars, RSS_URL
 
 # this RSS feed chosen as test feed because it is reliably updated every day 
 # (many times per day) and because the audio file is short/small!
-
-url = 'https://feeds.npr.org/500005/podcast.xml'
 
 @pytest.fixture()
 def template():
@@ -19,7 +17,7 @@ def template():
         test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    test.url = url
+    test.url = RSS_URL
 
     test.destinations = mock.mock_destinations()
 

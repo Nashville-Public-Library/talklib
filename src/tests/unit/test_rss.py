@@ -2,14 +2,11 @@ import pytest
 from unittest.mock import patch
 
 from talklib import TLShow
-from ..mock import env_vars
+from ..mock import env_vars, RSS_URL
 
 import xml.etree.ElementTree as ET
 
 
-# this RSS feed chosen as template feed because it is reliably updated every day 
-# (many times per day) and because the audio file is short/small!
-url = 'https://feeds.npr.org/500005/podcast.xml'
 
 
 @pytest.fixture
@@ -18,7 +15,7 @@ def template_rss():
         test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
-    test.url = url
+    test.url = RSS_URL
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False
 

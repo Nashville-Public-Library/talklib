@@ -7,10 +7,9 @@ import subprocess
 from unittest.mock import patch
 
 from talklib import TLShow
-from ..mock import env_vars, download_test_file
+from ..mock import env_vars, download_test_file, RSS_URL
 
 permalink_URL = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
-RSS_URL = 'https://feeds.npr.org/500005/podcast.xml'
 
 input_file = 'input.mp3'  # name the file we download
 
