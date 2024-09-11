@@ -10,7 +10,7 @@ to mock a local file. Downloading the file itself it just setting up the test.
 
 This static link was chosen because it's reliably available and the file is small/short.
 '''
-permalink = "http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE="
+permalink = "http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDI="
 RSS_URL = "https://feeds.megaphone.fm/ESP9792844572"
 
 env_vars = {
