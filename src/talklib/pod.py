@@ -78,6 +78,7 @@ class TLPod(BaseModel, AWS):
                 if to_match in file:
                     return os.path.basename(file)
         to_send = f"There was a problem podcasting {self.show}. Cannot find matched file in {self.audio_folders}"
+        raise Exception (to_send)
         # self.__send_notifications(message=to_send, subject='Error')
         # raise_exception_and_wait(message=to_send)
 
@@ -86,7 +87,7 @@ class TLPod(BaseModel, AWS):
         filename = file.split('.')
         filename = filename[0]
         a.input_file = file
-        a.output_file = filename+'mp3'
+        a.output_file = filename+'.mp3'
         ha = a.convert()
         return ha
 
