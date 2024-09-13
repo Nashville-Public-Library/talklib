@@ -12,9 +12,15 @@ This static link was chosen because it's reliably available and the file is smal
 permalink = "http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDI="
 RSS_URL = "https://feeds.megaphone.fm/ESP9792844572"
 
+def mock_destinations():
+    destination = 'dest1'
+    if not os.path.exists(destination):
+            os.mkdir(destination)
+    return destination
+
 env_vars = {
-        'destinations': 'nothing',
-        'syslog_server': 'mocked_value2',
+        'destinations': mock_destinations(),
+        'syslog_server': '10.10.10.10',
         'fromEmail': 'mocked_value2',
         'toEmail': 'mocked_value2',
         'mail_server_external': 'mocked_value2',
@@ -24,18 +30,19 @@ env_vars = {
         'twilio_to': 'mocked_value2',
         'icecast_user': 'mahhhh',
         'icecast_pass': 'mahhhhh',
-        'destinations': 'nope'
+        'AWS_ACCESS_KEY_ID': 'negative',
+        'AWS_SECRET_ACCESS_KEY': 'nothing!'
     }
 
     
-def download_test_file():
-    input_file = 'input.mp3'  # name the file we download
-    downloaded_file = input_file
-    file_exists = os.path.isfile(input_file)
+def download_test_file(filename: str = 'input.mp3'):
+    downloaded_file = filename
+    file_exists = os.path.isfile(filename)
     if not file_exists:
-        with open (input_file, mode='wb') as downloaded_file:
+        with open (filename, mode='wb') as downloaded_file:
             a = requests.get(permalink)
             downloaded_file.write(a.content)
             downloaded_file.close()
             return downloaded_file.name
+
     return downloaded_file
