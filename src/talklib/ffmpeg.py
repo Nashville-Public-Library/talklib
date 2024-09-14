@@ -32,6 +32,8 @@ class FFMPEG:
         command.update({'af': f'loudnorm=I=-{self.compression_level}'})
         if self.breakaway:
             command.update({'t': self.breakaway})
+        if self.output_file.endswith('mp3'):
+            command.update({'b:a': "96k"})
         command.update({'y': None})
         command.update({'filename': self.output_file})
 
