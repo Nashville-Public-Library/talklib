@@ -1,4 +1,5 @@
 from datetime import datetime
+import xml.etree.ElementTree as ET
 import glob
 import os
 from typing import Type
@@ -54,8 +55,77 @@ class AWS():
             if not key.endswith("/"):
                 print(key)
 
+class Episode(BaseModel):
+    feed_file: str 
+    audio_filename: str
+    bucket_folder: str
+    episode_title: str
 
-class TLPod(BaseModel, AWS):
+    pub_date: str = datetime.now().strftime('%a, %d %b %Y %H:%M:%S -5000')
+    
+    def size_in_bytes(self, filename):
+        size_in_bytes = os.path.getsize(filename)
+        size_in_bytes = str(size_in_bytes)
+        return size_in_bytes
+    
+    def enclosure(self):
+        enclosure = f"https://tlpod.s3.us-east-1.amazonaws.com/{self.bucket_folder}/{self.audio_filename}"
+        return enclosure
+
+    def add_new_episode(self):
+        feed = ET.parse(self.feed_file)
+        root = feed.getroot()
+        root = root.find('channel')
+
+        # make a new element, called 'item'
+        item = ET.Element('item')
+
+        # add elements to the item element
+        title = ET.Element('title')
+        title.text = self.episode_title
+        item.append(title)
+
+        pubDate = ET.Element('pubDate')
+        pubDate.text = self.pub_date
+        item.append(pubDate)
+
+        enclosure = ET.Element('enclosure')
+        enclosure.set('url', self.enclosure())
+        enclosure.set('length', self.size_in_bytes(self.audio_filename))
+        enclosure.set('type', 'audio/mpeg')
+        item.append(enclosure)
+
+        guid = ET.Element('guid')
+        guid.set('isPermaLink', 'false')
+        guid.text = self.audio_filename # this is just the name of the audio file. useful for deleting the file later on...
+        item.append(guid)
+
+        last_build_date = root.find('lastBuildDate')
+        last_build_date.text = self.pub_date
+
+        # insert the item element into the channel element, at index position x
+        root.insert(10, item)
+
+        ET.indent(feed) # makes the XML real pretty like
+        feed.write(self.feed_file)
+    
+    def remove_old_episodes(self):
+        feed = ET.parse(self.feed_file)
+        root = feed.getroot()
+        root = root.find('channel')
+        number_of_items = root.findall('item')
+        if len(number_of_items) > 10:
+            guid_of_item = number_of_items[-1]
+            guid = guid_of_item.find('guid').text
+            root.remove(guid_of_item)
+            AWS().delete_file()
+            ET.indent(feed)
+            feed.write(self.feed_file)
+        else:
+            print('under 50')
+
+
+class TLPod(BaseModel):
     '''
     everything should be in lower case!
 
@@ -78,10 +148,13 @@ class TLPod(BaseModel, AWS):
         '''match the name of the program that has today's date in the filename'''
         today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
         to_match:str = self.filename_to_match + today_date
+        self.__prep_syslog(message=f"looking for file to match: {to_match}")
         for dest in self.audio_folders:
+            self.__prep_syslog(message=f"searching for {to_match} in {dest}...")
             files = glob.glob(f"{dest}/*.wav")
             for file in files:
                 if to_match.lower() in file.lower():
+                    self.__prep_syslog(message="found matching file!")
                     return file
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
         raise Exception (to_send)
@@ -89,13 +162,15 @@ class TLPod(BaseModel, AWS):
         # raise_exception_and_wait(message=to_send)
 
     def convert(self, file:str):
+        self.__prep_syslog(message="Converting audio file to mp3...")
         a = FFMPEG()
         filename = file.split('.')
         filename = filename[0]
-        filename = os.path.basename(filename)
+        filename = os.path.basename(filename).lower()
         a.input_file = file
         a.output_file = filename + '.mp3'
         ha = a.convert()
+        self.__prep_syslog(message="File successfully converted")
         return ha
     
     def check_bucket_folder_exists(self):
@@ -134,20 +209,48 @@ class TLPod(BaseModel, AWS):
 
 
     def run(self):
+        self.__prep_syslog(message="Starting up...")
         audio_file = self.match_file()
+        converted_file = self.convert(file=audio_file)
+
         if self.check_bucket_folder_exists():
-            self.__prep_syslog(message='bucket folder exists')
+            self.__prep_syslog(message=f"{self.bucket_folder} folder exists in bucket")
         else:
             to_send = f'cannot find bucket folder titled: {self.bucket_folder}.'
             self.__send_notifications(message=to_send, subject='Error')
             raise_exception_and_wait(message=to_send)
+
         aws = AWS()
         try:
+            self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}")
             feed_file = aws.download_file(bucket_folder=self.bucket_folder, file='feed.xml')
         except ClientError as e:
-            to_send = 'unable to download feed file'
+            to_send = f'unable to download feed file: {e}'
             self.__send_notifications(message=to_send, subject='Error')
             raise_exception_and_wait(message=to_send)
-        
 
- 
+        episode = Episode(
+            feed_file=feed_file,
+            audio_filename=converted_file,
+            bucket_folder=self.bucket_folder,
+            episode_title=f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})"
+            )
+        self.__prep_syslog("adding episode to feed...")
+        episode.add_new_episode()
+        try:
+            aws.upload_file(bucket_folder=self.bucket_folder, file=converted_file)
+            aws.upload_file(bucket_folder=self.bucket_folder, file=feed_file)
+        except ClientError as e:
+            to_send = f'unable to download feed file: {e}'
+            self.__send_notifications(message=to_send, subject='Error')
+            raise_exception_and_wait(message=to_send)
+
+        try:
+            self.__prep_syslog(f"Deleting local file ({feed_file}) from {os.getcwd()}")
+            os.remove(feed_file)
+            self.__prep_syslog(f"Deleting local file ({converted_file}) from {os.getcwd()}")
+            os.remove(converted_file)
+        except:
+            print('whoops')
+
+        print('done?')
