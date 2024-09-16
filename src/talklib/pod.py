@@ -4,6 +4,7 @@ import os
 from typing import Type
 
 import boto3
+from botocore.exceptions import ClientError
 from pydantic import BaseModel, Field
 
 from talklib.ev import EV
@@ -25,6 +26,7 @@ class AWS():
 
     def download_file(self, bucket_folder, file):
         self.s3.download_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file)
+        return file
 
     def delete_file(self, file):
         pass
@@ -34,17 +36,19 @@ class AWS():
         response = self.s3.list_buckets()
         response = response['Buckets']
         for bucket_name in response:
-            print(bucket_name["Name"])
+            return(bucket_name["Name"])
 
-    def print_folders(self):
-        result = self.s3.list_objects(Bucket="tlpod")
+    def get_folders(self):
+        folders = []
+        result = self.s3.list_objects(Bucket=self.bucket)
         for contents in result["Contents"]:
             key:str = contents["Key"]
             if key.endswith("/"):
-                print(key)
+                folders.append(key.strip('/').lower())
+        return folders
     
-    def print_files(self):
-        result = self.s3.list_objects(Bucket="tlpod")
+    def get_files(self):
+        result = self.s3.list_objects(Bucket=self.bucket)
         for contents in result["Contents"]:
             key:str = contents["Key"]
             if not key.endswith("/"):
@@ -53,6 +57,8 @@ class AWS():
 
 class TLPod(BaseModel, AWS):
     '''
+    everything should be in lower case!
+
     show: generic name for the show/program
 
     filename_to_match: the base name of the show we want to match. do not include the date.
@@ -61,9 +67,9 @@ class TLPod(BaseModel, AWS):
     bucket_folder: the name of the folder on S3 where the audio and RSS files are stored.
     should be lower case
     '''
-    show: str
+    display_name: str
     filename_to_match: str
-    bucket_folder: str 
+    bucket_folder: str
     audio_folders:list = EV().destinations
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
@@ -75,9 +81,9 @@ class TLPod(BaseModel, AWS):
         for dest in self.audio_folders:
             files = glob.glob(f"{dest}/*.wav")
             for file in files:
-                if to_match in file:
-                    return os.path.basename(file)
-        to_send = f"There was a problem podcasting {self.show}. Cannot find matched file {to_match} in {self.audio_folders}"
+                if to_match.lower() in file.lower():
+                    return file
+        to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
         raise Exception (to_send)
         # self.__send_notifications(message=to_send, subject='Error')
         # raise_exception_and_wait(message=to_send)
@@ -86,22 +92,30 @@ class TLPod(BaseModel, AWS):
         a = FFMPEG()
         filename = file.split('.')
         filename = filename[0]
+        filename = os.path.basename(filename)
         a.input_file = file
-        a.output_file = filename+'.mp3'
+        a.output_file = filename + '.mp3'
         ha = a.convert()
         return ha
+    
+    def check_bucket_folder_exists(self):
+        aws = AWS()
+        folders = aws.get_folders()
+        if self.bucket_folder.lower() in folders:
+            return True
+        return False
 
 
 
     def __prep_syslog(self, message: str, level: str = 'info'):
         '''send message to syslog server'''
-        message = f'{self.show}: {message}'
+        message = f'{self.display_name}: {message}'
         print(message)
         self.notifications.send_syslog(message=message, level=level)
 
     def __prep_send_mail(self, message: str, subject: str):
         '''send email to TL gmail account via relay address'''
-        subject = f'{subject}: {self.show}'
+        subject = f'{subject}: {self.display_name}'
         self.notifications.send_mail(subject=subject, message=message)
 
     def __send_sms_if_enabled(self, message: str):
@@ -121,6 +135,19 @@ class TLPod(BaseModel, AWS):
 
     def run(self):
         audio_file = self.match_file()
-        converted_file = self.convert(file=audio_file)
+        if self.check_bucket_folder_exists():
+            self.__prep_syslog(message='bucket folder exists')
+        else:
+            to_send = f'cannot find bucket folder titled: {self.bucket_folder}.'
+            self.__send_notifications(message=to_send, subject='Error')
+            raise_exception_and_wait(message=to_send)
         aws = AWS()
-        aws.upload_file(bucket_folder=self.bucket_folder, file=converted_file)
+        try:
+            feed_file = aws.download_file(bucket_folder=self.bucket_folder, file='feed.xml')
+        except ClientError as e:
+            to_send = 'unable to download feed file'
+            self.__send_notifications(message=to_send, subject='Error')
+            raise_exception_and_wait(message=to_send)
+        
+
+ 

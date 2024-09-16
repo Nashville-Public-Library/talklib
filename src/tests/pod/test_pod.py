@@ -18,7 +18,7 @@ def test_type_1():
     '''pydantic should raise an error if wrong type passed in'''
     with pytest.raises(ValidationError):
             test = TLPod(
-                show=5, 
+                display_name=5, 
                 show_filename="del",
                 bucket_folder='nope')
             
@@ -26,7 +26,7 @@ def test_type_2():
     '''pydantic should raise an error if wrong type passed in'''
     with pytest.raises(ValidationError):
             test = TLPod(
-                show=5, 
+                display_name=5, 
                 show_filename=5,
                 bucket_folder='nope')
 
@@ -34,14 +34,14 @@ def test_type_3():
     '''pydantic should raise an error if wrong type passed in'''
     with pytest.raises(ValidationError):
             test = TLPod(
-                show='delete', 
+                display_name='delete', 
                 show_filename="del",
                 bucket_folder=5)
             
 def test_match_file_1():
     '''checking matched filename'''
     test = TLPod(
-        show = 'test',
+        display_name = 'test',
         filename_to_match='test',
         bucket_folder='test',
       )
@@ -56,7 +56,7 @@ def test_match_file_1():
 def test_match_file_2(self):
     '''should raise exception if invalid filename passed in'''
     test = TLPod(
-        show='test',
+        display_name='test',
         filename_to_match='notExist',
         bucket_folder='nope'
     )
