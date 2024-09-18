@@ -29,8 +29,8 @@ class AWS():
         self.s3.download_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file)
         return file
 
-    def delete_file(self, file):
-        pass
+    def delete_file(self, bucket_folder, file):
+        self.s3.delete_object(Bucket=self.bucket, Key=bucket_folder+'/'+file)
     
     def print_buckets(self):
     # Retrieve the list of existing buckets
@@ -118,7 +118,7 @@ class Episode(BaseModel):
             guid_of_item = number_of_items[-1]
             guid = guid_of_item.find('guid').text
             root.remove(guid_of_item)
-            AWS().delete_file()
+            AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
             ET.indent(feed)
             feed.write(self.feed_file)
         else:
