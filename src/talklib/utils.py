@@ -21,7 +21,7 @@ def raise_exception_and_wait(message: str, error = Exception) -> None:
     clear_screen()
     print(f'{message}\n')  # get user's attention!
     input('(press enter to close this window)') # force user to acknowledge by closing window
-    exit()
+    raise error
 
 def today_is_weekday() -> bool:
     '''crude mechanism for determining if today is a weekday.'''
