@@ -2,6 +2,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 import glob
 import os
+import time
 from typing import Type
 
 import boto3
@@ -22,8 +23,8 @@ class AWS():
     aws_secret_access_key = ev.aws_secret_access_key
     )
 
-    def upload_file(self, bucket_folder, file):
-        self.s3.upload_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file)
+    def upload_file(self, bucket_folder, file, ExtraArgs=None):
+        self.s3.upload_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file, ExtraArgs=ExtraArgs)
 
     def download_file(self, bucket_folder, file):
         self.s3.download_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file)
@@ -60,8 +61,15 @@ class Episode(BaseModel):
     audio_filename: str
     bucket_folder: str
     episode_title: str
+    max_episodes: int
 
-    pub_date: str = datetime.now().strftime('%a, %d %b %Y %H:%M:%S -5000')
+    def pub_date(self): 
+        timezone = time.timezone/60/60
+        timezone = round(timezone)
+        if time.daylight: # if DST is currently active
+            timezone-=1
+
+        return datetime.now().strftime(f'%a, %d %b %Y %H:%M:%S -0{timezone}00')
     
     def size_in_bytes(self, filename):
         size_in_bytes = os.path.getsize(filename)
@@ -86,7 +94,7 @@ class Episode(BaseModel):
         item.append(title)
 
         pubDate = ET.Element('pubDate')
-        pubDate.text = self.pub_date
+        pubDate.text = self.pub_date()
         item.append(pubDate)
 
         enclosure = ET.Element('enclosure')
@@ -101,7 +109,7 @@ class Episode(BaseModel):
         item.append(guid)
 
         last_build_date = root.find('lastBuildDate')
-        last_build_date.text = self.pub_date
+        last_build_date.text = self.pub_date()
 
         # insert the item element into the channel element, at index position x
         root.insert(10, item)
@@ -113,16 +121,18 @@ class Episode(BaseModel):
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
         root = root.find('channel')
-        number_of_items = root.findall('item')
-        if len(number_of_items) > 10:
-            guid_of_item = number_of_items[-1]
-            guid = guid_of_item.find('guid').text
+        items = root.findall('item')
+        number_of_items = len(items)
+        index = -1
+        while number_of_items > self.max_episodes:
+            guid_of_item = items[index] # locate last item in feed
+            guid = guid_of_item.find('guid').text # grab the guid (filename) so we can delete the file from S3
             root.remove(guid_of_item)
-            AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
+            # AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
             ET.indent(feed)
             feed.write(self.feed_file)
-        else:
-            print('under 50')
+            number_of_items-=1
+            index-=1
 
 
 class TLPod(BaseModel):
@@ -140,6 +150,7 @@ class TLPod(BaseModel):
     display_name: str
     filename_to_match: str
     bucket_folder: str
+    max_episodes_in_feed: int = 10
     audio_folders:list = EV().destinations
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
@@ -233,13 +244,15 @@ class TLPod(BaseModel):
             feed_file=feed_file,
             audio_filename=converted_file,
             bucket_folder=self.bucket_folder,
-            episode_title=f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})"
+            episode_title=f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})",
+            max_episodes=self.max_episodes_in_feed
             )
         self.__prep_syslog("adding episode to feed...")
         episode.add_new_episode()
+        episode.remove_old_episodes()
         try:
-            aws.upload_file(bucket_folder=self.bucket_folder, file=converted_file)
-            aws.upload_file(bucket_folder=self.bucket_folder, file=feed_file)
+            aws.upload_file(bucket_folder=self.bucket_folder, file=converted_file, ExtraArgs={'ContentType': "audio/mpeg"})
+            aws.upload_file(bucket_folder=self.bucket_folder, file=feed_file, ExtraArgs={'ContentType': "application/rss+xml"})
         except ClientError as e:
             to_send = f'unable to download feed file: {e}'
             self.__send_notifications(message=to_send, subject='Error')
