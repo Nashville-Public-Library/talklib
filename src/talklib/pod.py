@@ -173,13 +173,14 @@ class TLPod(BaseModel):
         # raise_exception_and_wait(message=to_send)
 
     def convert(self, file:str):
-        self.__prep_syslog(message="Converting audio file to mp3...")
+        self.__prep_syslog(message=f"Converting {file} to mp3...")
         a = FFMPEG()
         filename = file.split('.')
         filename = filename[0]
         filename = os.path.basename(filename).lower()
         a.input_file = file
         a.output_file = filename + '.mp3'
+        self.__prep_syslog(message=f"Filename will be {a.output_file}")
         ha = a.convert()
         self.__prep_syslog(message="File successfully converted")
         return ha
@@ -234,7 +235,7 @@ class TLPod(BaseModel):
         aws = AWS()
         try:
             self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}")
-            feed_file = aws.download_file(bucket_folder=self.bucket_folder, file='feed.xml')
+            feed_file = aws.download_file(bucket_folder=self.bucket_folder, file='feed.xml') # all XML files in S3 should have the same name
         except ClientError as e:
             to_send = f'unable to download feed file: {e}'
             self.__send_notifications(message=to_send, subject='Error')
@@ -247,17 +248,21 @@ class TLPod(BaseModel):
             episode_title=f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})",
             max_episodes=self.max_episodes_in_feed
             )
-        self.__prep_syslog("adding episode to feed...")
+        self.__prep_syslog(message="adding episode to feed...")
         episode.add_new_episode()
+        self.__prep_syslog("removing old episodes from feed...")
         episode.remove_old_episodes()
         try:
+            self.__prep_syslog(message=f"uploading {converted_file} to {self.bucket_folder}")
             aws.upload_file(bucket_folder=self.bucket_folder, file=converted_file, ExtraArgs={'ContentType': "audio/mpeg"})
+            self.__prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}")
             aws.upload_file(bucket_folder=self.bucket_folder, file=feed_file, ExtraArgs={'ContentType': "application/rss+xml"})
         except ClientError as e:
             to_send = f'unable to download feed file: {e}'
             self.__send_notifications(message=to_send, subject='Error')
             raise_exception_and_wait(message=to_send)
 
+        self.__prep_syslog(message="Attempting to delete local files...")
         try:
             self.__prep_syslog(f"Deleting local file ({feed_file}) from {os.getcwd()}")
             os.remove(feed_file)
