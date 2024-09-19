@@ -16,7 +16,8 @@ from talklib.utils import raise_exception_and_wait, today_is_weekday
 
 class AWS():
     ev = EV()
-    bucket = 'tlpod'
+    bucket = "tlpod"
+    region = "us-east-1"
     s3 = boto3.client(
     's3', 
     aws_access_key_id = ev.aws_access_key_id, 
@@ -64,7 +65,7 @@ class Episode(BaseModel):
     max_episodes: int
 
     def pub_date(self): 
-        timezone = time.timezone/60/60
+        timezone = time.timezone/60/60 # 60 seconds per minute, 60 minutes per hour
         timezone = round(timezone)
         if time.daylight: # if DST is currently active
             timezone-=1
@@ -77,7 +78,8 @@ class Episode(BaseModel):
         return size_in_bytes
     
     def enclosure(self):
-        enclosure = f"https://tlpod.s3.us-east-1.amazonaws.com/{self.bucket_folder}/{self.audio_filename}"
+        aws = AWS()
+        enclosure = f"https://{aws.bucket}.s3.{aws.region}.amazonaws.com/{self.bucket_folder}/{self.audio_filename}"
         return enclosure
 
     def add_new_episode(self):
@@ -125,10 +127,10 @@ class Episode(BaseModel):
         number_of_items = len(items)
         index = -1
         while number_of_items > self.max_episodes:
-            guid_of_item = items[index] # locate last item in feed
-            guid = guid_of_item.find('guid').text # grab the guid (filename) so we can delete the file from S3
-            root.remove(guid_of_item)
-            # AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
+            item_to_remove = items[index] # locate last item in feed
+            guid = item_to_remove.find('guid').text # grab the guid (filename) so we can delete the file from S3
+            root.remove(item_to_remove)
+            AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
             ET.indent(feed)
             feed.write(self.feed_file)
             number_of_items-=1
@@ -139,18 +141,20 @@ class TLPod(BaseModel):
     '''
     everything should be in lower case!
 
-    show: generic name for the show/program
+    display_name: generic name for the show/program. type=string
 
     filename_to_match: the base name of the show we want to match. do not include the date.
-    for example, to match RollingStone091322, use 'RollingStone'.
+    for example, to match RollingStone091322, use 'RollingStone'. type=string
 
     bucket_folder: the name of the folder on S3 where the audio and RSS files are stored.
-    should be lower case
+    should be lower case. type=string
+
+    max_episodes_in_feed: the max number of episodes that should be in the feed after you add the episode.
     '''
     display_name: str
     filename_to_match: str
     bucket_folder: str
-    max_episodes_in_feed: int = 10
+    max_episodes_in_feed: int = 5
     audio_folders:list = EV().destinations
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
@@ -234,7 +238,7 @@ class TLPod(BaseModel):
 
         aws = AWS()
         try:
-            self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}")
+            self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}/ folder")
             feed_file = aws.download_file(bucket_folder=self.bucket_folder, file='feed.xml') # all XML files in S3 should have the same name
         except ClientError as e:
             to_send = f'unable to download feed file: {e}'
@@ -253,9 +257,9 @@ class TLPod(BaseModel):
         self.__prep_syslog("removing old episodes from feed...")
         episode.remove_old_episodes()
         try:
-            self.__prep_syslog(message=f"uploading {converted_file} to {self.bucket_folder}")
+            self.__prep_syslog(message=f"uploading {converted_file} to {self.bucket_folder}/ folder")
             aws.upload_file(bucket_folder=self.bucket_folder, file=converted_file, ExtraArgs={'ContentType': "audio/mpeg"})
-            self.__prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}")
+            self.__prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}/ folder")
             aws.upload_file(bucket_folder=self.bucket_folder, file=feed_file, ExtraArgs={'ContentType': "application/rss+xml"})
         except ClientError as e:
             to_send = f'unable to download feed file: {e}'
@@ -264,11 +268,11 @@ class TLPod(BaseModel):
 
         self.__prep_syslog(message="Attempting to delete local files...")
         try:
-            self.__prep_syslog(f"Deleting local file ({feed_file}) from {os.getcwd()}")
+            self.__prep_syslog(f"Deleting local file '{feed_file}' from {os.getcwd()}")
             os.remove(feed_file)
-            self.__prep_syslog(f"Deleting local file ({converted_file}) from {os.getcwd()}")
+            self.__prep_syslog(f"Deleting local file '{converted_file}' from {os.getcwd()}")
             os.remove(converted_file)
         except:
-            print('whoops')
+            self.__prep_syslog(message="Unable to delete local files...")
 
-        print('done?')
+        self.__prep_syslog(message='All done')
