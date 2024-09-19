@@ -90,7 +90,7 @@ class Episode(BaseModel):
         # make a new element, called 'item'
         item = ET.Element('item')
 
-        # add elements to the item element
+        # create all of the sub elements, then append them to the 'item' element
         title = ET.Element('title')
         title.text = self.episode_title
         item.append(title)
@@ -110,13 +110,22 @@ class Episode(BaseModel):
         guid.text = self.audio_filename # this is just the name of the audio file. useful for deleting the file later on...
         item.append(guid)
 
+        # insert the new 'item' element as the first item, but below all the other channel elements
+        items = root.findall('item')
+        if items:
+            # If there are existing items (there usually will be), add the new item before to the top
+            first_item = items[0]
+            index = list(root).index(first_item)
+            root.insert(index, item)
+        else:
+            # If no items exist, add the new item to the bottom (after the other channel elements)
+            root.append(item)
+
+        # don't forget to update this as well
         last_build_date = root.find('lastBuildDate')
-        last_build_date.text = self.pub_date()
+        last_build_date.text = self.pub_date() # fine to use this same pub date, as the format for both is the same
 
-        # insert the item element into the channel element, at index position x
-        root.insert(10, item)
-
-        ET.indent(feed) # makes the XML real pretty like
+        ET.indent(feed) # makes the XML pretty looking
         feed.write(self.feed_file)
     
     def remove_old_episodes(self):
@@ -129,7 +138,9 @@ class Episode(BaseModel):
         while number_of_items > self.max_episodes:
             item_to_remove = items[index] # locate last item in feed
             guid = item_to_remove.find('guid').text # grab the guid (filename) so we can delete the file from S3
+            print(f'removing from feed: {item_to_remove}')
             root.remove(item_to_remove)
+            print(f"deleteing {guid} from {self.bucket_folder}/ folder")
             AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
             ET.indent(feed)
             feed.write(self.feed_file)
@@ -141,7 +152,8 @@ class TLPod(BaseModel):
     '''
     everything should be in lower case!
 
-    display_name: generic name for the show/program. type=string
+    display_name: generic name for the show/program. WIll be displayed as the
+    episode "Title" in the podcast feed. type=string
 
     filename_to_match: the base name of the show we want to match. do not include the date.
     for example, to match RollingStone091322, use 'RollingStone'. type=string
