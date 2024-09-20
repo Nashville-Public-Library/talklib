@@ -94,7 +94,11 @@ class Notify:
             format['Subject'] = subject
             format['From'] = self.EV.fromEmail
             format['To'] = email
-
-            mail = smtplib.SMTP(host=self.EV.mail_server)
-            mail.send_message(format)
-            mail.quit()
+            try:
+                mail = smtplib.SMTP(host=self.EV.mail_server)
+                mail.send_message(format)
+                mail.quit()
+            except ConnectionRefusedError as e:
+                print(e)
+            except TimeoutError as e:
+                print(e)
