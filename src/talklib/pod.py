@@ -197,9 +197,8 @@ class TLPod(BaseModel):
                     self.__prep_syslog(message="found matching file!")
                     return file
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
-        raise Exception (to_send)
-        # self.__send_notifications(message=to_send, subject='Error')
-        # raise_exception_and_wait(message=to_send)
+        self.__send_notifications(message=to_send, subject='Error')
+        raise_exception_and_wait(message=to_send, error=FileNotFoundError)
 
     def convert(self, file:str):
         self.__prep_syslog(message=f"Converting {file} to mp3...")
