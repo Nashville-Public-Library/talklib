@@ -57,6 +57,12 @@ class AWS():
             if not key.endswith("/"):
                 print(key)
 
+    def check_bucket_folder_exists(self, bucket_folder: str):
+        folders = self.get_folders()
+        if bucket_folder.lower() in folders:
+            return True
+        return False
+
 class Episode(BaseModel):
     feed_file: str 
     audio_filename: str
@@ -201,13 +207,6 @@ class TLPod(BaseModel):
         self.__prep_syslog(message="File successfully converted")
         return ha
     
-    def check_bucket_folder_exists(self):
-        aws = AWS()
-        folders = aws.get_folders()
-        if self.bucket_folder.lower() in folders:
-            return True
-        return False
-    
     def countdown(self):
         '''
         the reason for this is to give a visual cue to the user
@@ -256,14 +255,15 @@ class TLPod(BaseModel):
         audio_file = self.match_file()
         converted_file = self.convert(file=audio_file)
 
-        if self.check_bucket_folder_exists():
+        aws = AWS()
+
+        if aws.check_bucket_folder_exists(bucket_folder=self.bucket_folder):
             self.__prep_syslog(message=f"{self.bucket_folder} folder exists in bucket")
         else:
             to_send = f'cannot find bucket folder titled: {self.bucket_folder}.'
             self.__send_notifications(message=to_send, subject='Error')
             raise_exception_and_wait(message=to_send)
 
-        aws = AWS()
         try:
             self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}/ folder")
             feed_file = aws.download_file(bucket_folder=self.bucket_folder, file='feed.xml') # all XML files in S3 should have the same name
