@@ -207,6 +207,21 @@ class TLPod(BaseModel):
         if self.bucket_folder.lower() in folders:
             return True
         return False
+    
+    def countdown(self):
+        '''
+        the reason for this is to give a visual cue to the user
+        that the script has finished and is about to exit.
+        Otherwise, the user does not know what happened; they
+        just see the screen disappear.
+        '''
+        self.__prep_syslog(message='All Done.')
+        number = 5
+        i = 0
+        while i < number:
+            print(f'This window will close in {number} seconds...', end='\r')
+            number-=1
+            time.sleep(1)
 
 
 
@@ -287,4 +302,4 @@ class TLPod(BaseModel):
         except:
             self.__prep_syslog(message="Unable to delete local files...")
 
-        self.__prep_syslog(message='All done')
+        self.countdown()
