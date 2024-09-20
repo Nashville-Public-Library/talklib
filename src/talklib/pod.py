@@ -7,7 +7,7 @@ from typing import Type
 
 import boto3
 from botocore.exceptions import ClientError
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from talklib.ev import EV
 from talklib.notify import Notify
@@ -169,13 +169,20 @@ class TLPod(BaseModel):
 
     max_episodes_in_feed: the max number of episodes that should be in the feed after you add the episode.
     '''
-    display_name: str
-    filename_to_match: str
-    bucket_folder: str
-    max_episodes_in_feed: int = 5
+    display_name: str = Field(min_length=1)
+    filename_to_match: str = Field(min_length=1)
+    bucket_folder: str = Field(default=None)
+    max_episodes_in_feed: int = Field(ge=1, default=5)
     audio_folders:list = EV().destinations
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
+
+    @model_validator(mode='after')
+    def post_update(self):
+        if not self.bucket_folder:
+            self.bucket_folder = self.filename_to_match
+
+        return self
 
     def match_file(self):
         '''match the name of the program that has today's date in the filename'''
