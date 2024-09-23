@@ -64,10 +64,10 @@ class AWS():
         return False
 
 class Episode(BaseModel):
-    feed_file: str 
-    audio_filename: str
-    bucket_folder: str
-    episode_title: str
+    feed_file: str = Field(min_length=1)
+    audio_filename: str = Field(min_length=1)
+    bucket_folder: str = Field(min_length=1)
+    episode_title: str = Field(min_length=1)
     max_episodes: int
 
     def pub_date(self): 
