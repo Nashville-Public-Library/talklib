@@ -2,6 +2,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 import glob
 import os
+import re
 import time
 from typing import Type
 
@@ -173,27 +174,40 @@ class TLPod(BaseModel):
     filename_to_match: str = Field(min_length=1)
     bucket_folder: str = Field(default=None)
     max_episodes_in_feed: int = Field(ge=1, default=5)
+    filename_override: bool = False
     audio_folders:list = EV().destinations
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
 
     @model_validator(mode='after')
     def post_update(self):
+        '''
+        the name of the bucket folder should match the base name of the file. If bucket_folder is not explicitly set
+        by the user, use the filename. However, if filename_override is being used, strip out the digits first.
+        '''
         if not self.bucket_folder:
-            self.bucket_folder = self.filename_to_match
+            if self.filename_override:
+                self.bucket_folder = re.sub(pattern="[0-9]", string=self.filename_to_match.lower(), repl='')
+            else: 
+                self.bucket_folder = self.filename_to_match.lower()
 
         return self
+    
+    def get_filename_to_match(self) -> str:
+        if self.filename_override:
+            return self.filename_to_match.lower()
+        today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
+        return (self.filename_to_match + today_date).lower()
 
     def match_file(self):
         '''match the name of the program that has today's date in the filename'''
-        today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
-        to_match:str = self.filename_to_match + today_date
+        to_match = self.get_filename_to_match()
         self.__prep_syslog(message=f"looking for file to match: {to_match}")
         for dest in self.audio_folders:
             self.__prep_syslog(message=f"searching for {to_match} in {dest}...")
             files = glob.glob(f"{dest}/*.wav")
             for file in files:
-                if to_match.lower() in file.lower():
+                if to_match in file.lower():
                     self.__prep_syslog(message="found matching file!")
                     return file
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
