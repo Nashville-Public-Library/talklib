@@ -15,36 +15,36 @@ from talklib.notify import Notify
 from talklib.ffmpeg import FFMPEG
 from talklib.utils import raise_exception_and_wait, today_is_weekday
 
-class AWS():
-    ev = EV()
-    bucket = "tlpod"
-    region = "us-east-1"
-    s3 = boto3.client(
+class AWS(BaseModel):
+    ev: Type[EV]  = EV()
+    bucket: str = "tlpod"
+    region: str = "us-east-1"
+    _s3  = boto3.client(
     's3', 
     aws_access_key_id = ev.aws_access_key_id, 
     aws_secret_access_key = ev.aws_secret_access_key
     )
 
     def upload_file(self, bucket_folder, file, ExtraArgs=None):
-        self.s3.upload_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file, ExtraArgs=ExtraArgs)
+        self._s3.upload_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file, ExtraArgs=ExtraArgs)
 
     def download_file(self, bucket_folder, file):
-        self.s3.download_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file)
+        self._s3.download_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file)
         return file
 
     def delete_file(self, bucket_folder, file):
-        self.s3.delete_object(Bucket=self.bucket, Key=bucket_folder+'/'+file)
+        self._s3.delete_object(Bucket=self.bucket, Key=bucket_folder+'/'+file)
     
     def print_buckets(self):
     # Retrieve the list of existing buckets
-        response = self.s3.list_buckets()
+        response = self._s3.list_buckets()
         response = response['Buckets']
         for bucket_name in response:
             return(bucket_name["Name"])
 
     def get_folders(self):
         folders = []
-        result = self.s3.list_objects(Bucket=self.bucket)
+        result = self._s3.list_objects(Bucket=self.bucket)
         for contents in result["Contents"]:
             key:str = contents["Key"]
             if key.endswith("/"):
@@ -52,7 +52,7 @@ class AWS():
         return folders
     
     def get_files(self):
-        result = self.s3.list_objects(Bucket=self.bucket)
+        result = self._s3.list_objects(Bucket=self.bucket)
         for contents in result["Contents"]:
             key:str = contents["Key"]
             if not key.endswith("/"):
