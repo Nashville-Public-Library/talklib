@@ -90,6 +90,7 @@ class Episode(BaseModel):
         return enclosure
 
     def add_new_episode(self):
+        ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
         root = root.find('channel')
@@ -133,9 +134,10 @@ class Episode(BaseModel):
         last_build_date.text = self.pub_date() # fine to use this same pub date, as the format for both is the same
 
         ET.indent(feed) # makes the XML pretty looking
-        feed.write(self.feed_file)
+        feed.write(self.feed_file, encoding="utf-8", xml_declaration=True)
     
     def remove_old_episodes(self):
+        ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
         root = root.find('channel')
@@ -150,7 +152,7 @@ class Episode(BaseModel):
             print(f"deleteing {guid} from {self.bucket_folder}/ folder")
             AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
             ET.indent(feed)
-            feed.write(self.feed_file)
+            feed.write(self.feed_file, encoding="utf-8", xml_declaration=True)
             number_of_items-=1
             index-=1
 
