@@ -70,6 +70,7 @@ class Episode(BaseModel):
     bucket_folder: str = Field(min_length=1)
     episode_title: str = Field(min_length=1)
     max_episodes: int
+    categories: list
 
     def pub_date(self): 
         timezone = time.timezone/60/60 # 60 seconds per minute, 60 minutes per hour
@@ -117,6 +118,11 @@ class Episode(BaseModel):
         guid.set('isPermaLink', 'false')
         guid.text = self.audio_filename # this is just the name of the audio file. useful for deleting the file later on...
         item.append(guid)
+
+        for category in self.categories:
+            category_element = ET.Element("category")
+            category_element.text = category
+            item.append(category_element)
 
         # insert the new 'item' element as the first item, but below all the other channel elements
         items = root.findall('item')
@@ -174,6 +180,7 @@ class TLPod(BaseModel):
     '''
     display_name: str = Field(min_length=1)
     filename_to_match: str = Field(min_length=1)
+    categories: list = Field(default=[])
     bucket_folder: str = Field(default=None)
     max_episodes_in_feed: int = Field(ge=1, default=5)
     filename_override: bool = False
@@ -298,6 +305,7 @@ class TLPod(BaseModel):
             feed_file=feed_file,
             audio_filename=converted_file,
             bucket_folder=self.bucket_folder,
+            categories=self.categories,
             episode_title=f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})",
             max_episodes=self.max_episodes_in_feed
             )
