@@ -1,6 +1,7 @@
 from datetime import datetime
 import xml.etree.ElementTree as ET
 import glob
+import math
 import os
 import re
 import time
@@ -89,6 +90,18 @@ class Episode(BaseModel):
         aws = AWS()
         enclosure = f"https://{aws.bucket}.s3.{aws.region}.amazonaws.com/{self.bucket_folder}/{self.audio_filename}"
         return enclosure
+    
+    def itunes_duration(self):
+        ffmpeg = FFMPEG(input_file=self.audio_filename)
+        duration = ffmpeg.get_length_in_minutes()
+        seconds, minutes = math.modf(duration)
+
+        minutes = round(minutes)
+
+        seconds = seconds*60
+        seconds = round(seconds)
+
+        return f"{minutes}:{seconds:02}"
 
     def add_new_episode(self):
         ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
@@ -119,6 +132,10 @@ class Episode(BaseModel):
         guid.set('isPermaLink', 'false')
         guid.text = self.audio_filename # this is just the name of the audio file. useful for deleting the file later on...
         item.append(guid)
+
+        itunes_duration_element = ET.Element("itunes:duration")
+        itunes_duration_element.text = self.itunes_duration()
+        item.append(itunes_duration_element)
 
         for category in self.categories:
             category_element = ET.Element("category")
