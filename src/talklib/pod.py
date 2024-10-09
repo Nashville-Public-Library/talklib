@@ -91,6 +91,7 @@ class Episode(BaseModel):
         return enclosure
 
     def add_new_episode(self):
+        ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
         ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
@@ -143,6 +144,7 @@ class Episode(BaseModel):
         feed.write(self.feed_file, encoding="utf-8", xml_declaration=True)
     
     def remove_old_episodes(self):
+        ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
         ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
