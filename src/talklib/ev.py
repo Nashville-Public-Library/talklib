@@ -51,6 +51,7 @@ class EV:
         self.twilio_to = sort_twilio_to() # to where should texts/calls be sent
         self.icecast_user = os.environ['icecast_user'] # our icecast username
         self.icecast_pass = os.environ['icecast_pass'] # our icecast password
+        self.pod_server_uname = os.environ['pod_server_uname']
 
 
 def sort_destinations():

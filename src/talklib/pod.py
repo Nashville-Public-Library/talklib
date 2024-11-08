@@ -7,8 +7,8 @@ import re
 import time
 from typing import Type
 
-import boto3
 from botocore.exceptions import ClientError
+from fabric import Connection
 from pydantic import BaseModel, Field, model_validator
 
 from talklib.ev import EV
@@ -17,51 +17,49 @@ from talklib.ffmpeg import FFMPEG
 from talklib.utils import raise_exception_and_wait, today_is_weekday
 
 class AWS():
-    ev: Type[EV]  = EV()
-    bucket: str = "tlpod"
-    region: str = "us-east-1"
-    s3  = boto3.client(
-    's3', 
-    aws_access_key_id = ev.aws_access_key_id, 
-    aws_secret_access_key = ev.aws_secret_access_key
-    )
+    server: str = "assets.library.nashville.org"
+    user = EV().pod_server_uname
+    connection = Connection(host=server, user=user)
 
-    def upload_file(self, bucket_folder, file, ExtraArgs=None):
-        self.s3.upload_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file, ExtraArgs=ExtraArgs)
+    def upload_file(self, file: str, folder: str):
+        self.connection.put(local=file, remote="shows/" + folder)
+        return
 
-    def download_file(self, bucket_folder, file):
-        self.s3.download_file(Bucket=self.bucket, Key=bucket_folder+'/'+file, Filename=file)
-        return file
+    def download_file(self, folder, file):
+        try:
+            self.connection.get(remote="shows" + "/" + folder + '/' + file)
+            return file
+        except Exception as e:
+            # send notifications, etc TODO
+            print(e)
 
-    def delete_file(self, bucket_folder, file):
-        self.s3.delete_object(Bucket=self.bucket, Key=bucket_folder+'/'+file)
-    
-    def print_buckets(self):
-    # Retrieve the list of existing buckets
-        response = self.s3.list_buckets()
-        response = response['Buckets']
-        for bucket_name in response:
-            return(bucket_name["Name"])
+    def delete_file(self, folder, file):
+        try:
+            self.connection.sftp().remove("shows" + "/" + folder + '/' + file)
+            return
+        except Exception as e:
+            # send notifications, etc TODO
+            print(e)
 
     def get_folders(self):
-        folders = []
-        result = self.s3.list_objects(Bucket=self.bucket)
-        for contents in result["Contents"]:
-            key:str = contents["Key"]
-            if key.endswith("/"):
-                folders.append(key.strip('/').lower())
-        return folders
+        results = []
+        folders = self.connection.run("cd shows && ls", hide=True)
+        folders:str = folders.stdout
+        folders = folders.rsplit("\n")
+        for folder in folders:
+            results.append(folder.lower())
+        return results
     
-    def get_files(self):
-        result = self.s3.list_objects(Bucket=self.bucket)
-        for contents in result["Contents"]:
-            key:str = contents["Key"]
-            if not key.endswith("/"):
-                print(key)
+    # def get_files(self):
+    #     result = self.s3.list_objects(Bucket=self.bucket)
+    #     for contents in result["Contents"]:
+    #         key:str = contents["Key"]
+    #         if not key.endswith("/"):
+    #             print(key)
 
-    def check_bucket_folder_exists(self, bucket_folder: str):
+    def check_folder_exists(self, folder: str):
         folders = self.get_folders()
-        if bucket_folder.lower() in folders:
+        if folder.lower() in folders:
             return True
         return False
 
