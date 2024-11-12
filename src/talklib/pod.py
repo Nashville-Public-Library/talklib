@@ -7,7 +7,6 @@ import re
 import time
 from typing import Type
 
-from botocore.exceptions import ClientError
 from fabric import Connection
 from pydantic import BaseModel, Field, model_validator
 
@@ -21,11 +20,15 @@ class AWS():
     user = EV().pod_server_uname
     connection = Connection(host=server, user=user)
 
-    def upload_file(self, file: str, folder: str):
-        self.connection.put(local=file, remote="shows/" + folder)
-        return
+    def upload_file(self, file: str, folder: str) -> None:
+        try:
+            self.connection.put(local=file, remote="shows/" + folder)
+            return
+        except Exception as e:
+            # send notifications, etc TODO
+            print(e)
 
-    def download_file(self, folder, file):
+    def download_file(self, file: str, folder: str) -> None:
         try:
             self.connection.get(remote="shows" + "/" + folder + '/' + file)
             return file
@@ -33,7 +36,7 @@ class AWS():
             # send notifications, etc TODO
             print(e)
 
-    def delete_file(self, folder, file):
+    def delete_file(self, file: str, folder: str) -> None:
         try:
             self.connection.sftp().remove("shows" + "/" + folder + '/' + file)
             return
@@ -41,7 +44,7 @@ class AWS():
             # send notifications, etc TODO
             print(e)
 
-    def get_folders(self):
+    def get_folders(self) -> list:
         results = []
         folders = self.connection.run("cd shows && ls", hide=True)
         folders:str = folders.stdout
@@ -57,7 +60,7 @@ class AWS():
     #         if not key.endswith("/"):
     #             print(key)
 
-    def check_folder_exists(self, folder: str):
+    def check_folder_exists(self, folder: str) -> bool:
         folders = self.get_folders()
         if folder.lower() in folders:
             return True
@@ -71,7 +74,7 @@ class Episode(BaseModel):
     max_episodes: int
     categories: list
 
-    def pub_date(self): 
+    def pub_date(self) -> str: 
         timezone = time.timezone/60/60 # 60 seconds per minute, 60 minutes per hour
         timezone = round(timezone)
         if time.daylight: # if DST is currently active
@@ -79,17 +82,17 @@ class Episode(BaseModel):
 
         return datetime.now().strftime(f'%a, %d %b %Y %H:%M:%S -0{timezone}00')
     
-    def size_in_bytes(self, filename):
+    def size_in_bytes(self, filename) -> str:
         size_in_bytes = os.path.getsize(filename)
         size_in_bytes = str(size_in_bytes)
         return size_in_bytes
     
-    def enclosure(self):
+    def enclosure(self) -> str:
         aws = AWS()
         enclosure = f"https://assets.library.nashville.org/{self.bucket_folder}/{self.audio_filename}"
         return enclosure
     
-    def itunes_duration(self):
+    def itunes_duration(self) -> str:
         ffmpeg = FFMPEG(input_file=self.audio_filename)
         duration = ffmpeg.get_length_in_minutes()
         seconds, minutes = math.modf(duration)
