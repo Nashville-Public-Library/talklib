@@ -86,7 +86,7 @@ class Episode(BaseModel):
     
     def enclosure(self):
         aws = AWS()
-        enclosure = f"https://{aws.bucket}.s3.{aws.region}.amazonaws.com/{self.bucket_folder}/{self.audio_filename}"
+        enclosure = f"https://assets.library.nashville.org/{self.bucket_folder}/{self.audio_filename}"
         return enclosure
     
     def itunes_duration(self):
@@ -102,8 +102,8 @@ class Episode(BaseModel):
         return f"{minutes}:{seconds:02}"
 
     def add_new_episode(self):
-        ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
         ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
+        ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
         root = root.find('channel')
@@ -159,8 +159,8 @@ class Episode(BaseModel):
         feed.write(self.feed_file, encoding="utf-8", xml_declaration=True)
     
     def remove_old_episodes(self):
-        ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
         ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
+        ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
         root = root.find('channel')
@@ -173,7 +173,7 @@ class Episode(BaseModel):
             print(f'removing from feed: {item_to_remove}')
             root.remove(item_to_remove)
             print(f"deleteing {guid} from {self.bucket_folder}/ folder")
-            AWS().delete_file(bucket_folder=self.bucket_folder, file=guid)
+            AWS().delete_file(folder=self.bucket_folder, file=guid)
             ET.indent(feed)
             feed.write(self.feed_file, encoding="utf-8", xml_declaration=True)
             number_of_items-=1
@@ -238,7 +238,7 @@ class TLPod(BaseModel):
                     return file
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
         self.__send_notifications(message=to_send, subject='Error')
-        raise_exception_and_wait(message=to_send, error=FileNotFoundError)
+        raise FileNotFoundError
 
     def convert(self, file:str):
         self.__prep_syslog(message=f"Converting {file} to mp3...")
@@ -252,23 +252,6 @@ class TLPod(BaseModel):
         ha = a.convert()
         self.__prep_syslog(message="File successfully converted")
         return ha
-    
-    def countdown(self):
-        '''
-        the reason for this is to give a visual cue to the user
-        that the script has finished and is about to exit.
-        Otherwise, the user does not know what happened; they
-        just see the screen disappear.
-        '''
-        self.__prep_syslog(message='All Done.')
-        number = 5
-        i = 0
-        while i < number:
-            print(f'This window will close in {number} seconds...', end='\r')
-            number-=1
-            time.sleep(1)
-
-
 
     def __prep_syslog(self, message: str, level: str = 'info'):
         '''send message to syslog server'''
@@ -303,17 +286,17 @@ class TLPod(BaseModel):
 
         aws = AWS()
 
-        if aws.check_bucket_folder_exists(bucket_folder=self.bucket_folder):
+        if aws.check_folder_exists(folder=self.bucket_folder):
             self.__prep_syslog(message=f"{self.bucket_folder} folder exists in bucket")
         else:
-            to_send = f'cannot find bucket folder titled: {self.bucket_folder}.'
+            to_send = f"cannot find bucket folder titled: {self.bucket_folder}."
             self.__send_notifications(message=to_send, subject='Error')
-            raise_exception_and_wait(message=to_send)
+            raise Exception (f"cannot find bucket folder titled: {self.bucket_folder}.")
 
         try:
             self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}/ folder")
-            feed_file = aws.download_file(bucket_folder=self.bucket_folder, file='feed.xml') # all XML files in S3 should have the same name
-        except ClientError as e:
+            feed_file = aws.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files in S3 should have the same name
+        except Exception as e:
             to_send = f'unable to download feed file: {e}'
             self.__send_notifications(message=to_send, subject='Error')
             raise_exception_and_wait(message=to_send)
@@ -332,10 +315,10 @@ class TLPod(BaseModel):
         episode.remove_old_episodes()
         try:
             self.__prep_syslog(message=f"uploading {converted_file} to {self.bucket_folder}/ folder")
-            aws.upload_file(bucket_folder=self.bucket_folder, file=converted_file, ExtraArgs={'ContentType': "audio/mpeg"})
+            aws.upload_file(folder=self.bucket_folder, file=converted_file)
             self.__prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}/ folder")
-            aws.upload_file(bucket_folder=self.bucket_folder, file=feed_file, ExtraArgs={'ContentType': "application/rss+xml"})
-        except ClientError as e:
+            aws.upload_file(folder=self.bucket_folder, file=feed_file)
+        except Exception as e:
             to_send = f'unable to download feed file: {e}'
             self.__send_notifications(message=to_send, subject='Error')
             raise_exception_and_wait(message=to_send)
@@ -349,4 +332,4 @@ class TLPod(BaseModel):
         except:
             self.__prep_syslog(message="Unable to delete local files...")
 
-        self.countdown()
+        self.__prep_syslog(message="All done.")
