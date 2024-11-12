@@ -69,7 +69,7 @@ def test_match_file_1():
     test = TLPod(
         display_name = 'test',
         filename_to_match='test',
-        bucket_folder='test',
+        bucket_folder='test'
       )
     today = datetime.now().strftime("%m%d%y")
     test_file = download_test_file(filename=f'test{today}.wav')
@@ -78,17 +78,27 @@ def test_match_file_1():
 
     assert type(test.match_file()) == str
 
-@patch('builtins.input', side_effect=['11', '13', 'Bob'])
-def test_match_file_2(self):
-    '''should raise exception if invalid filename passed in'''
+def test_match_file_2():
+    '''should raise exception if matching filename cannot be found'''
     test = TLPod(
         display_name='test',
         filename_to_match='notExist',
         bucket_folder='nope'
     )
-    test.notifications = False
-    with pytest.raises(Exception):
+    test.notifications.enable_all = False
+    with pytest.raises(FileNotFoundError):
         test.match_file()
+
+def test_match_bucket_folder_1():
+    '''should raise exception if filename that doesn't exist passed in'''
+    test = TLPod(
+        display_name='test',
+        filename_to_match='notExist',
+        bucket_folder='doesNotExist'
+    )
+    test.notifications.enable_all = False
+    with pytest.raises(Exception):
+        test.run()
             
 # def test_buckets():
 #     a = AWS()
