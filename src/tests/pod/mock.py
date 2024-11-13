@@ -30,8 +30,7 @@ env_vars = {
         'twilio_to': 'mocked_value2',
         'icecast_user': 'mahhhh',
         'icecast_pass': 'mahhhhh',
-        'AWS_ACCESS_KEY_ID': 'negative',
-        'AWS_SECRET_ACCESS_KEY': 'nothing!'
+        'pod_server_uname': 'mahhhhh'
     }
 
     
