@@ -235,17 +235,20 @@ class TLPod(BaseModel):
         raise FileNotFoundError
 
     def convert(self, file:str):
+        output_filename = file.split('.')
+        output_filename = output_filename[0]
+        output_filename = os.path.basename(output_filename).lower()
+        output_filename = output_filename + '.mp3'
+
+        ffmpeg = FFMPEG()
+        ffmpeg.input_file = file
+        ffmpeg.output_file = output_filename
+        ffmpeg.compression = False
+        self.__prep_syslog(message=f"Filename will be {ffmpeg.output_file}")
         self.__prep_syslog(message=f"Converting {file} to mp3...")
-        a = FFMPEG()
-        filename = file.split('.')
-        filename = filename[0]
-        filename = os.path.basename(filename).lower()
-        a.input_file = file
-        a.output_file = filename + '.mp3'
-        self.__prep_syslog(message=f"Filename will be {a.output_file}")
-        ha = a.convert()
+        output = ffmpeg.convert()
         self.__prep_syslog(message="File successfully converted")
-        return ha
+        return output
 
     def __prep_syslog(self, message: str, level: str = 'info'):
         '''send message to syslog server'''
