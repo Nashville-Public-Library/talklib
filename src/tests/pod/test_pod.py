@@ -9,8 +9,7 @@ import pytest
 
 from .mock import env_vars, mock_destinations, download_test_file
 with patch.dict('os.environ', env_vars):
-    from talklib import TLPod
-    from talklib.pod import AWS
+        from talklib.pod import TLPod, AWS
 
 
 def test_type_1():
@@ -99,12 +98,6 @@ def test_match_bucket_folder_1():
     test.notifications.enable_all = False
     with pytest.raises(Exception):
         test.run()
-            
-# def test_buckets():
-#     a = AWS()
-#     a.print_buckets()
-#     a.print_folders()
-#     a.print_files()
 
 def teardown():
     today = datetime.now().strftime("%m%d%y")
