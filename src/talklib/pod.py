@@ -13,36 +13,24 @@ from pydantic import BaseModel, Field, model_validator
 from talklib.ev import EV
 from talklib.notify import Notify
 from talklib.ffmpeg import FFMPEG
-from talklib.utils import raise_exception_and_wait, today_is_weekday
+from talklib.utils import today_is_weekday
 
 class AWS():
     server: str = "assets.library.nashville.org"
-    user = EV().pod_server_uname
+    user: str = EV().pod_server_uname
     connection = Connection(host=server, user=user)
 
     def upload_file(self, file: str, folder: str) -> None:
-        try:
-            self.connection.put(local=file, remote="shows/" + folder)
-            return
-        except Exception as e:
-            # send notifications, etc TODO
-            print(e)
+        self.connection.put(local=file, remote="shows/" + folder)
+        return
 
     def download_file(self, file: str, folder: str) -> None:
-        try:
-            self.connection.get(remote="shows" + "/" + folder + '/' + file)
-            return file
-        except Exception as e:
-            # send notifications, etc TODO
-            print(e)
+        self.connection.get(remote="shows" + "/" + folder + '/' + file)
+        return file
 
     def delete_file(self, file: str, folder: str) -> None:
-        try:
-            self.connection.sftp().remove("shows" + "/" + folder + '/' + file)
-            return
-        except Exception as e:
-            # send notifications, etc TODO
-            print(e)
+        self.connection.sftp().remove("shows" + "/" + folder + '/' + file)
+        return
 
     def get_folders(self) -> list:
         results = []
@@ -176,7 +164,10 @@ class Episode(BaseModel):
             print(f'removing from feed: {item_to_remove}')
             root.remove(item_to_remove)
             print(f"deleteing {guid} from {self.bucket_folder}/ folder")
-            AWS().delete_file(folder=self.bucket_folder, file=guid)
+            try:
+                AWS().delete_file(folder=self.bucket_folder, file=guid)
+            except Exception as e:
+                print(e)
             ET.indent(feed)
             feed.write(self.feed_file, encoding="utf-8", xml_declaration=True)
             number_of_items-=1
@@ -300,9 +291,9 @@ class TLPod(BaseModel):
             self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}/ folder")
             feed_file = aws.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files in S3 should have the same name
         except Exception as e:
-            to_send = f'unable to download feed file: {e}'
+            to_send = f'unable to download {feed_file}: {e}'
             self.__send_notifications(message=to_send, subject='Error')
-            raise_exception_and_wait(message=to_send)
+            raise e
 
         episode = Episode(
             feed_file=feed_file,
@@ -321,10 +312,11 @@ class TLPod(BaseModel):
             aws.upload_file(folder=self.bucket_folder, file=converted_file)
             self.__prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}/ folder")
             aws.upload_file(folder=self.bucket_folder, file=feed_file)
-        except Exception as e:
-            to_send = f'unable to download feed file: {e}'
+
+        except (FileNotFoundError, Exception) as e:
+            to_send = f'unable to upload file: {e}'
             self.__send_notifications(message=to_send, subject='Error')
-            raise_exception_and_wait(message=to_send)
+            raise e
 
         self.__prep_syslog(message="Attempting to delete local files...")
         try:
