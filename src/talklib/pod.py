@@ -197,6 +197,7 @@ class TLPod(BaseModel):
     audio_folders:list = EV().destinations
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
+    ssh: Type[SSH] = SSH()
 
     @model_validator(mode='after')
     def post_update(self):
@@ -277,9 +278,8 @@ class TLPod(BaseModel):
         audio_file = self.match_file()
         converted_file = self.convert(file=audio_file)
 
-        ssh = SSH()
 
-        if ssh.check_folder_exists(folder=self.bucket_folder):
+        if self.ssh.check_folder_exists(folder=self.bucket_folder):
             self.__prep_syslog(message=f"{self.bucket_folder} folder exists in bucket")
         else:
             to_send = f"cannot find bucket folder titled: {self.bucket_folder}."
@@ -288,7 +288,7 @@ class TLPod(BaseModel):
 
         try:
             self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}/ folder")
-            feed_file = ssh.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files on server should have the same name
+            feed_file = self.ssh.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files on server should have the same name
         except Exception as e:
             to_send = f'unable to download {feed_file}: {e}'
             self.__send_notifications(message=to_send, subject='Error')
@@ -308,9 +308,9 @@ class TLPod(BaseModel):
         episode.remove_old_episodes()
         try:
             self.__prep_syslog(message=f"uploading {converted_file} to {self.bucket_folder}/ folder")
-            ssh.upload_file(folder=self.bucket_folder, file=converted_file)
+            self.ssh.upload_file(folder=self.bucket_folder, file=converted_file)
             self.__prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}/ folder")
-            ssh.upload_file(folder=self.bucket_folder, file=feed_file)
+            self.ssh.upload_file(folder=self.bucket_folder, file=feed_file)
 
         except (FileNotFoundError, Exception) as e:
             to_send = f'unable to upload file: {e}'
