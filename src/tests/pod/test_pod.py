@@ -9,7 +9,7 @@ import pytest
 
 from .mock import env_vars, mock_destinations, download_test_file
 with patch.dict('os.environ', env_vars):
-        from talklib.pod import TLPod, AWS
+        from talklib.pod import TLPod, SSH
 
 
 def test_type_1():

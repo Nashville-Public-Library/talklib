@@ -15,7 +15,7 @@ from talklib.notify import Notify
 from talklib.ffmpeg import FFMPEG
 from talklib.utils import today_is_weekday
 
-class AWS():
+class SSH():
     server: str = "assets.library.nashville.org"
     user: str = EV().pod_server_uname
     connection = Connection(host=server, user=user)
@@ -76,7 +76,6 @@ class Episode(BaseModel):
         return size_in_bytes
     
     def enclosure(self) -> str:
-        aws = AWS()
         enclosure = f"https://assets.library.nashville.org/{self.bucket_folder}/{self.audio_filename}"
         return enclosure
     
@@ -165,7 +164,7 @@ class Episode(BaseModel):
             root.remove(item_to_remove)
             print(f"deleteing {guid} from {self.bucket_folder}/ folder")
             try:
-                AWS().delete_file(folder=self.bucket_folder, file=guid)
+                SSH().delete_file(folder=self.bucket_folder, file=guid)
             except Exception as e:
                 print(e)
             ET.indent(feed)
@@ -278,9 +277,9 @@ class TLPod(BaseModel):
         audio_file = self.match_file()
         converted_file = self.convert(file=audio_file)
 
-        aws = AWS()
+        ssh = SSH()
 
-        if aws.check_folder_exists(folder=self.bucket_folder):
+        if ssh.check_folder_exists(folder=self.bucket_folder):
             self.__prep_syslog(message=f"{self.bucket_folder} folder exists in bucket")
         else:
             to_send = f"cannot find bucket folder titled: {self.bucket_folder}."
@@ -289,7 +288,7 @@ class TLPod(BaseModel):
 
         try:
             self.__prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}/ folder")
-            feed_file = aws.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files in S3 should have the same name
+            feed_file = ssh.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files on server should have the same name
         except Exception as e:
             to_send = f'unable to download {feed_file}: {e}'
             self.__send_notifications(message=to_send, subject='Error')
@@ -309,9 +308,9 @@ class TLPod(BaseModel):
         episode.remove_old_episodes()
         try:
             self.__prep_syslog(message=f"uploading {converted_file} to {self.bucket_folder}/ folder")
-            aws.upload_file(folder=self.bucket_folder, file=converted_file)
+            ssh.upload_file(folder=self.bucket_folder, file=converted_file)
             self.__prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}/ folder")
-            aws.upload_file(folder=self.bucket_folder, file=feed_file)
+            ssh.upload_file(folder=self.bucket_folder, file=feed_file)
 
         except (FileNotFoundError, Exception) as e:
             to_send = f'unable to upload file: {e}'
