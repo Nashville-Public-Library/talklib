@@ -252,7 +252,7 @@ class TLPod(BaseModel):
 
     def __prep_syslog(self, message: str, level: str = 'info'):
         '''send message to syslog server'''
-        message = f'{self.display_name}: {message}'
+        message = f'{self.display_name} (podcast): {message}'
         print(message)
         self.notifications.send_syslog(message=message, level=level)
 
