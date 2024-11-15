@@ -240,13 +240,12 @@ class TLPod(BaseModel):
         output_filename = os.path.basename(output_filename).lower()
         output_filename = output_filename + '.mp3'
 
-        ffmpeg = FFMPEG()
-        ffmpeg.input_file = file
-        ffmpeg.output_file = output_filename
-        ffmpeg.compression = False
-        self.__prep_syslog(message=f"Filename will be {ffmpeg.output_file}")
+        self.ffmpeg.input_file = file
+        self.ffmpeg.output_file = output_filename
+        self.ffmpeg.compression = False
+        self.__prep_syslog(message=f"Converted audio file will be {self.ffmpeg.output_file}")
         self.__prep_syslog(message=f"Converting {file} to mp3...")
-        output = ffmpeg.convert()
+        output = self.ffmpeg.convert()
         self.__prep_syslog(message="File successfully converted")
         return output
 
