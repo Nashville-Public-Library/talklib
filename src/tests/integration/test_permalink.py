@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import patch
 
+from talklib import TLShow
 from .. import mock
 from ..mock import env_vars, permalink
-with patch.dict('os.environ', env_vars):
-    from talklib import TLShow
 
 
 @pytest.fixture
 def template():
-    test = TLShow()
+    with patch.dict('os.environ', env_vars):
+        test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = permalink

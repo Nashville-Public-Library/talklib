@@ -4,17 +4,17 @@ getting started with some general tests for the talklib module via Pytest.
 import pytest
 from unittest.mock import patch
 
+from talklib import TLShow
 from .. import mock
 from ..mock import env_vars, RSS_URL
-with patch.dict('os.environ', env_vars):
-    from talklib import TLShow
 
 # this RSS feed chosen as test feed because it is reliably updated every day 
 # (many times per day) and because the audio file is short/small!
 
 @pytest.fixture()
 def template():
-    test = TLShow()
+    with patch.dict('os.environ', env_vars):
+        test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = RSS_URL
