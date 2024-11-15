@@ -3,9 +3,10 @@ import pytest
 from unittest.mock import patch
 import os
 
-from talklib import TLShow
 from .. import mock
 from ..mock import env_vars, download_test_file
+with patch.dict('os.environ', env_vars):
+    from talklib import TLShow
 
 
 input_file = 'input.mp3'  # name the file we download
@@ -13,8 +14,7 @@ input_file = 'input.mp3'  # name the file we download
 @pytest.fixture
 def template():
     
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.local_file = download_test_file()

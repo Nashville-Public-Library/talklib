@@ -1,8 +1,9 @@
 import pytest
 from unittest.mock import patch, MagicMock
 
-from talklib import TLShow
 from ..mock import env_vars
+with patch.dict('os.environ', env_vars):
+    from talklib import TLShow
 
 
 url = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
@@ -10,8 +11,7 @@ url = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
 @pytest.fixture
 def template_permalink():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = url

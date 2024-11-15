@@ -6,8 +6,9 @@ import requests
 import subprocess
 from unittest.mock import patch
 
-from talklib import TLShow
 from ..mock import env_vars, download_test_file, RSS_URL
+with patch.dict('os.environ', env_vars):
+    from talklib import TLShow
 
 permalink_URL = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
@@ -15,8 +16,7 @@ input_file = 'input.mp3'  # name the file we download
 
 @pytest.fixture
 def template_local():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.local_file = input_file

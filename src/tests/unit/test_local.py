@@ -3,16 +3,16 @@ import pytest
 import os
 from unittest.mock import patch, MagicMock
 
-from talklib import TLShow
 from ..mock import env_vars
+with patch.dict('os.environ', env_vars):
+    from talklib import TLShow
 
 url = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 cwd = os.getcwd()
 
 @pytest.fixture
 def template_local():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.local_file = 'some_file.mp3'
