@@ -85,7 +85,7 @@ def test_match_file_2():
         filename_to_match='notExist',
         bucket_folder='nope'
     )
-    test.notifications.enable_all = False
+    test.notifications.notify.enable_all = False
     with pytest.raises(FileNotFoundError):
         test.match_file()
 
@@ -96,7 +96,7 @@ def test_match_bucket_folder_1():
         filename_to_match='notExist',
         bucket_folder='doesNotExist'
     )
-    test.notifications.enable_all = False
+    test.notifications.notify.enable_all = False
     with pytest.raises(Exception):
         test.run()
 
