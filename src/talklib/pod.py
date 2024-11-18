@@ -5,7 +5,7 @@ import math
 import os
 import re
 import time
-from typing import Type, Optional
+from typing import Type
 
 from fabric import Connection
 from pydantic import BaseModel, Field, model_validator
@@ -84,13 +84,13 @@ class Notifications(BaseModel):
             self.prep_syslog(message=message, level=syslog_level)
 
 class Episode(BaseModel):
-    feed_file: Optional[str] = Field(min_length=1, default=None)
-    audio_filename: Optional[str] = Field(min_length=1, default=None)
-    bucket_folder: Optional[str] = Field(min_length=1, default=None)
-    episode_title: Optional[str] = Field(min_length=1, default=None)
+    feed_file: str = Field(min_length=1, default=None)
+    audio_filename: str = Field(min_length=1, default=None)
+    bucket_folder: str = Field(min_length=1, default=None)
+    episode_title: str = Field(min_length=1, default=None)
     notifications: Notifications
-    max_episodes: Optional[int] = Field(default=None)
-    categories: Optional[list] = Field(default=None)
+    max_episodes: int = Field(default=None)
+    categories: list = Field(default=None)
 
     def pub_date(self) -> str: 
         timezone = time.timezone/60/60 # 60 seconds per minute, 60 minutes per hour
