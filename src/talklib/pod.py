@@ -8,17 +8,49 @@ import time
 from typing import Type
 
 from fabric import Connection
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 from talklib.ev import EV
 from talklib.notify import Notify
 from talklib.ffmpeg import FFMPEG
 from talklib.utils import today_is_weekday
 
-class SSH():
+class Notifications(BaseModel):
+    prefix: str = None  # prefix all messages with identifier for the show/podcast
+    notify: Type[Notify] = Notify()
+
+    def prep_syslog(self, message: str, level: str = 'info'):
+        '''send message to syslog server'''
+        message = f'{self.prefix}: {message}'
+        print(message)
+        self.notify.send_syslog(message=message, level=level)
+
+    def prep_send_mail(self, message: str, subject: str):
+        '''send email to TL gmail account via relay address'''
+        subject = f'{subject}: {self.prefix}'
+        self.notify.send_mail(subject=subject, message=message)
+
+    def send_sms_if_enabled(self, message: str):
+        '''send sms via twilio IF twilio_enable is set to True'''
+        self.notify.send_sms(message=message)
+
+    def send_notifications(self, message: str, subject: str, syslog_level: str = 'error'):
+        '''we generally only want to send SMS via Twilio if today is on a weekend'''
+        if today_is_weekday():
+            self.prep_send_mail(message=message, subject=subject)
+            self.prep_syslog(message=message, level=syslog_level)
+        else:
+            self.send_sms_if_enabled(message=message)
+            self.prep_send_mail(message=message, subject=subject)
+            self.prep_syslog(message=message, level=syslog_level)
+
+class SSH(BaseModel):
     server: str = "assets.library.nashville.org"
     user: str = EV().pod_server_uname
-    connection = Connection(host=server, user=user)
+    connection: Connection = Connection(host=server, user=user)
+    notifications: Notifications = Notifications()
+
+    model_config = ConfigDict(arbitrary_types_allowed=True) # pydantic struggles to validate the Connection object 
 
     def upload_file(self, file: str, folder: str) -> None:
         self.connection.put(local=file, remote="shows/" + folder)
@@ -54,41 +86,13 @@ class SSH():
             return True
         return False
     
-class Notifications(BaseModel):
-    prefix: str = None  # prefix all messages with identifier for the show/podcast
-    notify: Type[Notify] = Notify()
-
-    def prep_syslog(self, message: str, level: str = 'info'):
-        '''send message to syslog server'''
-        message = f'{self.prefix}: {message}'
-        print(message)
-        self.notify.send_syslog(message=message, level=level)
-
-    def prep_send_mail(self, message: str, subject: str):
-        '''send email to TL gmail account via relay address'''
-        subject = f'{subject}: {self.prefix}'
-        self.notify.send_mail(subject=subject, message=message)
-
-    def send_sms_if_enabled(self, message: str):
-        '''send sms via twilio IF twilio_enable is set to True'''
-        self.notify.send_sms(message=message)
-
-    def send_notifications(self, message: str, subject: str, syslog_level: str = 'error'):
-        '''we generally only want to send SMS via Twilio if today is on a weekend'''
-        if today_is_weekday():
-            self.prep_send_mail(message=message, subject=subject)
-            self.prep_syslog(message=message, level=syslog_level)
-        else:
-            self.send_sms_if_enabled(message=message)
-            self.prep_send_mail(message=message, subject=subject)
-            self.prep_syslog(message=message, level=syslog_level)
 
 class Episode(BaseModel):
     feed_file: str = Field(min_length=1, default=None)
     audio_filename: str = Field(min_length=1, default=None)
     bucket_folder: str = Field(min_length=1, default=None)
     episode_title: str = Field(min_length=1, default=None)
-    notifications: Notifications
+    notifications: Notifications = Notifications()
     max_episodes: int = Field(default=None)
     categories: list = Field(default=None)
 
@@ -239,7 +243,7 @@ class TLPod(BaseModel):
     notifications: Type[Notifications] = Notifications()
     episode: Type[Episode] = Episode(notifications=notifications)
     ffmpeg: Type[FFMPEG] = FFMPEG()
-    ssh: Type[SSH] = SSH()
+    ssh: Type[SSH] = SSH(notifications=notifications)
 
     @model_validator(mode='after')
     def post_update(self):
@@ -253,8 +257,10 @@ class TLPod(BaseModel):
             else: 
                 self.bucket_folder = self.filename_to_match.lower()
 
-        self.notifications.prefix = f"{self.display_name} (podcast)"
-        self.episode.notifications.prefix = f"{self.display_name} (podcast)"
+        prefix = f"{self.display_name} (podcast)"
+        self.notifications.prefix = prefix
+        self.episode.notifications.prefix = prefix
+        self.ssh.notifications.prefix = prefix
 
         return self
     
