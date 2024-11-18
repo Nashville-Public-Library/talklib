@@ -53,16 +53,35 @@ class SSH(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True) # pydantic struggles to validate the Connection object 
 
     def upload_file(self, file: str, folder: str) -> None:
-        self.connection.put(local=file, remote="shows/" + folder)
-        return
+        try:
+            self.notifications.prep_syslog(message=f"Attempting to upload '{file}' to {folder}/")
+            self.connection.put(local=file, remote="shows/" + folder)
+            self.notifications.prep_syslog(message=f"Successfully uploaded '{file}' to {folder}/")
+            return
+        except (FileNotFoundError, Exception) as e:
+            to_send = f"unable to upload '{file}': {e}"
+            self.notifications.send_notifications(message=to_send, subject='Error')
+            raise e
 
     def download_file(self, file: str, folder: str) -> None:
-        self.connection.get(remote="shows" + "/" + folder + '/' + file)
-        return file
+        try:
+            self.notifications.prep_syslog(message=f"Attempting to download '{file}' from {folder}/")
+            self.connection.get(remote="shows" + "/" + folder + '/' + file)
+            self.notifications.prep_syslog(message=f"Successfully downloaded '{file}' to {os.getcwd()}")
+            return file
+        except Exception as e:
+            to_send = f"unable to download '{file}': {e}"
+            self.notifications.send_notifications(message=to_send, subject='Error')
+            raise e
 
     def delete_file(self, file: str, folder: str) -> None:
-        self.connection.sftp().remove("shows" + "/" + folder + '/' + file)
-        return
+        try:
+            self.notifications.prep_syslog(message=f"Attempting to delete '{file}' from {folder}/")
+            self.connection.sftp().remove("shows" + "/" + folder + '/' + file)
+            self.notifications.prep_syslog(message=f"Successfully deleted '{file}' from {folder}/")
+            return
+        except Exception as e:
+            self.notifications.send_notifications(message=f"Unable to delete '{file}' from {folder}: {e}. Continuing automation...")
 
     def get_folders(self) -> list:
         results = []
@@ -81,10 +100,15 @@ class SSH(BaseModel):
     #             print(key)
 
     def check_folder_exists(self, folder: str) -> bool:
+        self.notifications.prep_syslog(message=f"checking if {folder} exists on server...")
         folders = self.get_folders()
         if folder.lower() in folders:
+            self.notifications.prep_syslog(message=f"{folder} exists!")
             return True
-        return False
+        
+        to_send = f"cannot find folder titled: {folder} on server"
+        self.notifications.send_notifications(message=to_send, subject='Error')
+        raise Exception (to_send)
     
 
 class Episode(BaseModel):
@@ -206,11 +230,9 @@ class Episode(BaseModel):
             guid = item_to_remove.find('guid').text # grab the guid (filename) so we can delete the file from the server
             self.notifications.prep_syslog(f'removing from feed: {item_to_remove}')
             root.remove(item_to_remove)
-            self.notifications.prep_syslog(f"deleteing {guid} from {self.bucket_folder}/ folder")
-            try:
-                SSH().delete_file(folder=self.bucket_folder, file=guid)
-            except Exception as e:
-                print(e)
+            
+            SSH().delete_file(folder=self.bucket_folder, file=guid)
+            
             ET.indent(feed)
             self.notifications.prep_syslog(message=f"writing to feed file...")
             feed.write(self.feed_file, encoding="utf-8", xml_declaration=True)
@@ -299,27 +321,25 @@ class TLPod(BaseModel):
         output = self.ffmpeg.convert()
         self.notifications.prep_syslog(message="File successfully converted")
         return output
+    
+    def delete_local_file(self, file: str):
+        try:
+            self.notifications.prep_syslog(message=f"Attempting to delete local file: {file}")
+            os.remove(file)
+            self.notifications.prep_syslog(message=f"Successfully deleted local file: {file}")
+            return
+        except Exception:
+            self.notifications.prep_syslog(message=f"Unable to delete local file: {file}")
 
     def run(self):
         self.notifications.prep_syslog(message="Starting up...")
+
+        self.ssh.check_folder_exists(folder=self.bucket_folder)
+
         audio_file = self.match_file()
         converted_file = self.convert(file=audio_file)
 
-
-        if self.ssh.check_folder_exists(folder=self.bucket_folder):
-            self.notifications.prep_syslog(message=f"{self.bucket_folder} folder exists in bucket")
-        else:
-            to_send = f"cannot find bucket folder titled: {self.bucket_folder}."
-            self.notifications.send_notifications(message=to_send, subject='Error')
-            raise Exception (f"cannot find bucket folder titled: {self.bucket_folder}.")
-
-        try:
-            self.notifications.prep_syslog(message=f"Downloading XML feed from {self.bucket_folder}/ folder")
-            feed_file = self.ssh.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files on server should have the same name
-        except Exception as e:
-            to_send = f'unable to download {feed_file}: {e}'
-            self.notifications.send_notifications(message=to_send, subject='Error')
-            raise e
+        feed_file = self.ssh.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files on server should have the same name
 
         self.episode.feed_file = feed_file
         self.episode.audio_filename = converted_file
@@ -330,25 +350,11 @@ class TLPod(BaseModel):
        
         self.episode.add_new_episode()
         self.episode.remove_old_episodes()
+    
+        self.ssh.upload_file(folder=self.bucket_folder, file=converted_file)
+        self.ssh.upload_file(folder=self.bucket_folder, file=feed_file)
 
-        try:
-            self.notifications.prep_syslog(message=f"uploading {converted_file} to {self.bucket_folder}/ folder")
-            self.ssh.upload_file(folder=self.bucket_folder, file=converted_file)
-            self.notifications.prep_syslog(message=f"uploading {feed_file} to {self.bucket_folder}/ folder")
-            self.ssh.upload_file(folder=self.bucket_folder, file=feed_file)
-
-        except (FileNotFoundError, Exception) as e:
-            to_send = f'unable to upload file: {e}'
-            self.notifications.send_notifications(message=to_send, subject='Error')
-            raise e
-
-        self.notifications.prep_syslog(message="Attempting to delete local files...")
-        try:
-            self.notifications.prep_syslog(f"Deleting local file '{feed_file}' from {os.getcwd()}")
-            os.remove(feed_file)
-            self.notifications.prep_syslog(f"Deleting local file '{converted_file}' from {os.getcwd()}")
-            os.remove(converted_file)
-        except:
-            self.notifications.prep_syslog(message="Unable to delete local files...")
+        self.delete_local_file(file=feed_file)
+        self.delete_local_file(file=converted_file)
 
         self.notifications.prep_syslog(message="All done.")
