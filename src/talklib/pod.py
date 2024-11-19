@@ -47,10 +47,8 @@ class Notifications(BaseModel):
 class SSH(BaseModel):
     server: str = "assets.library.nashville.org"
     user: str = EV().pod_server_uname
-    connection: Connection = Connection(host=server, user=user)
+    connection: Type[Connection] = Connection(host=server, user=user)
     notifications: Notifications = Notifications()
-
-    model_config = ConfigDict(arbitrary_types_allowed=True) # pydantic struggles to validate the Connection object 
 
     def upload_file(self, file: str, folder: str) -> None:
         try:
