@@ -98,13 +98,13 @@ class SSH(BaseModel):
     #             print(key)
 
     def check_folder_exists(self, folder: str) -> bool:
-        self.notifications.prep_syslog(message=f"checking if {folder} exists on server...")
+        self.notifications.prep_syslog(message=f"checking if {folder}/ exists on server...")
         folders = self.get_folders()
         if folder.lower() in folders:
-            self.notifications.prep_syslog(message=f"{folder} exists!")
+            self.notifications.prep_syslog(message=f"{folder}/ exists!")
             return True
         
-        to_send = f"cannot find folder titled: {folder} on server"
+        to_send = f"cannot find folder titled: {folder}/ on server"
         self.notifications.send_notifications(message=to_send, subject='Error')
         raise Exception (to_send)
     
