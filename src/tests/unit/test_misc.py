@@ -74,7 +74,7 @@ def test_create_output_filename(template_local: TLShow):
 def test_create_output_filename_2(template_local: TLShow):
     '''if include_date is true, datetime should be included in filename'''
     template_local.include_date = True
-    assert template_local._TLShow__create_output_filename() == f'{template_local.show_filename}-{template_local.six_digit_date_string()}.wav'
+    assert template_local._TLShow__create_output_filename() == f'{template_local.show_filename}{template_local.six_digit_date_string()}.wav'
 
 def test_create_output_filename_3(template_local: TLShow):
     assert type(template_local._TLShow__create_output_filename()) == str
