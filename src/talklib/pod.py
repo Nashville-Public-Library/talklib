@@ -310,15 +310,23 @@ class TLPod(BaseModel):
         output_filename = output_filename[0]
         output_filename = os.path.basename(output_filename).lower()
         output_filename = output_filename + '.mp3'
+        self.notifications.prep_syslog(message=f"Converted audio file will be {output_filename}")
 
         self.ffmpeg.input_file = file
         self.ffmpeg.output_file = output_filename
         self.ffmpeg.compression = False
-        self.notifications.prep_syslog(message=f"Converted audio file will be {self.ffmpeg.output_file}")
+        
+        ffmpeg_commands = self.ffmpeg.get_commands()
+        self.notifications.prep_syslog(message=f"FFmppeg commands: {ffmpeg_commands}")
+
         self.notifications.prep_syslog(message=f"Converting {file} to mp3...")
-        output = self.ffmpeg.convert()
-        self.notifications.prep_syslog(message="File successfully converted")
-        return output
+        try:
+            output = self.ffmpeg.convert()
+            self.notifications.prep_syslog(message="File successfully converted")
+            return output
+        except Exception as ffmpeg_exception:
+            self.notifications.send_notifications(message=f'FFmpeg error: {ffmpeg_exception}', subject='Error')
+            raise ffmpeg_exception
     
     def delete_local_file(self, file: str):
         try:
