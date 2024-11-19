@@ -44,7 +44,7 @@ class TLShow():
         '''returns the audio filename to use depending on whether we should include the date'''
         if self.include_date:
             date = self.six_digit_date_string()
-            output_file = (f"{self.show_filename}-{date}.wav")
+            output_file = (f"{self.show_filename}{date}.wav")
         else:
             output_file = (f'{self.show_filename}.wav')
         self.__prep_syslog(message=f'Filename will be: {output_file}')
