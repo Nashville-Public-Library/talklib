@@ -78,8 +78,10 @@ class SSH(BaseModel):
             self.connection.sftp().remove(f"talkinglibrary/shows/{folder}/{file}")
             self.notifications.prep_syslog(message=f"Successfully deleted '{file}' from {folder}/")
             return
-        except Exception as e:
-            self.notifications.send_notifications(message=f"Unable to delete '{file}' from {folder}: {e}. Continuing automation...")
+        except (Exception, FileNotFoundError) as e:
+            self.notifications.send_notifications(
+                message=f"Unable to delete '{file}' from {folder}: {e}. Continuing automation...",
+                subject="Error")
 
     def get_folders(self) -> list:
         results = []
