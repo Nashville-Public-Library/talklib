@@ -7,8 +7,8 @@ import re
 import time
 from typing import Type
 
-from fabric import Connection
-from pydantic import BaseModel, Field, model_validator, ConfigDict
+from fabric import Connection, Result
+from pydantic import BaseModel, Field, model_validator
 
 from talklib.ev import EV
 from talklib.notify import Notify
@@ -84,20 +84,34 @@ class SSH(BaseModel):
                 subject="Error")
 
     def get_folders(self) -> list:
-        results = []
-        folders = self.connection.run("cd talkinglibrary/shows && ls", hide=True)
-        folders:str = folders.stdout
-        folders = folders.rsplit("\n")
+        ret_val: list = []
+        result: Result = self.connection.run("cd talkinglibrary/shows && ls", hide=True)
+        result_stdout:str = result.stdout
+        folders: list[str] = result_stdout.rsplit("\n")
         for folder in folders:
-            results.append(folder.lower())
-        return results
+            if folder != "":
+                ret_val.append(folder.lower())
+        return ret_val
     
-    # def get_files(self):
-    #     result = self.s3.list_objects(Bucket=self.bucket)
-    #     for contents in result["Contents"]:
-    #         key:str = contents["Key"]
-    #         if not key.endswith("/"):
-    #             print(key)
+    def get_files_from_folder(self, folder: str) -> list:
+        ret_val: list = []
+        result: Result = self.connection.run(f"cd talkinglibrary/shows/{folder} && ls", hide=True)
+        result_stdout:str = result.stdout
+        files: list[str] = result_stdout.rsplit("\n")
+        for file in files:
+            if file != "": # exclude files without names?
+                ret_val.append(file.lower())
+        return ret_val
+    
+    def get_all_files(self) -> list:
+        ret_val: list = []
+        result: Result = self.connection.run("cd talkinglibrary/shows && ls -R", hide=True)
+        result_stdout:str = result.stdout
+        files: list[str] = result_stdout.rsplit("\n")
+        for file in files:
+            if not file.startswith("./") and file != "": # exclude folders and files without names
+                ret_val.append(file.lower())
+        return ret_val
 
     def check_folder_exists(self, folder: str) -> bool:
         self.notifications.prep_syslog(message=f"checking if {folder}/ exists on server...")
