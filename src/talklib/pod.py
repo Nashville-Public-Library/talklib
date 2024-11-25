@@ -136,8 +136,8 @@ class Episode(BaseModel):
 
     def pub_date(self) -> str: 
         timezone = time.timezone/60/60 # 60 seconds per minute, 60 minutes per hour
-        timezone = round(timezone)
-        if time.daylight: # if DST is currently active
+        timezone = round(timezone)  
+        if time.localtime().tm_isdst: # if DST is currently active
             timezone-=1
 
         pub_date = datetime.now().strftime(f'%a, %d %b %Y %H:%M:%S -0{timezone}00')
