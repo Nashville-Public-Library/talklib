@@ -53,7 +53,7 @@ class SSH(BaseModel):
     def upload_file(self, file: str, folder: str) -> None:
         try:
             self.notifications.prep_syslog(message=f"Attempting to upload '{file}' to {folder}/")
-            self.connection.put(local=file, remote=f"talkinglibrary/shows/{folder}")
+            self.connection.put(local=file, remote=f"talkinglibrary/shows/{folder}", preserve_mode=False)
             self.notifications.prep_syslog(message=f"Successfully uploaded '{file}' to {folder}/")
             return
         except (FileNotFoundError, Exception) as e:
