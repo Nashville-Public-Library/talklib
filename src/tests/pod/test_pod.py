@@ -55,6 +55,23 @@ def test_type_6():
                 filename_to_match="del",
                 filename_override=5)
             
+def test_type_7():
+    '''pydantic should raise an error if wrong type passed in'''
+    with pytest.raises(AttributeError):
+            test = TLPod(
+                display_name='delete', 
+                filename_to_match="del",
+                )
+            test.notifications.prefix = 3 # must be a string
+
+def test_notif_prefix():
+      '''notification prefix should be set to include the display name'''
+      test = TLPod(
+            display_name="mahhh",
+            filename_to_match='mah'
+      )
+      assert test.display_name in test.notifications.prefix
+            
 def test_bucket_filename_match():
           '''if no bucket folder is set explicitly, bucket folder should be set to filename_to_match'''
           test = TLPod(
