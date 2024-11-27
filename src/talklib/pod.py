@@ -5,7 +5,7 @@ import math
 import os
 import re
 import time
-from typing import Type
+from typing import ClassVar, Type
 
 from fabric import Connection, Result
 from pydantic import BaseModel, Field, model_validator
@@ -16,7 +16,7 @@ from talklib.ffmpeg import FFMPEG
 from talklib.utils import today_is_weekday
 
 class Notifications(BaseModel):
-    prefix: str = None  # prefix all messages with identifier for the show/podcast
+    prefix: ClassVar[str] = None  # prefix all messages with identifier for the show/podcast
     notify: Type[Notify] = Notify()
 
     def prep_syslog(self, message: str, level: str = 'info'):
@@ -294,14 +294,13 @@ class TLPod(BaseModel):
                 self.bucket_folder = self.filename_to_match.lower()
 
         prefix = f"{self.display_name} (podcast)"
-        self.notifications.prefix = prefix
-        self.episode.notifications.prefix = prefix
-        self.ssh.notifications.prefix = prefix
+        Notifications.prefix = prefix
 
         return self
     
     def get_filename_to_match(self) -> str:
         if self.filename_override:
+            self.notifications.prep_syslog(message="filename override is turned ON")
             return self.filename_to_match.lower()
         today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
         return (self.filename_to_match + today_date).lower()
@@ -330,7 +329,7 @@ class TLPod(BaseModel):
 
         self.ffmpeg.input_file = file
         self.ffmpeg.output_file = output_filename
-        self.ffmpeg.compression = False
+        self.ffmpeg.compression = False # this is for podcasts. these files should already be edited
         
         ffmpeg_commands = self.ffmpeg.get_commands()
         self.notifications.prep_syslog(message=f"FFmppeg commands: {ffmpeg_commands}")
