@@ -53,7 +53,7 @@ def test_type_6():
             test = TLPod(
                 display_name='delete', 
                 filename_to_match="del",
-                filename_override=5)
+                override_filename=5)
             
 def test_type_7():
     '''pydantic should raise an error if wrong type passed in'''
