@@ -172,16 +172,15 @@ class Episode(BaseModel):
         return result
 
     def add_new_episode(self):
+        '''Create an 'item' element. Then create all of the necessary sub elements and append them to the item element'''
         ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
         ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
         root = root.find('channel')
 
-        # make a new element, called 'item'
         item = ET.Element('item')
 
-        # create all of the sub elements, then append them to the 'item' element
         title = ET.Element('title')
         title.text = self.episode_title
         item.append(title)
@@ -223,7 +222,6 @@ class Episode(BaseModel):
             # If no items exist, add the new item to the bottom (after the other channel elements)
             root.append(item)
 
-        # don't forget to update this as well
         last_build_date = root.find('lastBuildDate')
         last_build_date.text = self.pub_date() # fine to use this same pub date, as the format for both is the same
 
@@ -276,7 +274,7 @@ class TLPod(BaseModel):
     categories: list = Field(default=[])
     bucket_folder: str = Field(default=None)
     max_episodes_in_feed: int = Field(ge=1, default=5)
-    filename_override: bool = False
+    override_filename: bool = False
     audio_folders:list = EV().destinations
     notifications: Type[Notifications] = Notifications()
     episode: Type[Episode] = Episode(notifications=notifications)
@@ -290,7 +288,7 @@ class TLPod(BaseModel):
         by the user, use the filename. However, if filename_override is being used, strip out the digits first.
         '''
         if not self.bucket_folder:
-            if self.filename_override:
+            if self.override_filename:
                 self.bucket_folder = re.sub(pattern="[0-9]", string=self.filename_to_match.lower(), repl='')
             else: 
                 self.bucket_folder = self.filename_to_match.lower()
@@ -301,7 +299,7 @@ class TLPod(BaseModel):
         return self
     
     def get_filename_to_match(self) -> str:
-        if self.filename_override:
+        if self.override_filename:
             self.notifications.prep_syslog(message="filename override is turned ON")
             return self.filename_to_match.lower()
         today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
