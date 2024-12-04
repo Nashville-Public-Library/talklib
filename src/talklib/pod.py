@@ -51,6 +51,8 @@ class SSH(BaseModel):
     notifications: Notifications = Notifications()
 
     def upload_file(self, file: str, folder: str) -> None:
+        self.check_folder_exists(folder=folder)
+        
         try:
             self.notifications.prep_syslog(message=f"Attempting to upload '{file}' to {folder}/")
             self.connection.put(local=file, remote=f"talkinglibrary/shows/{folder}", preserve_mode=False)
