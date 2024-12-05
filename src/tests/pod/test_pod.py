@@ -2,13 +2,12 @@ import atexit
 from datetime import datetime
 import os
 import shutil
-from unittest.mock import patch
 
 from pydantic_core import ValidationError
 import pytest
 
 from talklib.pod import TLPod
-from .mock import env_vars, mock_destinations, download_test_file
+from .mock import env_vars, mock_destinations
 
 @pytest.fixture(autouse=True)
 def mock_env_vars(monkeypatch):

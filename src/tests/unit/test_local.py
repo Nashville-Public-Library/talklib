@@ -1,7 +1,5 @@
-from datetime import datetime
 import pytest
 import os
-from unittest.mock import patch, MagicMock
 
 from talklib import TLShow
 from ..mock import env_vars

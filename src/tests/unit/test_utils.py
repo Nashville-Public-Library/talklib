@@ -1,6 +1,5 @@
 import os
 import pytest
-from unittest.mock import patch, MagicMock
 from ..mock import env_vars
 
 from talklib.notify import Notify

@@ -3,8 +3,6 @@ import xml.etree.ElementTree as ET
 import pytest
 import os
 import requests
-import subprocess
-from unittest.mock import patch
 
 from talklib import TLShow
 from ..mock import env_vars, download_test_file, RSS_URL

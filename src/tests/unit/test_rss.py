@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch
 
 from talklib import TLShow
 from ..mock import env_vars, RSS_URL
