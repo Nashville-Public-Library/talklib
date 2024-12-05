@@ -12,9 +12,7 @@ input_file = 'input.mp3'  # name the file we download
 
 @pytest.fixture
 def template():
-    
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.local_file = download_test_file()

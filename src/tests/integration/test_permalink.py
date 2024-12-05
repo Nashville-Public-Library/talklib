@@ -8,8 +8,7 @@ from ..mock import env_vars, permalink
 
 @pytest.fixture
 def template():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = permalink

@@ -7,9 +7,8 @@ from unittest.mock import patch
 from pydantic_core import ValidationError
 import pytest
 
+from talklib.pod import TLPod
 from .mock import env_vars, mock_destinations, download_test_file
-with patch.dict('os.environ', env_vars):
-        from talklib.pod import TLPod
 
 
 def test_type_1():

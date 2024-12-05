@@ -2,9 +2,9 @@ import os
 import pytest
 from unittest.mock import patch, MagicMock
 from ..mock import env_vars
-with patch.dict('os.environ', env_vars):
-    from talklib.notify import Notify
-    from talklib import utils
+
+from talklib.notify import Notify
+from talklib import utils
 
 cwd = os.getcwd()
 

@@ -15,8 +15,7 @@ input_file = 'input.mp3'  # name the file we download
 
 @pytest.fixture
 def template_local():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.local_file = input_file
@@ -28,8 +27,7 @@ def template_local():
 
 @pytest.fixture
 def template_permalink():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = permalink_URL
@@ -43,8 +41,7 @@ def template_permalink():
 
 @pytest.fixture
 def template_rss():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = RSS_URL
