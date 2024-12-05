@@ -10,6 +10,12 @@ import pytest
 from talklib.pod import TLPod
 from .mock import env_vars, mock_destinations, download_test_file
 
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    # Mock the 'destinations' environment variable globally
+    for key, value in env_vars.items():
+        monkeypatch.setenv(key, value)
+
 
 def test_type_1():
     '''pydantic should raise an error if instance variables aren't set'''

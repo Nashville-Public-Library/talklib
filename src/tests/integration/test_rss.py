@@ -8,8 +8,11 @@ from talklib import TLShow
 from .. import mock
 from ..mock import env_vars, RSS_URL
 
-# this RSS feed chosen as test feed because it is reliably updated every day 
-# (many times per day) and because the audio file is short/small!
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    # Mock the 'destinations' environment variable globally
+    for key, value in env_vars.items():
+        monkeypatch.setenv(key, value)
 
 @pytest.fixture()
 def template():

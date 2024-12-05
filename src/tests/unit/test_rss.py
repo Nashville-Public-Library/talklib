@@ -4,6 +4,11 @@ from unittest.mock import patch
 from talklib import TLShow
 from ..mock import env_vars, RSS_URL
 
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    # Mock the 'destinations' environment variable globally
+    for key, value in env_vars.items():
+        monkeypatch.setenv(key, value)
 
 @pytest.fixture
 def template_rss():
