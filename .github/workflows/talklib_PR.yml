@@ -28,8 +28,5 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .
 
-    - name: Print all environment variables
-      run: printenv
-
     - name: Test with pytest
       run: pytest -s
