@@ -10,11 +10,15 @@ from ..mock import env_vars, download_test_file
 
 input_file = 'input.mp3'  # name the file we download
 
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    # Mock the 'destinations' environment variable globally
+    for key, value in env_vars.items():
+        monkeypatch.setenv(key, value)
+
 @pytest.fixture
 def template():
-    
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.local_file = download_test_file()

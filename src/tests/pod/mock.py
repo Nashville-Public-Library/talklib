@@ -1,6 +1,5 @@
 import os
 import requests
-import shutil
 
 
 '''
@@ -11,11 +10,16 @@ to mock a local file. Downloading the file itself it just setting up the test.
 This static link was chosen because it's reliably available and the file is small/short.
 '''
 permalink = "http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDI="
-RSS_URL = "https://feeds.megaphone.fm/ESP9792844572"
+
+def mock_destinations():
+    destination = 'dest1'
+    if not os.path.exists(destination):
+            os.mkdir(destination)
+    return destination
 
 env_vars = {
-        'destinations': 'nothing',
-        'syslog_server': 'mocked_value2',
+        'destinations': mock_destinations(),
+        'syslog_server': '10.10.10.10',
         'fromEmail': 'mocked_value2',
         'toEmail': 'mocked_value2',
         'mail_server_external': 'mocked_value2',
@@ -28,25 +32,15 @@ env_vars = {
         'pod_server_uname': 'mahhhhh'
     }
 
-def mock_destinations():
-    destinations = ['dest1', 'dest2', 'dest3']
-    for destination in destinations:
-        if not os.path.exists(destination):
-            os.mkdir(destination)
-    return destinations
-
-def remove_destinations():
-    for destination in mock_destinations():
-        shutil.rmtree(destination)
     
-def download_test_file():
-    input_file = 'input.mp3'  # name the file we download
-    downloaded_file = input_file
-    file_exists = os.path.isfile(input_file)
+def download_test_file(filename: str = 'input.mp3'):
+    downloaded_file = filename
+    file_exists = os.path.isfile(filename)
     if not file_exists:
-        with open (input_file, mode='wb') as downloaded_file:
+        with open (filename, mode='wb') as downloaded_file:
             a = requests.get(permalink)
             downloaded_file.write(a.content)
             downloaded_file.close()
             return downloaded_file.name
+
     return downloaded_file

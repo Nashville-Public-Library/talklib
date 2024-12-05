@@ -1,15 +1,19 @@
 import pytest
-from unittest.mock import patch
 
 from talklib import TLShow
 from .. import mock
 from ..mock import env_vars, permalink
 
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    # Mock the 'destinations' environment variable globally
+    for key, value in env_vars.items():
+        monkeypatch.setenv(key, value)
+
 
 @pytest.fixture
 def template():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = permalink

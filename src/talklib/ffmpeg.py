@@ -5,6 +5,7 @@ class FFMPEG:
                 input_file: str = None,
                 output_file: str = None,
                 breakaway: int|float = 0,
+                compression: bool = True,
                 compression_level: int|float = 21,
                 sample_rate: int = 44100,
                 audio_channels: int = 1
@@ -13,6 +14,7 @@ class FFMPEG:
         self.input_file = input_file
         self.output_file = output_file
         self.breakaway = breakaway
+        self.compression = compression
         self.compression_level = compression_level
         self.sample_rate = sample_rate
         self.audio_channels = audio_channels
@@ -29,9 +31,12 @@ class FFMPEG:
         command = {}
         command.update({'ar': self.sample_rate})
         command.update({'ac': self.audio_channels})
-        command.update({'af': f'loudnorm=I=-{self.compression_level}'})
+        if self.compression:
+            command.update({'af': f'loudnorm=I=-{self.compression_level}'})
         if self.breakaway:
             command.update({'t': self.breakaway})
+        if self.output_file.endswith('mp3'):
+            command.update({'b:a': "96k"})
         command.update({'y': None})
         command.update({'filename': self.output_file})
 

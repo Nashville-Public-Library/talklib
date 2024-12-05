@@ -3,8 +3,6 @@ import xml.etree.ElementTree as ET
 import pytest
 import os
 import requests
-import subprocess
-from unittest.mock import patch
 
 from talklib import TLShow
 from ..mock import env_vars, download_test_file, RSS_URL
@@ -13,10 +11,15 @@ permalink_URL = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
 input_file = 'input.mp3'  # name the file we download
 
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    # Mock the 'destinations' environment variable globally
+    for key, value in env_vars.items():
+        monkeypatch.setenv(key, value)
+
 @pytest.fixture
 def template_local():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.local_file = input_file
@@ -28,8 +31,7 @@ def template_local():
 
 @pytest.fixture
 def template_permalink():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = permalink_URL
@@ -43,8 +45,7 @@ def template_permalink():
 
 @pytest.fixture
 def template_rss():
-    with patch.dict('os.environ', env_vars):
-        test = TLShow()
+    test = TLShow()
     test.show = 'Delete Me'
     test.show_filename = 'delete_me'
     test.url = RSS_URL
