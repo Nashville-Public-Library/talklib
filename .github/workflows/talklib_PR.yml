@@ -30,3 +30,6 @@ jobs:
 
     - name: Test with pytest
       run: pytest -s
+
+    - name: Print all environment variables
+      run: printenv
