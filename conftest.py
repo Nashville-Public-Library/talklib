@@ -1,7 +1,5 @@
 import os
 
-import pytest
-
 from src.tests.mock import env_vars
 
 def pytest_sessionstart(session):
