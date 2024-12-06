@@ -54,9 +54,9 @@ class SSH(BaseModel):
         self.check_folder_exists(folder=folder)
         
         try:
-            self.notifications.prep_syslog(message=f"Attempting to upload '{file}' to {folder}/")
-            self.connection.put(local=file, remote=f"talkinglibrary/shows/{folder}", preserve_mode=False)
-            self.notifications.prep_syslog(message=f"Successfully uploaded '{file}' to {folder}/")
+            self.notifications.prep_syslog(message=f"Attempting to upload '{file}' to {folder}/ on server")
+            self.connection.put(local=file, remote=f"shows/{folder}", preserve_mode=False)
+            self.notifications.prep_syslog(message=f"Successfully uploaded '{file}' to {folder}/ on server")
             return
         except (FileNotFoundError, Exception) as e:
             to_send = f"unable to upload '{file}': {e}"
@@ -65,8 +65,8 @@ class SSH(BaseModel):
 
     def download_file(self, file: str, folder: str) -> None:
         try:
-            self.notifications.prep_syslog(message=f"Attempting to download '{file}' from {folder}/")
-            self.connection.get(remote=f"talkinglibrary/shows/{folder}/{file}")
+            self.notifications.prep_syslog(message=f"Attempting to download '{file}' from {folder}/ on server")
+            self.connection.get(remote=f"shows/{folder}/{file}")
             self.notifications.prep_syslog(message=f"Successfully downloaded '{file}' to {os.getcwd()}")
             return file
         except Exception as e:
@@ -76,9 +76,9 @@ class SSH(BaseModel):
 
     def delete_file(self, file: str, folder: str) -> None:
         try:
-            self.notifications.prep_syslog(message=f"Attempting to delete '{file}' from {folder}/")
-            self.connection.sftp().remove(f"talkinglibrary/shows/{folder}/{file}")
-            self.notifications.prep_syslog(message=f"Successfully deleted '{file}' from {folder}/")
+            self.notifications.prep_syslog(message=f"Attempting to delete '{file}' from {folder}/ on server")
+            self.connection.sftp().remove(f"shows/{folder}/{file}")
+            self.notifications.prep_syslog(message=f"Successfully deleted '{file}' from {folder}/ on server")
             return
         except (Exception, FileNotFoundError) as e:
             self.notifications.send_notifications(
@@ -87,7 +87,7 @@ class SSH(BaseModel):
 
     def get_folders(self) -> list:
         ret_val: list = []
-        result: Result = self.connection.run("cd talkinglibrary/shows && ls", hide=True)
+        result: Result = self.connection.run("cd shows && ls", hide=True)
         result_stdout:str = result.stdout
         folders: list[str] = result_stdout.rsplit("\n")
         for folder in folders:
@@ -97,7 +97,7 @@ class SSH(BaseModel):
     
     def get_files_from_folder(self, folder: str) -> list:
         ret_val: list = []
-        result: Result = self.connection.run(f"cd talkinglibrary/shows/{folder} && ls", hide=True)
+        result: Result = self.connection.run(f"cd shows/{folder} && ls", hide=True)
         result_stdout:str = result.stdout
         files: list[str] = result_stdout.rsplit("\n")
         for file in files:
@@ -107,7 +107,7 @@ class SSH(BaseModel):
     
     def get_all_files(self) -> list:
         ret_val: list = []
-        result: Result = self.connection.run("cd talkinglibrary/shows && ls -R", hide=True)
+        result: Result = self.connection.run("cd shows && ls -R", hide=True)
         result_stdout:str = result.stdout
         files: list[str] = result_stdout.rsplit("\n")
         for file in files:
@@ -119,7 +119,7 @@ class SSH(BaseModel):
         self.notifications.prep_syslog(message=f"checking if {folder}/ exists on server...")
         folders = self.get_folders()
         if folder.lower() in folders:
-            self.notifications.prep_syslog(message=f"{folder}/ exists!")
+            self.notifications.prep_syslog(message=f"{folder}/ exists on server!")
             return True
         
         to_send = f"cannot find folder titled: {folder}/ on server"
