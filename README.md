@@ -4,7 +4,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/Nashville-Public-Library/talklib.png)](https://github.com/Nashville-Public-Library/talklib/issues)
 [![last-commit](https://img.shields.io/github/last-commit/Nashville-Public-Library/talklib)](https://github.com/Nashville-Public-Library/talklib/commits/master)
 
-## A package to automate processing of shows/segments airing on the TL
+## A package to automate processing TL shows/segments and podcasts
 
 [Skip to Examples](#examples)
 
@@ -24,7 +24,9 @@ Use this module to process the following types of shows/segments:
 ## Requirements
 
 ### -[Python](https://www.python.org/downloads/)
-Use Python 3.10 or higher
+Use Python 3.10 or higher.
+
+Make sure to select "add to PATH" during installation.
 
 ### -[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)
 You need Windows binaries for both FFmpeg & FFprobe installed on the PC and added to the PATH:
@@ -43,10 +45,12 @@ See [below](#disable-twilio) for how to disable Twilio.
 ### -Environment Variables
 This package uses Environment Variables to help with portability and keep sensitive info separated. The entire list of these is in the `ev.py` file. Make sure to set **all** of these on your PC(s). They are case-sensitive!
 
-**ONCE YOU SET/CHANGE/UPDATE ENVIRONMENT VARIABLES ON YOUR PC, YOU NEED TO RESTART WIREREADY**
+> **ONCE YOU SET/CHANGE/UPDATE ENVIRONMENT VARIABLES ON YOUR PC, YOU NEED TO RESTART WIREREADY**
 
 ---
 ## Installation
+
+AFTER you have all of the above [requirements](#requirements), inst
 
 - Open a terminal/command prompt
 - ````bash
@@ -69,7 +73,10 @@ Before we begin, a general note:
 - Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file).
 - Ensure the Batch & Python scripts are in the same directory.
 - A sample `.bat` file (`Example.bat`) is included in the [misc](https://github.com/Nashville-Public-Library/misc/tree/main/talklib_examples) repo. 
-- PLEASE NOTE: the `.bat` file will run all Python files in the folder. This is one reason it is best to separate your Python files into different folders, each with its own `.bat` file.
+    - Download this file and place it in the same folder as your Python file.
+    - Right-Click the file and click `Unblock` so that it can be executed.
+    - It is a best practice to give the `.bat` and `.py` files the same name, though it is not necessary.
+- PLEASE NOTE: the `.bat` file will run **all** Python files in the folder. This is one reason it is best to separate your Python files into different folders, each with its own `.bat` file.
 
 Here is what an example directory structure should look like:
 ````
@@ -78,7 +85,7 @@ D:\wireready
         -WP.bat
         -WP.py
 ````
-You would tell WR to run the `WP.bat` file, which would run the `WP.py` file.
+You would schedule WR to run the `WP.bat` file, which would run the `WP.py` file.
 
 ----
 
@@ -239,34 +246,6 @@ optional
         - the max is 5 (do not set to 1, 2, 3, or 4)!
         - be careful with this!
         - default is 21
-
-### Notes about formatting:
-
-if you're new to Python, here're some reminders
-
-### string 
-- must be enclosed in quotes (single or double; Python doesn't care)
-
-### boolean
-- either True or False
-- do not enclose in quotes
-- must be capitalized
-    - correct: True
-    - incorrect: true
-    
-### number
-- in our case, these can be either type int OR float, meaning either whole numbers OR decimal numbers are allowed
-    - OK: 5
-    - also OK: 5.4
-- do not enclose in quotes
-
-## Methods
-
-`run()`
-
-required
-- executes the script with the attributes you set
-- should be the last line in your script
 
 ## Examples<a id="examples"></a>
 ### RSS Example
