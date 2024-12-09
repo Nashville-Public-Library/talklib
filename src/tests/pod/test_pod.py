@@ -7,13 +7,7 @@ from pydantic_core import ValidationError
 import pytest
 
 from talklib.pod import TLPod
-from .mock import env_vars, mock_destinations
-
-@pytest.fixture(autouse=True)
-def mock_env_vars(monkeypatch):
-    # Mock the 'destinations' environment variable globally
-    for key, value in env_vars.items():
-        monkeypatch.setenv(key, value)
+from .mock import mock_destinations
 
 
 def test_type_1():
