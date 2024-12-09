@@ -11,12 +11,6 @@ permalink_URL = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
 input_file = 'input.mp3'  # name the file we download
 
-@pytest.fixture(autouse=True)
-def mock_env_vars(monkeypatch):
-    # Mock the 'destinations' environment variable globally
-    for key, value in env_vars.items():
-        monkeypatch.setenv(key, value)
-
 @pytest.fixture
 def template_local():
     test = TLShow()
