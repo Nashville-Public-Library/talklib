@@ -10,15 +10,16 @@
 
 *THIS README IS INTENDED TO ASSIST TL STAFF IN INSTALLING AND USING THIS PACKAGE*
 
-Use this module to process the following types of shows/segments:
-- Shows and segments we receive via RSS feed
-    - Shows such as New York Times, Wall Street Journal,  etc.
-    - Segments such as Health in a Heartbeat, Academic Minute, etc.
-- Segments we receive via "permalink"
-    - Such as PNS, Cirrus, etc.
-- Segments downloaded locally ahead of time
-    - Such as Sound Beat, Animal Airwaves, etc.
-
+This package automates two categories of things: 
+1. Shows/segments we receive from outside the TL
+    - Shows and segments we receive via RSS feed
+        - Shows such as New York Times, Wall Street Journal,  etc.
+        - Segments such as Health in a Heartbeat, Academic Minute, etc.
+    - Segments we receive via "permalink"
+        - Such as PNS, Cirrus, etc.
+    - Segments downloaded locally ahead of time
+        - Such as Sound Beat, Animal Airwaves, etc.
+2. TL Podcasts
 ---
 
 ## Requirements
@@ -50,7 +51,7 @@ This package uses Environment Variables to help with portability and keep sensit
 ---
 ## Installation
 
-AFTER you have all of the above [requirements](#requirements), inst
+AFTER you have all of the above [requirements](#requirements), install the library:
 
 - Open a terminal/command prompt
 - ````bash
@@ -74,7 +75,7 @@ Before we begin, a general note:
 - Ensure the Batch & Python scripts are in the same directory.
 - A sample `.bat` file (`Example.bat`) is included in the [misc](https://github.com/Nashville-Public-Library/misc/tree/main/talklib_examples) repo. 
     - Download this file and place it in the same folder as your Python file.
-    - Right-Click the file and click `Unblock` so that it can be executed.
+    - Right-Click the file > select `Properties` > select `Unblock` so that it can be executed.
     - It is a best practice to give the `.bat` and `.py` files the same name, though it is not necessary.
 - PLEASE NOTE: the `.bat` file will run **all** Python files in the folder. This is one reason it is best to separate your Python files into different folders, each with its own `.bat` file.
 
@@ -89,7 +90,7 @@ You would schedule WR to run the `WP.bat` file, which would run the `WP.py` file
 
 ----
 
-## Usage
+## Outside Shows/Segments Usage
 
 [Skip to Examples](#examples)
 
@@ -363,6 +364,78 @@ SD.url = 'https://somesite.org/sdn-feed.rss'
 SD.ffmpeg.compression_level = 18
 
 SD.run()
+````
+
+## TL Podcasts Usage
+
+`TLPod` is the main class to use.
+
+Import the class to your script like this:
+
+````python
+from talklib import TLPod
+````
+
+This is also fine:
+
+````python
+from talklib.pod import TLPod
+````
+
+## Examples<a id="pod_examples"></a>
+
+````python
+from talklib import TLPod
+
+nyt = TLPod(
+    display_name = "New York Times",
+    filename_to_match = "nyt",
+    categories = ["News and Politics"]
+)
+nyt.run()
+````
+
+To add multiple category tags, do this:
+
+````python
+from talklib import TLPod
+
+nyt = TLPod(
+    display_name = "New York Times",
+    filename_to_match = "nyt",
+    categories = ["News and Politics", "National News", "International News"]
+)
+nyt.run()
+````
+
+The default number of episodes allowed in a podcast feed at any given time is 5. To change that:
+
+````python
+from talklib import TLPod
+
+nyt = TLPod(
+    display_name = "New York Times",
+    filename_to_match = "nyt",
+    categories = ["News and Politics"],
+    max_episodes_in_feed = 7
+)
+nyt.run()
+````
+
+To disable ALL notifications, add a line like this:
+
+> This will disable all notifications **including** syslog messages
+
+````python
+from talklib import TLPod
+
+nyt = TLPod(
+    display_name = "New York Times",
+    filename_to_match = "nyt",
+    categories = ["News and Politics"],
+)
+nyt.notifications.notify.enable_all = False
+nyt.run()
 ````
 
 -----
