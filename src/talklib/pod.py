@@ -185,6 +185,11 @@ class Episode(BaseModel):
         title.text = self.episode_title
         item.append(title)
 
+        # Drupal needs to see a category element on every episode that matches the name of the program
+        channel_title_category_element = ET.Element("category")
+        channel_title_category_element.text = root.find('title').text
+        item.append(channel_title_category_element)
+
         pubDate = ET.Element('pubDate')
         pubDate.text = self.pub_date()
         item.append(pubDate)
