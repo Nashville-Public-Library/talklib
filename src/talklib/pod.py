@@ -325,13 +325,17 @@ class TLPod(BaseModel):
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
         self.notifications.send_notifications(message=to_send, subject='Error')
         raise FileNotFoundError
-
-    def convert(self, file:str):
+    
+    def create_converted_filename(self, file: str):
         output_filename = file.split('.')
         output_filename = output_filename[0]
         output_filename = os.path.basename(output_filename).lower()
         output_filename = output_filename + '.mp3'
         self.notifications.prep_syslog(message=f"Converted audio file will be {output_filename}")
+        return output_filename
+
+    def convert(self, file:str):
+        output_filename = self.create_converted_filename(file=file)
 
         self.ffmpeg.input_file = file
         self.ffmpeg.output_file = output_filename
