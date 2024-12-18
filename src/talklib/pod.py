@@ -179,6 +179,7 @@ class Episode(BaseModel):
         root = feed.getroot()
         root = root.find('channel')
 
+        self.notifications.prep_syslog(message="Building the new <item> element")
         item = ET.Element('item')
 
         title = ET.Element('title')
@@ -221,7 +222,7 @@ class Episode(BaseModel):
             # If there are existing items (there usually will be), add the new item before to the top
             first_item = items[0]
             index = list(root).index(first_item)
-            self.notifications.prep_syslog(message=f"adding {item} to feed at {index}")
+            self.notifications.prep_syslog(message=f"adding {item} to feed at channel index: {index}")
             root.insert(index, item)
         else:
             # If no items exist, add the new item to the bottom (after the other channel elements)
@@ -359,6 +360,7 @@ class TLPod(BaseModel):
 
     def run(self):
         self.notifications.prep_syslog(message="Starting up...")
+        self.notifications.prep_syslog(message=f"Attributes: {self.__repr__()}")
 
         self.ssh.check_folder_exists(folder=self.bucket_folder)
 
