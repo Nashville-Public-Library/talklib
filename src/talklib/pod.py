@@ -134,7 +134,6 @@ class Episode(BaseModel):
     episode_title: str = Field(min_length=1, default=None)
     notifications: Notifications = Notifications()
     max_episodes: int = Field(default=None)
-    categories: list = Field(default=None)
 
     def pub_date(self) -> str: 
         timezone = time.timezone/60/60 # 60 seconds per minute, 60 minutes per hour
@@ -210,12 +209,6 @@ class Episode(BaseModel):
         itunes_duration_element.text = self.itunes_duration()
         item.append(itunes_duration_element)
 
-        for category in self.categories:
-            category_element = ET.Element("category")
-            category_element.text = category
-            self.notifications.prep_syslog(message=f"adding category: {category}")
-            item.append(category_element)
-
         # insert the new 'item' element as the first item, but below all the other channel elements
         items = root.findall('item')
         if items:
@@ -277,7 +270,6 @@ class TLPod(BaseModel):
     '''
     display_name: str = Field(min_length=1)
     filename_to_match: str = Field(min_length=1)
-    categories: list = Field(default=[])
     bucket_folder: str = Field(default=None)
     max_episodes_in_feed: int = Field(ge=1, default=5)
     override_filename: bool = False
@@ -376,7 +368,6 @@ class TLPod(BaseModel):
         self.episode.feed_file = feed_file
         self.episode.audio_filename = converted_file
         self.episode.bucket_folder = self.bucket_folder
-        self.episode.categories = self.categories
         self.episode.episode_title = f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})"
         self.episode.max_episodes = self.max_episodes_in_feed
        
