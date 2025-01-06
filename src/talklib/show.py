@@ -277,13 +277,13 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
         a standards organization. Most podcasts/RSS feeds follow this standard.
         '''
         root = self.__get_feed()
-        for channel in root.findall('channel'):
-            item = channel.find('item')  # 'find' only returns the first match!
-            pub_date = item.find('pubDate').text
-            today = datetime.now().strftime("%a, %d %b %Y")
-            if today in pub_date:
-                self.__prep_syslog(message='The feed is updated.')
-                return True
+        channel = root.find('channel')
+        item = channel.find('item')  # 'find' only returns the first match!
+        pub_date = item.find('pubDate').text
+        today = datetime.now().strftime("%a, %d %b %Y")
+        if today in pub_date:
+            self.__prep_syslog(message='The feed is updated.')
+            return True
 
     def __get_RSS_audio_url(self) -> str:
         '''TODO: explain'''
