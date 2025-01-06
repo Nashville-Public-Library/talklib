@@ -169,7 +169,23 @@ class Episode(BaseModel):
         result = f"{minutes}:{seconds:02}"
         self.notifications.prep_syslog(message=f"itunes:duration will be {result}")
         return result
-
+    
+    def check_for_duplicate_episode(self, title: str):
+        if title == self.episode_title:
+            self.cleanup_files_on_abort()
+            to_send = "Found episode with identical title already in feed. Aborting..."
+            self.notifications.send_notifications(message=to_send, subject="Error")
+            raise Exception (to_send)
+        return
+    
+    def cleanup_files_on_abort(self):
+        files = glob.glob("*.mp3")
+        for file in files:
+            self.notifications.prep_syslog(message=f"Aborting automation, deleting local temp files: {file}")
+            os.remove(file)
+        self.notifications.prep_syslog(message=f"Aborting automation, deleting local temp files: feed.xml")   
+        os.remove("feed.xml")
+        
     def add_new_episode(self):
         '''Create an 'item' element. Then create all of the necessary sub elements and append them to the item element'''
         ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
@@ -177,6 +193,8 @@ class Episode(BaseModel):
         feed = ET.parse(self.feed_file)
         root = feed.getroot()
         root = root.find('channel')
+
+        self.check_for_duplicate_episode(title=root.find("item").find("title").text)
 
         self.notifications.prep_syslog(message="Building the new <item> element")
         item = ET.Element('item')
