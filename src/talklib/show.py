@@ -288,12 +288,18 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
     def __get_RSS_audio_url(self) -> str:
         '''TODO: explain'''
         root = self.__get_feed()
-        for channel in root.findall('channel'):
-            item = channel.find('item')  # 'find' only returns the first match!
+        channel = root.find('channel')
+        item = channel.find('item')  # 'find' only returns the first match!
+        try:
             audio_url = item.find('enclosure').attrib
             audio_url = audio_url.get('url')
             self.__prep_syslog(message=f'Audio URL is: {audio_url}')
             return audio_url
+        except AttributeError as AE:
+            to_send = f"There's a Problem with {self.show}. \
+There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n\{get_timestamp()}"
+            self.__send_notifications(message=to_send, subject="error")
+            raise_exception_and_wait(message=to_send, error=AE)
 
     def __check_feed_loop(self) -> str:
         '''
