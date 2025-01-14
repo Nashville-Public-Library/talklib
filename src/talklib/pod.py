@@ -171,11 +171,13 @@ class Episode(BaseModel):
         return result
     
     def check_for_duplicate_episode(self, title: str):
+        self.notifications.prep_syslog(message="checking for duplicate episode...")
         if title == self.episode_title:
             self.cleanup_files_on_abort()
             to_send = "Found episode with identical title already in feed. Aborting..."
             self.notifications.send_notifications(message=to_send, subject="Error")
             raise Exception (to_send)
+        self.notifications.prep_syslog(message="no duplicate episode found")
         return
     
     def cleanup_files_on_abort(self):
@@ -194,7 +196,11 @@ class Episode(BaseModel):
         root = feed.getroot()
         root = root.find('channel')
 
-        self.check_for_duplicate_episode(title=root.find("item").find("title").text)
+        # if we have a new feed, or a feed with no episodes
+        try:
+            self.check_for_duplicate_episode(title=root.find("item").find("title").text)
+        except:
+            pass
 
         self.notifications.prep_syslog(message="Building the new <item> element")
         item = ET.Element('item')
