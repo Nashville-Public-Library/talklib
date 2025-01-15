@@ -7,7 +7,7 @@ from pydantic_core import ValidationError
 import pytest
 
 from talklib.pod import TLPod, Episode
-from .mock import mock_destinations, download_test_file
+from .mock import mock_destinations, download_test_file, write_mock_feed
 
 
 def test_type_1():
@@ -118,7 +118,7 @@ def test_match_bucket_folder_1():
 def test_check_for_duplicate_episode_1():
     '''if a matching title is found in episode list, an exception should be raised'''
     ep = Episode(
-            feed_file="mock.xml",
+            feed_file=write_mock_feed(),
             audio_filename=download_test_file(),
             bucket_folder="none",
             episode_title="Mock Title 011525"
@@ -130,7 +130,7 @@ def test_check_for_duplicate_episode_1():
 def test_check_for_duplicate_episode_2():
     '''no exception if matching title is not found'''
     ep = Episode(
-            feed_file="mock.xml",
+            feed_file=write_mock_feed(),
             audio_filename=download_test_file(),
             bucket_folder="none",
             episode_title="Not A Duplicate Title"
@@ -150,6 +150,11 @@ def teardown():
     
     try:
          os.remove("input.mp3")
+    except:
+         pass
+    
+    try:
+         os.remove("mock.xml")
     except:
          pass
     
