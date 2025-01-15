@@ -323,9 +323,10 @@ class TLPod(BaseModel):
     def get_filename_to_match(self) -> str:
         if self.override_filename:
             self.notifications.prep_syslog(message="filename override is turned ON")
-            return self.filename_to_match.lower()
+            file = (self.filename_to_match + ".wav").lower()
+            return file
         today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
-        return (self.filename_to_match + today_date).lower()
+        return (self.filename_to_match + today_date + ".wav").lower()
 
     def match_file(self):
         '''match the name of the program that has today's date in the filename'''
@@ -335,8 +336,9 @@ class TLPod(BaseModel):
             self.notifications.prep_syslog(message=f"searching for {to_match} in {dest}...")
             files = glob.glob(f"{dest}/*.wav")
             for file in files:
-                if to_match in file.lower():
-                    self.notifications.prep_syslog(message="found matching file!")
+                basename = os.path.basename(file)
+                if to_match == basename.lower():
+                    self.notifications.prep_syslog(message=f"found matching file: {file}")
                     return file
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
         self.notifications.send_notifications(message=to_send, subject='Error')
