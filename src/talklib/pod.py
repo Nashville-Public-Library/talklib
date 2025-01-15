@@ -170,24 +170,47 @@ class Episode(BaseModel):
         self.notifications.prep_syslog(message=f"itunes:duration will be {result}")
         return result
     
-    def check_for_duplicate_episode(self, title: str):
+    def get_root_feed_file(self):
+        ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
+        ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
+        feed = ET.parse(self.feed_file)
+        root = feed.getroot()
+        return root
+
+    
+    def check_for_duplicate_episode(self):
         self.notifications.prep_syslog(message="checking for duplicate episode...")
-        if title == self.episode_title:
-            self.cleanup_files_on_abort()
-            to_send = "Found episode with identical title already in feed. Aborting..."
-            self.notifications.send_notifications(message=to_send, subject="Error")
-            raise Exception (to_send)
+        root = self.get_root_feed_file()
+        channel = root.find("channel")
+        items = channel.findall("item")
+        for item in items:
+            item = item.find("title").text
+            if item == self.episode_title:
+                to_send = "Found episode with identical title already in feed. Aborting..."
+                self.notifications.send_notifications(message=to_send, subject="Error")
+                self.cleanup_files_on_abort()
+                raise Exception (to_send)
         self.notifications.prep_syslog(message="no duplicate episode found")
         return
     
     def cleanup_files_on_abort(self):
+        self.notifications.prep_syslog(message=f"Aborting automation, deleting local temp files...")
         files = glob.glob("*.mp3")
         for file in files:
-            self.notifications.prep_syslog(message=f"Aborting automation, deleting local temp files: {file}")
-            os.remove(file)
-        self.notifications.prep_syslog(message=f"Aborting automation, deleting local temp files: feed.xml")   
-        os.remove("feed.xml")
-        
+            self.notifications.prep_syslog(message=f"Attempting to delete: {file}")
+            try:
+                os.remove(file)
+                self.notifications.prep_syslog(message=f"Successfully deleted: {file}")
+            except:
+                self.notifications.prep_syslog(message=f"Unable to delete {file}")
+
+        self.notifications.prep_syslog(message=f"Attempting to delete: feed.xml")
+        try:          
+            os.remove("feed.xml")
+            self.notifications.prep_syslog(message=f"Successfully deleted: feed.xml")
+        except:
+            self.notifications.prep_syslog(message=f"Unable to delete:: feed.xml")
+
     def add_new_episode(self):
         '''Create an 'item' element. Then create all of the necessary sub elements and append them to the item element'''
         ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
@@ -197,10 +220,7 @@ class Episode(BaseModel):
         root = root.find('channel')
 
         # if we have a new feed, or a feed with no episodes
-        try:
-            self.check_for_duplicate_episode(title=root.find("item").find("title").text)
-        except:
-            pass
+        self.check_for_duplicate_episode()
 
         self.notifications.prep_syslog(message="Building the new <item> element")
         item = ET.Element('item')

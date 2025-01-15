@@ -6,8 +6,8 @@ import shutil
 from pydantic_core import ValidationError
 import pytest
 
-from talklib.pod import TLPod
-from .mock import mock_destinations
+from talklib.pod import TLPod, Episode
+from .mock import mock_destinations, download_test_file
 
 
 def test_type_1():
@@ -115,15 +115,44 @@ def test_match_bucket_folder_1():
     with pytest.raises(Exception):
         test.run()
 
+def test_check_for_duplicate_episode_1():
+    '''if a matching title is found in episode list, an exception should be raised'''
+    ep = Episode(
+            feed_file="mock.xml",
+            audio_filename=download_test_file(),
+            bucket_folder="none",
+            episode_title="Mock Title 011525"
+      )
+    ep.notifications.notify.enable_all = False
+    with pytest.raises(Exception):
+        ep.check_for_duplicate_episode()
+
+def test_check_for_duplicate_episode_2():
+    '''no exception if matching title is not found'''
+    ep = Episode(
+            feed_file="mock.xml",
+            audio_filename=download_test_file(),
+            bucket_folder="none",
+            episode_title="Not A Duplicate Title"
+      )
+    # with pytest.raises(Exception):
+    ep.notifications.notify.enable_all = False
+    ep.check_for_duplicate_episode()
+
 def teardown():
     today = datetime.now().strftime("%m%d%y")
 
     today = f'test{today}.wav'
     try:
         os.remove(today)
-        shutil.rmtree(mock_destinations())
     except:
          pass
-        
+    
+    try:
+         os.remove("input.mp3")
+    except:
+         pass
+    
+    shutil.rmtree(mock_destinations())
 
 atexit.register(teardown)
