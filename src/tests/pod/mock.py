@@ -86,3 +86,41 @@ def write_mock_feed():
     tree = ET.fromstring(mock_feed)
     ET.ElementTree(tree).write("mock.xml", encoding="UTF-8", xml_declaration=True)
     return "mock.xml"
+
+mock_feed_no_items = """
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+  <channel>
+    <title>Mock Title</title>
+    <link>http://nashvilletalkinglibrary.org/</link>
+    <atom:link href="http://someURL/shows/wsj/feed.xml" rel="self" type="application/rss+xml" />
+    <description>
+    Mock feed file. Does not exist. Why are you reading this? 
+    </description>
+    <copyright>© 1975-2022 Nashville Talking Library - Do not copy or redistribute</copyright>
+    <docs>https://cyber.harvard.edu/rss/rss.html</docs>
+    <generator>NTL Python Magic</generator>
+    <webMaster>nashvilletalkinglibrary@gmail.com (Darth Vader)</webMaster>
+    <itunes:owner>
+      <itunes:name>Nashville Talking Library</itunes:name>
+      <itunes:email>ntl@nashville.gov</itunes:email>
+    </itunes:owner>
+    <itunes:category text="Education" />
+    <itunes:explicit>true</itunes:explicit>
+    <itunes:image href="http://someURL/shows/wsj/image.jpg" />
+    <image>
+      <url>http://someURL/shows/wsj/image.jpg</url>
+      <title>Wall Street Journal</title>
+      <link>http://nashvilletalkinglibrary.org/</link>
+    </image>
+    <language>en</language>
+    <lastBuildDate>Wed, 15 Jan 2025 15:02:49 -0600</lastBuildDate>
+  </channel>
+</rss>
+"""
+
+def write_mock_feed_no_items():
+    ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
+    ET.register_namespace(prefix="itunes", uri="http://www.itunes.com/dtds/podcast-1.0.dtd")
+    tree = ET.fromstring(mock_feed_no_items)
+    ET.ElementTree(tree).write("mock_no_items.xml", encoding="UTF-8", xml_declaration=True)
+    return "mock_no_items.xml"

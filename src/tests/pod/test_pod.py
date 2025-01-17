@@ -1,5 +1,5 @@
 import atexit
-from datetime import datetime
+import glob
 import os
 import shutil
 
@@ -7,7 +7,7 @@ from pydantic_core import ValidationError
 import pytest
 
 from talklib.pod import TLPod, Episode
-from .mock import mock_destinations, download_test_file, write_mock_feed
+from .mock import mock_destinations, download_test_file, write_mock_feed, write_mock_feed_no_items
 
 
 def test_type_1():
@@ -135,28 +135,26 @@ def test_check_for_duplicate_episode_2():
             bucket_folder="none",
             episode_title="Not A Duplicate Title"
       )
-    # with pytest.raises(Exception):
+    ep.notifications.notify.enable_all = False
+    ep.check_for_duplicate_episode()
+
+def test_check_for_duplicate_episode_3():
+    '''no exception even if there are no items in the feed'''
+    ep = Episode(
+            feed_file=write_mock_feed_no_items(),
+            audio_filename=download_test_file(),
+            bucket_folder="none",
+            episode_title="Not A Duplicate Title"
+      )
     ep.notifications.notify.enable_all = False
     ep.check_for_duplicate_episode()
 
 def teardown():
-    today = datetime.now().strftime("%m%d%y")
-
-    today = f'test{today}.wav'
-    try:
-        os.remove(today)
-    except:
-         pass
-    
-    try:
-         os.remove("input.mp3")
-    except:
-         pass
-    
-    try:
-         os.remove("mock.xml")
-    except:
-         pass
+    """remove temp files/folders that were created for the tests"""
+    files = glob.glob("*.wav") + glob.glob("*.mp3") + glob.glob("*.xml")
+    for file in files:
+         os.remove(file)
+         print("removed" + file)
     
     shutil.rmtree(mock_destinations())
 
