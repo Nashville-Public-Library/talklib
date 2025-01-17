@@ -2,7 +2,7 @@
 
 ![tests](https://github.com/Nashville-Public-Library/talklib/actions/workflows/talklib.yml/badge.svg)
 [![GitHub issues](https://img.shields.io/github/issues/Nashville-Public-Library/talklib.png)](https://github.com/Nashville-Public-Library/talklib/issues)
-[![last-commit](https://img.shields.io/github/last-commit/Nashville-Public-Library/talklib)](https://github.com/Nashville-Public-Library/talklib/commits/master)
+[![last-commit](https://img.shields.io/github/last-commit/Nashville-Public-Library/talklib)](https://github.com/Nashville-Public-Library/talklib/commits/main)
 
 ## A package to automate processing TL shows/segments and podcasts
 
@@ -368,9 +368,17 @@ SD.run()
 
 ## TL Podcasts Usage
 
-`TLPod` is the main class to use.
+### Prerequisites
 
-Import the class to your script like this:
+Before starting to podcast a new show, you must log in to the server and create a directory. The directory should be named the same as the base name of the audio files for that show. For example, The Nashville Scene audio files are labelled as SceneMMDDYY. The directory name on the server should be `scene` in all lower-case.
+
+You must also add two files to this directory: an RSS Feed and and an image.
+
+The RSS feed should be named `feed.xml`. The image (the logo for the show) should be named `image.jpg`. You should update the template RSS feed file for each program. There are several default values such as Title that need to be changed. They are marked as such in the template.
+
+### Scripts
+
+`TLPod` is the main class to use. Import the class to your script like this:
 
 ````python
 from talklib import TLPod
@@ -390,23 +398,11 @@ from talklib import TLPod
 nyt = TLPod(
     display_name = "New York Times",
     filename_to_match = "nyt",
-    categories = ["News and Politics"]
 )
 nyt.run()
 ````
 
-To add multiple category tags, do this:
 
-````python
-from talklib import TLPod
-
-nyt = TLPod(
-    display_name = "New York Times",
-    filename_to_match = "nyt",
-    categories = ["News and Politics", "National News", "International News"]
-)
-nyt.run()
-````
 
 The default number of episodes allowed in a podcast feed at any given time is 5. To change that:
 
@@ -416,7 +412,6 @@ from talklib import TLPod
 nyt = TLPod(
     display_name = "New York Times",
     filename_to_match = "nyt",
-    categories = ["News and Politics"],
     max_episodes_in_feed = 7
 )
 nyt.run()
