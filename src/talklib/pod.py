@@ -115,6 +115,9 @@ class SSH(BaseModel):
                 ret_val.append(file.lower())
         return ret_val
 
+    def get_feed_from_folder(self, folder: str):
+        self.download_file(file="feed.xml", folder=folder)
+
     def check_folder_exists(self, folder: str) -> bool:
         self.notifications.prep_syslog(message=f"checking if {folder}/ exists on server...")
         folders = self.get_folders()
