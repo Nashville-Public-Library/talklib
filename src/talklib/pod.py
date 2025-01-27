@@ -8,6 +8,7 @@ import time
 from typing import ClassVar, Type
 
 from fabric import Connection, Result
+from paramiko.ssh_exception import SSHException as paramiko_SSH_exception
 from pydantic import BaseModel, Field, model_validator
 
 from talklib.ev import EV
@@ -69,8 +70,9 @@ class SSH(BaseModel):
             self.connection.get(remote=f"shows/{folder}/{file}")
             self.notifications.prep_syslog(message=f"Successfully downloaded '{file}' to {os.getcwd()}")
             return file
-        except Exception as e:
-            to_send = f"unable to download '{file}': {e}"
+        except paramiko_SSH_exception as e:
+            to_send = f"unable to download '{file}' due to an authentication error. Are your SSH keys correctly configured?\n\
+The error from the SSH library is: {e}"
             self.notifications.send_notifications(message=to_send, subject='Error')
             raise e
 
