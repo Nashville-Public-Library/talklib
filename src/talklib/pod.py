@@ -75,6 +75,10 @@ class SSH(BaseModel):
 The error from the SSH library is: {e}"
             self.notifications.send_notifications(message=to_send, subject='Error')
             raise e
+        except FileNotFoundError as e:
+            to_send = f"Unable to download {file} from /{folder}. It seems the file does not exist: {e}"
+            self.notifications.send_notifications(message=to_send, subject='Error')
+            raise e
 
     def delete_file(self, file: str, folder: str) -> None:
         try:
