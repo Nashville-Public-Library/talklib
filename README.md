@@ -6,6 +6,8 @@
 
 ## A package to automate processing TL shows/segments and podcasts
 
+[talklib on PyPI](https://pypi.org/project/talklib/)
+
 [Skip to Examples](#examples)
 
 *THIS README IS INTENDED TO ASSIST TL STAFF IN INSTALLING AND USING THIS PACKAGE*
@@ -30,7 +32,7 @@ Use Python 3.10 or higher.
 Make sure to select "add to PATH" during installation.
 
 ### -[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)
-You need Windows binaries for both FFmpeg & FFprobe installed on the PC and added to the PATH:
+You need both FFmpeg & FFprobe installed on the PC and added to the PATH:
 
 To repeat, **this package will not work without FFmpeg and FFprobe**. 
 
@@ -38,6 +40,8 @@ FFmpeg and FFprobe should be two separate binaries.
 
 ### -[Twilio](https://www.twilio.com/)
 Twilio is used for SMS and phone call notifications.
+
+THIS IS NOT SOMETHING YOU NEED TO DOWNLOAD/INSTALL.
 
 Access our TL Twilio info (token, etc.) by [logging in](https://www.twilio.com/login) to Twilio.
 
@@ -71,7 +75,7 @@ Before we begin, a general note:
 - The "Run" command in WR defaults to running from a different directory AND a different drive letter. This causes confusion.
 - WR also does not run `.py` files by default. 
 - These are some of the reasons why we do not run `.py` files directly from WR.
-- Instead, we tell WR to run a Batch script (`.bat` file) which in turn will run the Python script (`.py` file).
+- Instead, we tell WR to run a Batch script (`.bat` file) which in turn will automatically run the Python script (`.py` file).
 - Ensure the Batch & Python scripts are in the same directory.
 - A sample `.bat` file (`Example.bat`) is included in the [misc](https://github.com/Nashville-Public-Library/misc/tree/main/talklib_examples) repo. 
     - Download this file and place it in the same folder as your Python file.
@@ -86,7 +90,7 @@ D:\wireready
         -WP.bat
         -WP.py
 ````
-You would schedule WR to run the `WP.bat` file, which would run the `WP.py` file.
+You would schedule WR to run the `WP.bat` file, which would automatically run the `WP.py` file.
 
 ----
 
@@ -427,7 +431,6 @@ from talklib import TLPod
 nyt = TLPod(
     display_name = "New York Times",
     filename_to_match = "nyt",
-    categories = ["News and Politics"],
 )
 nyt.notifications.notify.enable_all = False
 nyt.run()
