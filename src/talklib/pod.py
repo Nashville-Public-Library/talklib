@@ -347,15 +347,20 @@ class TLPod(BaseModel):
         prefix = f"{self.display_name} (podcast)"
         Notifications.prefix = prefix
 
+        self.display_name = f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})"
+
         return self
     
     def get_filename_to_match(self) -> str:
         if self.override_filename:
             self.notifications.prep_syslog(message="filename override is turned ON")
-            file = (self.filename_to_match + ".wav").lower()
+            file = (self.filename_to_match).lower()
             return file
         today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
-        return (self.filename_to_match + today_date + ".wav").lower()
+        return (self.filename_to_match + today_date).lower()
+
+    def get_alt_endings(self):
+       alt: tuple = ("r", "s", "dnp")
 
     def match_file(self):
         '''match the name of the program that has today's date in the filename'''
@@ -365,9 +370,18 @@ class TLPod(BaseModel):
             self.notifications.prep_syslog(message=f"searching for {to_match} in {dest}...")
             files = glob.glob(f"{dest}/*.wav")
             for file in files:
-                basename = os.path.basename(file)
-                if to_match == basename.lower():
+                if to_match in file.lower():
                     self.notifications.prep_syslog(message=f"found matching file: {file}")
+
+                    if "Copy" in file:
+                        self.notifications.prep_syslog(message=f"skipping file with 'copy' in filename: {file}")
+                        continue
+                    
+                    if file.endswith("dnp.wav"):
+                        to_send = f"'dnp' found in filename ({file}), will not podcast. Exiting automation!"
+                        self.notifications.send_notifications(message=to_send, subject="Error")
+                        raise Exception (to_send)
+                    
                     return file
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
         self.notifications.send_notifications(message=to_send, subject='Error')
@@ -423,7 +437,7 @@ class TLPod(BaseModel):
         self.episode.feed_file = feed_file
         self.episode.audio_filename = converted_file
         self.episode.bucket_folder = self.bucket_folder
-        self.episode.episode_title = f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})"
+        self.episode.episode_title = self.display_name
         self.episode.max_episodes = self.max_episodes_in_feed
        
         self.episode.add_new_episode()
