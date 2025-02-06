@@ -68,7 +68,7 @@ def test_notif_prefix():
             display_name="mahhh",
             filename_to_match='mah'
       )
-      assert test.display_name in test.notifications.prefix
+      assert "mahhh" in test.notifications.prefix
             
 def test_bucket_filename_match():
           '''if no bucket folder is set explicitly, bucket folder should be set to filename_to_match'''

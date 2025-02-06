@@ -347,15 +347,35 @@ class TLPod(BaseModel):
         prefix = f"{self.display_name} (podcast)"
         Notifications.prefix = prefix
 
+        self.display_name = f"{self.display_name} ({datetime.now().strftime('%a, %d %b')})"
+
         return self
     
     def get_filename_to_match(self) -> str:
         if self.override_filename:
             self.notifications.prep_syslog(message="filename override is turned ON")
-            file = (self.filename_to_match + ".wav").lower()
+            file = (self.filename_to_match).lower()
             return file
         today_date: str = datetime.now().strftime("%m%d%y") # this is how we date our programs: MMDDYY
-        return (self.filename_to_match + today_date + ".wav").lower()
+        return (self.filename_to_match + today_date).lower()
+
+    def check_alt_endings(self,file: str):
+        file_lower_case: str = file.lower()
+        
+        if file_lower_case.endswith("-sub.wav"):
+            self.notifications.prep_syslog(message=f"'-sub' found in filename: {file}. Amending 'display_name' for episode...")
+            self.display_name = f"{self.display_name} (Substitute)"
+            self.notifications.prep_syslog(message=f"New display_name: {self.display_name}")
+
+        if file_lower_case.endswith("-rep.wav"):
+            self.notifications.prep_syslog(message=f"'-rep' found in filename: {file}. Amending 'display_name' for episode...")
+            self.display_name = f"{self.display_name} (Encore)"
+            self.notifications.prep_syslog(message=f"New display_name: {self.display_name}")
+        
+        if file_lower_case.endswith("-dnp.wav"):
+            to_send = f"'-dnp' found in filename ({file}), will NOT podcast this episode. Exiting automation!"
+            self.notifications.send_notifications(message=to_send, subject="Info", syslog_level="info")
+            raise Exception (to_send)
 
     def match_file(self):
         '''match the name of the program that has today's date in the filename'''
@@ -365,10 +385,17 @@ class TLPod(BaseModel):
             self.notifications.prep_syslog(message=f"searching for {to_match} in {dest}...")
             files = glob.glob(f"{dest}/*.wav")
             for file in files:
-                basename = os.path.basename(file)
-                if to_match == basename.lower():
+                if to_match in file.lower():
                     self.notifications.prep_syslog(message=f"found matching file: {file}")
+
+                    if "Copy (" in file:
+                        self.notifications.prep_syslog(message=f"skipping file with 'copy' in filename: {file}")
+                        continue
+
+                    self.check_alt_endings(file=file)
+                    
                     return file
+                
         to_send = f"There was a problem podcasting {self.display_name}. Cannot find matched file {to_match} in {self.audio_folders}"
         self.notifications.send_notifications(message=to_send, subject='Error')
         raise FileNotFoundError
@@ -423,7 +450,7 @@ class TLPod(BaseModel):
         self.episode.feed_file = feed_file
         self.episode.audio_filename = converted_file
         self.episode.bucket_folder = self.bucket_folder
-        self.episode.episode_title = f"{self.display_name} ({datetime.now().strftime('%a, %d %B')})"
+        self.episode.episode_title = self.display_name
         self.episode.max_episodes = self.max_episodes_in_feed
        
         self.episode.add_new_episode()
