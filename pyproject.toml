@@ -23,3 +23,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 include = ["talklib*"]
 exclude = [".tests*"]
+
+
+[project.scripts]
+talklib = "talklib.cli:main"
