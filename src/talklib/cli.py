@@ -3,6 +3,8 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 
+from talklib.pod import SSH
+
 def parse_args():
     parser = argparse.ArgumentParser(description="use talklib in the terminal")
 
@@ -29,12 +31,17 @@ def generate_feed_template():
 
 def new_podcast_dir(name: str):
     if not os.path.isfile("feed.xml"):
-        return print("cannot find 'feed.xml' in " + os.getcwd())
+        return print(f"cannot find 'feed.xml' in {os.getcwd()}. You must have this file in the current directory.")
 
     if not os.path.isfile("image.jpg"):
-        return print("cannot find 'image.jpg' in " + os.getcwd())
+        return print(f"cannot find 'image.jpg' in {os.getcwd()}. You must have this file in the current directory.")
 
     print("generating new podcast directory called " + name)
+
+    ssh = SSH()
+    ssh.make_new_folder(folder=name)
+    ssh.upload_file(file="feed.xml", folder=name)
+    ssh.upload_file(file="image.jpg", folder=name)
 
     print("done! you can now delete the local copies of the files")
     return
