@@ -90,6 +90,12 @@ The error from the SSH library is: {e}"
             self.notifications.send_notifications(
                 message=f"Unable to delete '{file}' from {folder}: {e}. Continuing automation...",
                 subject="Error")
+            
+    def make_new_folder(self, folder: str) -> None:
+        if self.check_folder_exists_no_exception(folder=folder):
+            raise Exception (f"{folder}/ already exists on server! Exiting...")
+        self.connection.run(f"cd shows && mkdir {folder}", hide=True)
+        self.notifications.prep_syslog(message=f"{folder}/ created on server")
 
     def get_folders(self) -> list:
         ret_val: list = []
@@ -134,6 +140,13 @@ The error from the SSH library is: {e}"
         to_send = f"cannot find folder titled: {folder}/ on server"
         self.notifications.send_notifications(message=to_send, subject='Error')
         raise Exception (to_send)
+    
+    def check_folder_exists_no_exception(self, folder: str):
+        self.notifications.prep_syslog(message=f"checking if {folder}/ exists on server...")
+        folders = self.get_folders()
+        if folder.lower() in folders:
+            self.notifications.prep_syslog(message=f"{folder}/ exists on server!")
+            return True
     
 
 class Episode(BaseModel):

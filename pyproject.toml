@@ -1,6 +1,6 @@
 [project]
 name = "talklib"
-version = "2.2.1"
+version = "3.0.0"
 description = "A package to automate processing of shows/segments airing on the TL"
 readme = "README.md"
 license = {file = "LICENSE.txt"}
@@ -23,3 +23,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 include = ["talklib*"]
 exclude = [".tests*"]
+
+
+[project.scripts]
+talklib = "talklib.cli:main"
