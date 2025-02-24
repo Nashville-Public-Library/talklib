@@ -4,12 +4,14 @@ import glob
 import math
 import os
 import re
+import subprocess
 import time
 from typing import ClassVar, Type
 
 from fabric import Connection, Result
 from paramiko.ssh_exception import SSHException as paramiko_SSH_exception
 from pydantic import BaseModel, Field, model_validator
+import requests
 
 from talklib.ev import EV
 from talklib.notify import Notify
@@ -418,15 +420,13 @@ class TLPod(BaseModel):
         output_filename = output_filename[0]
         output_filename = os.path.basename(output_filename).lower()
         output_filename = output_filename + '.mp3'
-        self.notifications.prep_syslog(message=f"Converted audio file will be {output_filename}")
+        self.notifications.prep_syslog(message=f"final audio file will be {output_filename}")
         return output_filename
 
     def convert(self, file:str):
-        output_filename = self.create_converted_filename(file=file)
-
         self.ffmpeg.input_file = file
-        self.ffmpeg.output_file = output_filename
-        self.ffmpeg.compression = False # this is for podcasts. these files should already be edited
+        self.ffmpeg.output_file = "out.mp3"
+        self.ffmpeg.compression = False # this is for podcasts. these files should already be edited  
         
         ffmpeg_commands = self.ffmpeg.get_commands()
         self.notifications.prep_syslog(message=f"FFmppeg commands: {ffmpeg_commands}")
@@ -439,6 +439,32 @@ class TLPod(BaseModel):
         except Exception as ffmpeg_exception:
             self.notifications.send_notifications(message=f'FFmpeg error: {ffmpeg_exception}', subject='Error')
             raise ffmpeg_exception
+        
+    def concat(self, preroll:str, program_audio: str, output_filename: str):
+        self.notifications.prep_syslog(message="concatenating preroll and program audio together...")
+        subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i "concat:{preroll}|{program_audio}" -c copy {output_filename}')
+        self.notifications.prep_syslog(message=f"files successfully concatenated as: {output_filename}")
+        return output_filename
+
+    def download_preroll(self):
+        download_URL = "https://assets.library.nashville.org/talkinglibrary/pod_preroll.mp3"
+        input_file = 'preroll.mp3'
+        with open (input_file, mode='wb') as downloaded_file:
+            self.notifications.prep_syslog(message=f"downloading preroll audio from {download_URL}...")
+            a = requests.get(download_URL)
+            downloaded_file.write(a.content)
+            downloaded_file.close()
+        self.notifications.prep_syslog(message="preroll audio successfully downloaded")
+        return downloaded_file.name
+    
+    def post_cleaup(self):
+        self.notifications.prep_syslog(message="looking for local files to delete...")
+        XML_files = glob.glob("*.xml")
+        for file in XML_files:
+            self.delete_local_file(file=file)
+        MP3_files = glob.glob("*.mp3")
+        for file in MP3_files:
+            self.delete_local_file(file=file)
     
     def delete_local_file(self, file: str):
         try:
@@ -457,11 +483,14 @@ class TLPod(BaseModel):
 
         audio_file = self.match_file()
         converted_file = self.convert(file=audio_file)
+        output_filename = self.create_converted_filename(file=audio_file)
+        preroll = self.download_preroll()
+        concat_file = self.concat(preroll=preroll, program_audio=converted_file, output_filename=output_filename)
 
         feed_file = self.ssh.download_file(folder=self.bucket_folder, file='feed.xml') # all XML files on server should have the same name
 
         self.episode.feed_file = feed_file
-        self.episode.audio_filename = converted_file
+        self.episode.audio_filename = concat_file
         self.episode.bucket_folder = self.bucket_folder
         self.episode.episode_title = self.display_name
         self.episode.max_episodes = self.max_episodes_in_feed
@@ -469,10 +498,9 @@ class TLPod(BaseModel):
         self.episode.add_new_episode()
         self.episode.remove_old_episodes()
     
-        self.ssh.upload_file(folder=self.bucket_folder, file=converted_file)
+        self.ssh.upload_file(folder=self.bucket_folder, file=concat_file)
         self.ssh.upload_file(folder=self.bucket_folder, file=feed_file)
 
-        self.delete_local_file(file=feed_file)
-        self.delete_local_file(file=converted_file)
+        self.post_cleaup()
 
         self.notifications.prep_syslog(message="All done.")
