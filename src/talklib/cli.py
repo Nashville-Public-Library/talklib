@@ -15,9 +15,16 @@ def parse_args():
         You MUST have an RSS feed (feed.xml) and logo (image.jpg) in the current directory."
     parser.add_argument('--new-pod-dir', type=str, help=new_podcast_directory_help, required=False)
 
+    download_feed_help:str = "download the RSS feed from the folder on the server you specify"
+    parser.add_argument('--download-feed', type=str, help=download_feed_help, required=False)
+
     args = parser.parse_args()
 
     return args
+
+def download_feed(name: str):
+    ssh = SSH()
+    ssh.get_feed_from_folder(folder=name)
 
 def generate_feed_template():
     ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
@@ -52,9 +59,11 @@ def main():
     args = parse_args()
 
     if args.feed_template:
-        generate_feed_template()
+        return generate_feed_template()
     if args.new_pod_dir:
-        new_podcast_dir(name=args.new_pod_dir)
+        return new_podcast_dir(name=args.new_pod_dir)
+    if args.download_feed:
+        return download_feed(name=args.download_feed)
 
 feed_template: str = """
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">

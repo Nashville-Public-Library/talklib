@@ -67,6 +67,7 @@ class SSH(BaseModel):
             raise e
 
     def download_file(self, file: str, folder: str) -> None:
+        folder = folder.lower()
         try:
             self.notifications.prep_syslog(message=f"Attempting to download '{file}' from {folder}/ on server")
             self.connection.get(remote=f"shows/{folder}/{file}")
@@ -130,6 +131,7 @@ The error from the SSH library is: {e}"
         return ret_val
 
     def get_feed_from_folder(self, folder: str):
+        self.check_folder_exists(folder=folder)
         self.download_file(file="feed.xml", folder=folder)
 
     def check_folder_exists(self, folder: str) -> bool:
