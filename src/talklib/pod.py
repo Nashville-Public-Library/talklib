@@ -95,6 +95,7 @@ The error from the SSH library is: {e}"
                 subject="Error")
             
     def make_new_folder(self, folder: str) -> None:
+        folder = folder.lower()
         if self.check_folder_exists_no_exception(folder=folder):
             raise Exception (f"{folder}/ already exists on server! Exiting...")
         self.connection.run(f"cd shows && mkdir {folder}", hide=True)
@@ -133,6 +134,9 @@ The error from the SSH library is: {e}"
     def get_feed_from_folder(self, folder: str):
         self.check_folder_exists(folder=folder)
         self.download_file(file="feed.xml", folder=folder)
+
+    def upload_feed_to_folder(self, folder:str):
+        self.upload_file(file="feed.xml", folder=folder)
 
     def check_folder_exists(self, folder: str) -> bool:
         self.notifications.prep_syslog(message=f"checking if {folder}/ exists on server...")

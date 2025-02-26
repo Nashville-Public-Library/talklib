@@ -3,7 +3,7 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 
-from talklib.pod import SSH
+from talklib.pod import SSH, Notifications
 
 def parse_args():
     parser = argparse.ArgumentParser(description="use talklib in the terminal")
@@ -15,16 +15,31 @@ def parse_args():
         You MUST have an RSS feed (feed.xml) and logo (image.jpg) in the current directory."
     parser.add_argument('--new-pod-dir', type=str, help=new_podcast_directory_help, required=False)
 
-    download_feed_help:str = "download the RSS feed from the folder on the server you specify"
+    download_feed_help:str = "Download the RSS feed from the folder on the server you specify."
     parser.add_argument('--download-feed', type=str, help=download_feed_help, required=False)
 
-    args = parser.parse_args()
+    upload_feed_help:str = "Upload the RSS feed to the folder on the server you specify."
+    parser.add_argument('--upload-feed', type=str, help=upload_feed_help, required=False)
 
+    args = parser.parse_args()
     return args
 
+def get_SSH():
+    Notifications.prefix = "talklib CLI"
+    notifications = Notifications()
+    notifications.notify.email_enable = False
+    ssh = SSH(notifications=notifications)
+    return ssh
+
 def download_feed(name: str):
-    ssh = SSH()
+    ssh = get_SSH()
     ssh.get_feed_from_folder(folder=name)
+
+def upload_feed(name:str):
+    if not os.path.isfile("feed.xml"):
+        return print(f"cannot find 'feed.xml' in {os.getcwd()}. You must have this file in the current directory.")
+    ssh = get_SSH()
+    ssh.upload_feed_to_folder(folder=name)
 
 def generate_feed_template():
     ET.register_namespace(prefix="atom", uri="http://www.w3.org/2005/Atom")
@@ -64,6 +79,8 @@ def main():
         return new_podcast_dir(name=args.new_pod_dir)
     if args.download_feed:
         return download_feed(name=args.download_feed)
+    if args.upload_feed:
+        return upload_feed(name=args.upload_feed)
 
 feed_template: str = """
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
