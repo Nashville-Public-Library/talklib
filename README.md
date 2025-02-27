@@ -423,7 +423,7 @@ nyt.run()
 
 To disable ALL notifications, add a line like this:
 
-> This will disable all notifications **including** syslog messages
+> This will disable all notifications **including** syslog messages (shell print statements will not be disabled)
 
 ````python
 from talklib import TLPod
