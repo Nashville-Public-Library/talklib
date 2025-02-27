@@ -1,6 +1,6 @@
 [project]
 name = "talklib"
-version = "3.1.0"
+version = "3.2.0"
 description = "A package to automate processing of shows/segments airing on the TL"
 readme = "README.md"
 license = {file = "LICENSE.txt"}
