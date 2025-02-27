@@ -370,6 +370,14 @@ class TLPod(BaseModel):
 
         self.display_name = f"{self.display_name} ({datetime.now().strftime('%a, %d %b')})"
 
+        # before we carry on, make sure we can successfully connect to the server
+        try:
+            self.ssh.connection.run("ls")
+        except Exception as e:
+            to_send:str = f"Cannot connect to server. Are you sure the SSH keys are set up correctly? Here is the error: {e}"
+            self.notifications.send_notifications(message=to_send, subject="Error")
+            raise e
+
         return self
     
     def get_filename_to_match(self) -> str:
