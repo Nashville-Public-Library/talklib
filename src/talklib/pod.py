@@ -20,7 +20,7 @@ from talklib.utils import today_is_weekday
 
 class Notifications(BaseModel):
     prefix: ClassVar[str] = None  # prefix all messages with identifier for the show/podcast
-    notify: Type[Notify] = Notify()
+    notify: ClassVar[Type[Notify]] = Notify()
 
     def prep_syslog(self, message: str, level: str = 'info'):
         '''send message to syslog server'''
@@ -349,9 +349,9 @@ class TLPod(BaseModel):
     override_filename: bool = False
     audio_folders:list = EV().destinations
     notifications: Type[Notifications] = Notifications()
-    episode: Type[Episode] = Episode(notifications=notifications)
+    episode: Type[Episode] = Episode()
     ffmpeg: Type[FFMPEG] = FFMPEG()
-    ssh: Type[SSH] = SSH(notifications=notifications)
+    ssh: Type[SSH] = SSH()
 
     @model_validator(mode='after')
     def post_update(self):
