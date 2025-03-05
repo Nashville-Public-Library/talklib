@@ -8,6 +8,9 @@ from talklib.pod import SSH, Notifications
 def parse_args():
     parser = argparse.ArgumentParser(description="use talklib in the terminal")
 
+    gui_help: str = "launch the GUI"
+    parser.add_argument('--gui', action='store_true', help=gui_help)
+
     feed_template_help = "Generate an RSS feed template in the current directory"
     parser.add_argument('--feed-template', action='store_true', help=feed_template_help, required=False)
 
@@ -68,11 +71,16 @@ def new_podcast_dir(name: str):
     print("done! you can now delete the local copies of the files")
     return
 
+def launch_gui():
+    import talklib.gui
+
 def main():
     if len(sys.argv) == 1: # if no arguments are passed
         return print("talklib -h for help")
     args = parse_args()
 
+    if args.gui:
+        return launch_gui()
     if args.feed_template:
         return generate_feed_template()
     if args.new_pod_dir:
