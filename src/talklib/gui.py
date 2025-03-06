@@ -25,6 +25,7 @@ rows = cursor.execute("SELECT * FROM tlshow")
 for row in rows:
     print(row)
 
+connection.commit()
 cursor.close()
 connection.close()
 
