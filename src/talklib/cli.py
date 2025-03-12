@@ -60,7 +60,7 @@ def new_podcast_dir(name: str):
 
     print("generating new podcast directory called " + name)
 
-    ssh = SSH()
+    ssh = get_SSH()
     ssh.make_new_folder(folder=name)
     ssh.upload_file(file="feed.xml", folder=name)
     ssh.upload_file(file="image.jpg", folder=name)
