@@ -1,6 +1,7 @@
 import sqlite3
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog
 
 def sql_new_RSS_show(show, show_filename, url, include_date=0, remove_yesterday=0, check_if_above=0, check_if_below=0):
     connection = sqlite3.connect('D:/wireready/test.db')
@@ -57,17 +58,31 @@ def sql_read_table():
 
     return rows
 
+def open_file_explorer():
+    """Opens a file explorer dialog and prints the selected file path."""
+    filepath = filedialog.askopenfilename(
+        initialdir="D:/wireready", 
+        title="Load the DB file",
+        filetypes=(("db files", ".db"),)
+    )
+    if filepath:
+        print(f"Selected file: {filepath}")
+
+
 root = Tk()
 root.title("talklib GUI")
 root.geometry("1400x600")
 main_window = ttk.Frame(root)
 main_window.grid()
 
+db_button = ttk.Button(master=main_window, text="Locate DB file", padding=5, command=lambda:open_file_explorer())
+db_button.grid(sticky="e")
+
 names = ttk.Frame(main_window).grid()
 name_column_num = 1
 columns = sql_column_names()
 for column in columns:
-    label = ttk.Label(master=names, text=column[1]).grid(row=0, column=name_column_num, sticky="w")
+    label = ttk.Label(master=names, text=column[1]).grid(row=1, column=name_column_num, sticky="w")
     name_column_num +=1
 rows = sql_read_table()
 row_num = 1
