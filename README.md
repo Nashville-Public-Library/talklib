@@ -374,7 +374,9 @@ SD.run()
 
 ### Prerequisites
 
-Before starting to podcast a new show, you must log in to the server and create a directory. The directory should be named the same as the base name of the audio files for that show. For example, The Nashville Scene audio files are labelled as SceneMMDDYY. The directory name on the server should be `scene` in all lower-case.
+Before starting to podcast a new show, you must log in to the server, create a directory, and upload some files. The `talklib` CLI has several functions to help you with this. Run `talklib --help` in your terminal to see a list of these helper functions.
+
+The directory should be named the same as the base name of the audio files for that show. For example, The Nashville Scene audio files are labelled as SceneMMDDYY. The directory name on the server should be `scene` in all lower-case.
 
 You must also add two files to this directory: an RSS Feed and and an image.
 
@@ -423,7 +425,7 @@ nyt.run()
 
 To disable ALL notifications, add a line like this:
 
-> This will disable all notifications **including** syslog messages (shell print statements will not be disabled)
+> This will disable all notifications **including** syslog messages (terminal print statements will not be disabled)
 
 ````python
 from talklib import TLPod
@@ -435,6 +437,21 @@ nyt = TLPod(
 nyt.notifications.notify.enable_all = False
 nyt.run()
 ````
+
+If the name of the corresponding directory on the server is different from the `filename_to_match` value, adjust for that like this:
+
+````python
+from talklib import TLPod
+
+nyt = TLPod(
+    display_name = "New York Times",
+    filename_to_match = "nyt",
+    bucket_folder = "newyorktimes"
+)
+nyt.run()
+````
+
+> This will match audio files that start with `nyt`, and will upload the files to the server directory called `newyorktimes`.
 
 -----
 ## Development<a id="development"></a>
