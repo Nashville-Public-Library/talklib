@@ -43,7 +43,7 @@ class Notifications(BaseModel):
             self.prep_send_mail(message=message, subject=subject)
             self.prep_syslog(message=message, level=syslog_level)
         else:
-            self.send_sms_if_enabled(message=message)
+            self.send_sms_if_enabled(message=self.prefix + ": " + message)
             self.prep_send_mail(message=message, subject=subject)
             self.prep_syslog(message=message, level=syslog_level)
 
