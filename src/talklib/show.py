@@ -192,7 +192,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
             self.__prep_send_mail(message=message, subject=subject)
             self.__prep_syslog(message=message, level=syslog_level)
         else:
-            self.__send_sms_if_enabled(message=message)
+            self.__send_sms_if_enabled(message=self.show + ": " + message)
             self.__prep_send_mail(message=message, subject=subject)
             self.__prep_syslog(message=message, level=syslog_level)
 
