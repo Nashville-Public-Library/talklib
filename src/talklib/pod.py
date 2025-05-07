@@ -52,6 +52,7 @@ class SSH(BaseModel):
     user: str = EV().pod_server_uname
     connection: Type[Connection] = Connection(host=server, user=user)
     notifications: Notifications = Notifications()
+    folder_exists: ClassVar[str] = False
 
     def upload_file(self, file: str, folder: str) -> None:
         self.check_folder_exists(folder=folder)
@@ -139,10 +140,13 @@ The error from the SSH library is: {e}"
         self.upload_file(file="feed.xml", folder=folder)
 
     def check_folder_exists(self, folder: str) -> bool:
+        if SSH.folder_exists:
+            return True
         self.notifications.prep_syslog(message=f"checking if {folder}/ exists on server...")
         folders = self.get_folders()
         if folder.lower() in folders:
             self.notifications.prep_syslog(message=f"{folder}/ exists on server!")
+            SSH.folder_exists = True
             return True
         
         to_send = f"cannot find folder titled: {folder}/ on server"
