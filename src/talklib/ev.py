@@ -41,21 +41,27 @@ import os
 class EV:
     def __init__(self):
         self.destinations = sort_destinations() # where should output files go? MUST BE A LIST EVEN WITH ONLY ONE
-        self.syslog_host = os.environ["syslog_server"] # ip of syslog server (PC with syslog software)
-        self.fromEmail = os.environ['fromEmail']  # from where should emails appear to come?
-        self.toEmail = sort_to_email()  # to where should emails be sent?
-        self.mail_server = os.environ["mail_server_external"]  # IP of mail server (ITS set this up for us)
-        self.twilio_sid = os.environ['twilio_sid'] # locate by logging in to Twilio website
-        self.twilio_token = os.environ['twilio_token']# locate by logging in to Twilio website
-        self.twilio_from = os.environ['twilio_from'] # locate by logging in to Twilio website
+        self.syslog_host = get_EV(ev="syslog_server") # ip of syslog server (PC with syslog software)
+        self.fromEmail = get_EV(ev="fromEmail") # from where should emails appear to come?
+        self.toEmail = sort_to_email() # to where should emails be sent?
+        self.mail_server = get_EV(ev="mail_server_external")  # IP of mail server (ITS set this up for us)
+        self.twilio_sid = get_EV(ev="twilio_sid") # locate by logging in to Twilio website
+        self.twilio_token = get_EV(ev="twilio_token") # locate by logging in to Twilio website
+        self.twilio_from = get_EV(ev="twilio_from") # locate by logging in to Twilio website
         self.twilio_to = sort_twilio_to() # to where should texts/calls be sent
-        self.icecast_user = os.environ['icecast_user'] # our icecast username
-        self.icecast_pass = os.environ['icecast_pass'] # our icecast password
-        self.pod_server_uname = os.environ['pod_server_uname']
+        self.icecast_user = get_EV(ev="icecast_user") # our icecast username
+        self.icecast_pass = get_EV(ev="icecast_pass") # our icecast password
+        self.pod_server_uname = get_EV(ev="pod_server_uname")
 
+def get_EV(ev: str):
+    try:
+        ev = os.environ[ev]
+        return ev
+    except KeyError:
+        raise RuntimeError(f"Missing required environment variable: {ev}")
 
 def sort_destinations():
-    destinations = os.environ['destinations']
+    destinations = get_EV(ev="destinations")
     destinations = destinations.split(",")
     destination_list = []
     for destination in destinations:
@@ -66,7 +72,7 @@ def sort_destinations():
     return destination_list
 
 def sort_to_email():
-    to_emails = os.environ['toEmail']
+    to_emails = get_EV(ev="toEmail")
     to_emails = to_emails.split(",")
     to_email_list = []
     for email in to_emails:
@@ -76,7 +82,7 @@ def sort_to_email():
     return to_email_list
 
 def sort_twilio_to():
-    twilio_to_numbers = os.environ['twilio_to']
+    twilio_to_numbers = get_EV(ev="twilio_to")
     twilio_to_numbers = twilio_to_numbers.split(",")
     twilio_to_list = []
     for number in twilio_to_numbers:
