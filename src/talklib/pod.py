@@ -176,7 +176,7 @@ class Episode(BaseModel):
         return pub_date
     
     def copyright(self) -> str:
-        year: str = datetime.now().year
+        year: int = datetime.now().year
         copyright: str = f"© 1975-{year} Nashville Talking Library - Do not copy or redistribute"
         self.notifications.prep_syslog(message=f"copyright will be: {copyright}")
         return copyright
