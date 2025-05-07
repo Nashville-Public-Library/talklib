@@ -15,7 +15,7 @@ RSS_URL = "https://feeds.megaphone.fm/ESP9792844572"
 
 env_vars = {
         'destinations': 'nothing',
-        'syslog_server': 'mocked_value2',
+        'syslog_server': '0.0.0.0',
         'fromEmail': 'mocked_value2',
         'toEmail': 'mocked_value2',
         'mail_server_external': 'mocked_value2',

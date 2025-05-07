@@ -1,4 +1,5 @@
 import atexit
+from datetime import datetime
 import glob
 import os
 import shutil
@@ -148,6 +149,22 @@ def test_check_for_duplicate_episode_3():
       )
     ep.notifications.notify.enable_all = False
     ep.check_for_duplicate_episode()
+
+# XML/EPISODE STUFF
+
+def test_copyright_1():
+     '''formatted correctly'''
+     episode = Episode()
+     copyright= episode.copyright()
+     assert type(copyright) == str
+
+def test_copyright_2():
+     '''current year should be in string'''
+     episode = Episode()
+     year = datetime.now().year
+     year = str(year)
+     copyright = episode.copyright()
+     assert year in copyright
 
 def teardown():
     """remove temp files/folders that were created for the tests"""

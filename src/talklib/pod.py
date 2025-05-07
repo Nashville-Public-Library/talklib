@@ -175,6 +175,12 @@ class Episode(BaseModel):
         self.notifications.prep_syslog(message=f"pubDate will be: {pub_date}")
         return pub_date
     
+    def copyright(self) -> str:
+        year: str = datetime.now().year
+        copyright: str = f"© 1975-{year} Nashville Talking Library - Do not copy or redistribute"
+        self.notifications.prep_syslog(message=f"copyright will be: {copyright}")
+        return copyright
+    
     def size_in_bytes(self, filename) -> str:
         size_in_bytes = os.path.getsize(filename)
         size_in_bytes = str(size_in_bytes)
@@ -297,6 +303,9 @@ class Episode(BaseModel):
 
         last_build_date = root.find('lastBuildDate')
         last_build_date.text = self.pub_date() # fine to use this same pub date, as the format for both is the same
+
+        copyright = root.find("copyright")
+        copyright.text = self.copyright()
 
         ET.indent(feed) # makes the XML pretty looking
         self.notifications.prep_syslog(message=f"writing feed file...")
