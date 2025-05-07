@@ -152,8 +152,25 @@ def test_check_for_duplicate_episode_3():
 
 # XML/EPISODE STUFF
 
+def test_pub_date_1():
+     '''formatted as a string'''
+     episode = Episode()
+     pub_date = episode.pub_date()
+     assert type(pub_date) == str
+
+def test_pub_date_2():
+     '''should have today's date info in it'''
+     episode = Episode()
+     day = datetime.now().strftime("%a")
+     month = datetime.now().strftime("%b")
+     year = datetime.now().strftime("%Y")
+     pub_date = episode.pub_date()
+     assert day in pub_date
+     assert month in pub_date
+     assert year in pub_date
+
 def test_copyright_1():
-     '''formatted correctly'''
+     '''formatted as a string'''
      episode = Episode()
      copyright= episode.copyright()
      assert type(copyright) == str
@@ -165,6 +182,9 @@ def test_copyright_2():
      year = str(year)
      copyright = episode.copyright()
      assert year in copyright
+
+
+
 
 def teardown():
     """remove temp files/folders that were created for the tests"""
