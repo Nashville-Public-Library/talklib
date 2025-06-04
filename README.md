@@ -24,7 +24,7 @@ This package automates two categories of things:
 2. TL Podcasts
 ---
 
-## Requirements
+## Requirements<a id="requirements"></a>
 
 ### -[Python](https://www.python.org/downloads/)
 Use Python 3.10 or higher.
@@ -460,15 +460,17 @@ nyt.run()
     ````bash
     git clone https://github.com/Nashville-Public-Library/talklib.git
     ````
-- cd into the folder
+    
+- cd into the folder in the terminal or open the folder in your IDE
     ````bash
     cd talklib
     ````
 - Create a virtual environment
     ````bash
-    python -m venv venv
+    py -m venv venv
     ````
-    - depending on your OS, instead of `python`you may need to use `py` or `python3`
+    - depending on your OS, instead of `py` you may need to use `python` or `python3`
+
 - Activate virtual environment
     - On Windows: 
     
@@ -480,6 +482,10 @@ nyt.run()
     ````bash 
     source venv/bin/activate
     ````
+
+    > [IMPORTANT]
+    > If done correctly, you should see `(venv)` in the terminal. Don't run the rest of these commands unless you see `(venv)` in the terminal.
+
 - Update pip
      ````bash
      py -m pip install --upgrade pip
