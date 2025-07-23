@@ -360,6 +360,7 @@ class TLPod(BaseModel):
     bucket_folder: str = Field(default=None)
     max_episodes_in_feed: int = Field(ge=1, default=5)
     override_filename: bool = False
+    short_timestamp: bool = False
     audio_folders:list = EV().destinations
     notifications: Type[Notifications] = Notifications()
     episode: Type[Episode] = Episode()
@@ -381,7 +382,10 @@ class TLPod(BaseModel):
         prefix = f"{self.display_name} (podcast)"
         Notifications.prefix = prefix
 
-        self.display_name = f"{self.display_name} ({datetime.now().strftime('%a, %d %b')})"
+        if self.short_timestamp:
+            self.display_name = f"{self.display_name} ({self.short_timestamp_for_display_name()})"
+        else:
+            self.display_name = f"{self.display_name} ({datetime.now().strftime('%a, %d %b')})"
 
         return self
     
@@ -396,6 +400,15 @@ class TLPod(BaseModel):
     #         raise e
 
     #     return self
+    def short_timestamp_for_display_name(self):
+            day_of_week: str = datetime.now().strftime("%A") # Weekday as locale’s full name.
+            hour: str = datetime.now().strftime('%I') # Hour (12-hour clock) as a zero-padded decimal number.
+            ampm: str = datetime.now().strftime("%p") # Locale’s equivalent of either AM or PM.
+
+            if hour == "00":
+                hour = "12"
+
+            return f"{day_of_week} {hour}{ampm}"
     
     def get_filename_to_match(self) -> str:
         if self.override_filename:
