@@ -361,6 +361,7 @@ class TLPod(BaseModel):
     max_episodes_in_feed: int = Field(ge=1, default=5)
     override_filename: bool = False
     short_timestamp: bool = False
+    preroll: bool = True
     audio_folders:list = EV().destinations
     notifications: Type[Notifications] = Notifications()
     episode: Type[Episode] = Episode()
@@ -485,6 +486,9 @@ class TLPod(BaseModel):
             raise ffmpeg_exception
         
     def concat(self, preroll:str, program_audio: str, output_filename: str):
+        if not self.preroll:
+            os.rename(program_audio, output_filename)
+            return output_filename
         self.notifications.prep_syslog(message="concatenating preroll and program audio together...")
         subprocess.run(f'ffmpeg -hide_banner -loglevel quiet -i "concat:{preroll}|{program_audio}" -c copy {output_filename}')
         self.notifications.prep_syslog(message=f"files successfully concatenated as: {output_filename}")
