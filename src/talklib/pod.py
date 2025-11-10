@@ -48,7 +48,7 @@ class Notifications(BaseModel):
             self.prep_syslog(message=message, level=syslog_level)
 
 class SSH(BaseModel):
-    server: str = "assets.library.nashville.org"
+    server: str = "assets.library.nashville.gov"
     user: str = EV().pod_server_uname
     connection: Type[Connection] = Connection(host=server, user=user)
     notifications: Notifications = Notifications()
@@ -192,7 +192,7 @@ class Episode(BaseModel):
         return size_in_bytes
     
     def enclosure(self) -> str:
-        enclosure = f"https://dts.podtrac.com/redirect.mp3/assets.library.nashville.org/talkinglibrary/shows/{self.bucket_folder}/{self.audio_filename}"
+        enclosure = f"https://dts.podtrac.com/redirect.mp3/assets.library.nashville.gov/talkinglibrary/shows/{self.bucket_folder}/{self.audio_filename}"
         self.notifications.prep_syslog(message=f"enclosure will be {enclosure}")
         return enclosure
     
@@ -495,7 +495,7 @@ class TLPod(BaseModel):
         return output_filename
 
     def download_preroll(self):
-        download_URL = "https://assets.library.nashville.org/talkinglibrary/pod_preroll.mp3"
+        download_URL = "https://assets.library.nashville.gov/talkinglibrary/pod_preroll.mp3"
         input_file = 'preroll.mp3'
         with open (input_file, mode='wb') as downloaded_file:
             self.notifications.prep_syslog(message=f"downloading preroll audio from {download_URL}...")
