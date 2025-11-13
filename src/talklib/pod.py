@@ -497,11 +497,15 @@ class TLPod(BaseModel):
     def download_preroll(self):
         download_URL = "https://assets.library.nashville.gov/talkinglibrary/pod_preroll.mp3"
         input_file = 'preroll.mp3'
+        self.notifications.prep_syslog(message=f"Attempting to download preroll audio from {download_URL}...")
         with open (input_file, mode='wb') as downloaded_file:
-            self.notifications.prep_syslog(message=f"downloading preroll audio from {download_URL}...")
-            a = requests.get(download_URL)
-            downloaded_file.write(a.content)
-            downloaded_file.close()
+            try:
+                a = requests.get(download_URL)
+                downloaded_file.write(a.content)
+                downloaded_file.close()
+            except (Exception, requests.exceptions.RequestException) as e:
+                self.notifications.send_notifications(message=f"Cannot download {download_URL}. Exception: {e}", subject="Error")
+                raise e
         self.notifications.prep_syslog(message="preroll audio successfully downloaded")
         return downloaded_file.name
     
