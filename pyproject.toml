@@ -1,6 +1,6 @@
 [project]
 name = "talklib"
-version = "3.4.5"
+version = "3.4.6"
 description = "A package to automate processing of shows/segments airing on the TL"
 readme = "README.md"
 license = "MIT-open-group"
