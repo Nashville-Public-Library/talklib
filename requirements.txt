@@ -63,7 +63,7 @@ six==1.16.0
 tomli==2.0.1
 twilio==9.0.2
 twine==4.0.2
-typing_extensions==4.12.2
+typing_extensions==4.15.0
 urllib3==2.6.3
 wrapt==1.16.0
 yarl==1.22.0
