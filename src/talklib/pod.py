@@ -226,7 +226,7 @@ class Episode(BaseModel):
         for item in items:
             item = item.find("title").text
             if item == self.episode_title:
-                to_send = "Found episode with identical title already in feed. Aborting..."
+                to_send = f"There was a problem podcasting {self.episode_title}. There is already an episode with an identical title in the feed. Aborting automation."
                 self.notifications.send_notifications(message=to_send, subject="Error")
                 self.cleanup_files_on_abort()
                 raise Exception (to_send)
@@ -433,7 +433,7 @@ class TLPod(BaseModel):
             self.notifications.prep_syslog(message=f"New display_name: {self.display_name}")
         
         if file_lower_case.endswith("-dnp.wav"):
-            to_send = f"'-dnp' found in filename ({file}), will NOT podcast this episode. Exiting automation!"
+            to_send = f"While podcasting {self.display_name}, '-dnp' was found in the matched file: {file}. We will NOT podcast this episode. Exiting automation."
             self.notifications.send_notifications(message=to_send, subject="Info", syslog_level="info")
             raise Exception (to_send)
 
@@ -482,7 +482,8 @@ class TLPod(BaseModel):
             self.notifications.prep_syslog(message="File successfully converted")
             return output
         except Exception as ffmpeg_exception:
-            self.notifications.send_notifications(message=f'FFmpeg error: {ffmpeg_exception}', subject='Error')
+            to_send: str = f'There was a problem podcasting {self.display_name}. There was an FFmpeg error: {ffmpeg_exception}'
+            self.notifications.send_notifications(message=to_send, subject='Error')
             raise ffmpeg_exception
         
     def concat(self, preroll:str, program_audio: str, output_filename: str):
@@ -555,4 +556,4 @@ class TLPod(BaseModel):
 
         self.post_cleaup()
 
-        self.notifications.prep_syslog(message="All done.")
+        self.notifications.prep_syslog(message="Podcasting was successful. Exiting automation.")
