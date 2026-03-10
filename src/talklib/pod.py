@@ -48,9 +48,7 @@ class Notifications(BaseModel):
             self.prep_syslog(message=message, level=syslog_level)
 
 class SSH(BaseModel):
-    server: str = "assets.library.nashville.gov"
-    user: str = EV().pod_server_uname
-    connection: Type[Connection] = Connection(host=server, user=user)
+    connection: Type[Connection] =  Connection(host="assets")
     notifications: Notifications = Notifications()
     folder_exists: ClassVar[str] = False
 
