@@ -51,7 +51,6 @@ class EV:
         self.twilio_to = sort_twilio_to() # to where should texts/calls be sent
         self.icecast_user = get_EV(ev="icecast_user") # our icecast username
         self.icecast_pass = get_EV(ev="icecast_pass") # our icecast password
-        self.pod_server_uname = get_EV(ev="pod_server_uname")
 
 def get_EV(ev: str):
     try:
