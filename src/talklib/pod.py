@@ -481,7 +481,7 @@ class TLPod(BaseModel):
             self.notifications.prep_syslog(message="File successfully converted")
             return output
         except ffmpeg_error as e:
-            to_send: str = f'There was a problem podcasting {self.display_name}. There was an FFmpeg error: {e.stderr.decode('utf-8')}'
+            to_send: str = f"There was a problem podcasting {self.display_name}. There was an FFmpeg error: {e.stderr.decode('utf-8')}"
             self.notifications.send_notifications(message=to_send, subject='Error')
             raise e
         
