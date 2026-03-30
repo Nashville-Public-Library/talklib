@@ -22,7 +22,7 @@ class FFMPEG:
     def __build_input_commands(self) -> dict:
         command = {}
         command.update({'hide_banner': None})
-        command.update({'loglevel': 'quiet'})
+        # command.update({'loglevel': 'quiet'})
         command.update({'filename': self.input_file})
 
         return command
@@ -56,7 +56,7 @@ class FFMPEG:
         output_commands = self.__build_output_commands()
         stream = ffmpeg.input(**input_commands)
         stream = ffmpeg.output(stream, **output_commands)
-        ffmpeg.run(stream, capture_stdout=True)
+        ffmpeg.run(stream, capture_stdout=True, capture_stderr=True)
         return self.output_file
     
     def get_length_in_minutes(self) -> float:

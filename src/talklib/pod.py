@@ -9,6 +9,7 @@ import time
 from typing import ClassVar, Type
 
 from fabric import Connection, Result
+from ffmpeg._run import Error as ffmpeg_error
 from paramiko.ssh_exception import SSHException as paramiko_SSH_exception
 from pydantic import BaseModel, Field, model_validator
 import requests
@@ -479,10 +480,10 @@ class TLPod(BaseModel):
             output = self.ffmpeg.convert()
             self.notifications.prep_syslog(message="File successfully converted")
             return output
-        except Exception as ffmpeg_exception:
-            to_send: str = f'There was a problem podcasting {self.display_name}. There was an FFmpeg error: {ffmpeg_exception}'
+        except ffmpeg_error as e:
+            to_send: str = f'There was a problem podcasting {self.display_name}. There was an FFmpeg error: {e.stderr.decode('utf-8')}'
             self.notifications.send_notifications(message=to_send, subject='Error')
-            raise ffmpeg_exception
+            raise e
         
     def concat(self, preroll:str, program_audio: str, output_filename: str):
         if not self.preroll:
