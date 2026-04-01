@@ -32,11 +32,22 @@ Use Python 3.10 or higher.
 Make sure to select "add to PATH" during installation.
 
 ### -[FFmpeg](https://www.ffmpeg.org/download.html#build-windows)
-You need both FFmpeg & FFprobe installed on the PC and added to the PATH:
+You need both FFmpeg & FFprobe installed on the PC and added to the PATH.
 
 To repeat, **this package will not work without FFmpeg and FFprobe**. 
 
 FFmpeg and FFprobe should be two separate binaries.
+
+The easiest way to install FFmpeg (and FFprobe) on Windows is with WinGet:
+````bash
+winget install Gyan.FFmpeg
+````
+
+This should install both FFmpeg & FFprobe. After WinGet completes installation, test to ensure FFmpeg is installed:
+````bash
+ffmpeg -version
+````
+You should see some output from FFmpeg. If you see an error, it was not installed correctly.
 
 ### -[Twilio](https://www.twilio.com/)
 Twilio is used for SMS and phone call notifications.
