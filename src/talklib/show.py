@@ -5,6 +5,7 @@ import shutil
 import time
 import xml.etree.ElementTree as ET
 
+from ffmpeg._run import Error as ffmpeg_error
 import requests
 
 from talklib.ev import EV
@@ -61,9 +62,9 @@ class TLShow():
             file = ffmpeg.convert()
             self.__prep_syslog(message='file converted successfully')
             return file
-        except Exception as ffmpeg_exception:
-            self.__send_notifications(message=f'FFmpeg error: {ffmpeg_exception}', subject='Error')
-            raise_exception_and_wait(ffmpeg_exception)
+        except ffmpeg_error as e:
+            self.__send_notifications(message=f'FFmpeg error: {e.stderr.decode('utf-8')}. Exiting automation...', subject='Error')
+            raise_exception_and_wait(e)
 
 
     def __copy_then_remove(self, fileToCopy):
