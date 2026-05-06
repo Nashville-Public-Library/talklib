@@ -2,6 +2,7 @@ from datetime import datetime
 import glob
 import os
 import shutil
+import socket
 import time
 import xml.etree.ElementTree as ET
 
@@ -432,6 +433,14 @@ There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n\{get_timest
         if self.notifications.email_enable:
             self.__check_str_and_bool_type(attrib_to_check=self.notifications.email_enable, type_to_check=bool, attrib_return='twilio_enable')
 
+    def check_ffmpeg_installed(self):
+        ffmpeg = shutil.which("ffmpeg")
+        if not ffmpeg:
+            to_send: str = f"It looks like FFmpeg is either not installed on this computer ({socket.gethostname()}), \
+or it isn't added to the PATH. You cannot use the talklib package without FFmpeg."
+            self.__send_notifications(message=to_send, subject="Error")
+            raise_exception_and_wait(message=to_send)
+    
     def run(self):
         '''begins to process the file'''
 
@@ -439,6 +448,7 @@ There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n\{get_timest
         print(f"I'm working on {self.show}. Just a moment...\n")
 
         self.__check_attributes_are_valid()
+        self.check_ffmpeg_installed()
 
         if self.url and self.is_permalink:
             self.__prep_syslog(message='permalink show detected')
