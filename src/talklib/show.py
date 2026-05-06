@@ -63,7 +63,7 @@ class TLShow():
             self.__prep_syslog(message='file converted successfully')
             return file
         except ffmpeg_error as e:
-            self.__send_notifications(message=f'FFmpeg error: {e.stderr.decode('utf-8')}. Exiting automation...', subject='Error')
+            self.__send_notifications(message=f"FFmpeg error: {e.stderr.decode('utf-8')}. Exiting automation...", subject='Error')
             raise_exception_and_wait(e)
 
 
