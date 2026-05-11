@@ -64,7 +64,7 @@ tomli==2.0.1
 twilio==9.0.2
 twine==4.0.2
 typing_extensions==4.15.0
-urllib3==2.6.3
+urllib3==2.7.0
 wrapt==1.16.0
 yarl==1.22.0
 zipp==3.23.0
