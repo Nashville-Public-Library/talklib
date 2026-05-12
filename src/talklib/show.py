@@ -8,7 +8,7 @@ from typing import Type
 import xml.etree.ElementTree as ET
 
 from ffmpeg._run import Error as ffmpeg_error
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 import requests
 
 from talklib.ev import EV
@@ -34,7 +34,20 @@ class TLShow(BaseModel):
     notifications: Type[Notify] = Notify()
     ffmpeg: Type[FFMPEG] = FFMPEG()
     destinations: list = EV().destinations
-    
+
+    @model_validator(mode='after')
+    def post_update(self):
+        if self.url and (self.local_file or self.is_local):
+            to_send: str = "You cannot specifiy both a URL and a local file. You must specify only one."
+            self.__send_notifications(message=to_send, subject="Error")
+            raise ValueError(to_send)
+        
+        if (not self.url) and (not self.local_file):
+            to_send: str = "Sorry, you need to specify either a URL or a local file"
+            self.__send_notifications(message=to_send, subject="Error")
+            raise ValueError(to_send)
+
+        return self
     
     def __str__(self) -> str:
         return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
@@ -65,8 +78,9 @@ class TLShow(BaseModel):
             self.__prep_syslog(message='file converted successfully')
             return file
         except ffmpeg_error as e:
-            self.__send_notifications(message=f"FFmpeg error: {e.stderr.decode('utf-8')}. Exiting automation...", subject='Error')
-            raise_exception_and_wait(e)
+            error: str = e.stderr.decode('utf-8')
+            self.__send_notifications(message=f"FFmpeg error: {error}. Exiting automation...", subject='Error')
+            raise_exception_and_wait(message=error)
 
 
     def __copy_then_remove(self, fileToCopy):
@@ -448,7 +462,7 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
         self.__prep_syslog(message=f'Starting script')
         print(f"I'm working on {self.show}. Just a moment...\n")
 
-        self.__check_attributes_are_valid()
+        # self.__check_attributes_are_valid()
         self.check_ffmpeg_installed()
 
         if self.url and self.is_permalink:
@@ -460,7 +474,7 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
             self.__prep_syslog(message='URL show detected')
             self.__run_URL_RSS()
 
-        elif self.is_local:
+        elif self.local_file:
             self.__prep_syslog(message='local show detected')
             self.__run_local()
                    
