@@ -22,10 +22,10 @@ class TLShow():
         self.show:str = None
         self.show_filename: str = None
         self.url: str = None
-        self.is_permalink: int | float = 0
+        self.is_permalink: bool = False
         self.include_date: bool = False
         self.remove_yesterday: bool = False
-        self.is_local: str = None
+        self.is_local: bool = False
         self.local_file: str = None
         self.remove_source: bool = False
         self.check_if_above: int | float = 0    
@@ -299,7 +299,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             return audio_url
         except AttributeError as AE:
             to_send = f"There's a Problem with {self.show}. \
-There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n\{get_timestamp()}"
+There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n{get_timestamp()}"
             self.__send_notifications(message=to_send, subject="error")
             raise_exception_and_wait(message=to_send, error=AE)
 
