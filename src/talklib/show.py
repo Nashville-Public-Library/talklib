@@ -4,9 +4,11 @@ import os
 import shutil
 import socket
 import time
+from typing import Type
 import xml.etree.ElementTree as ET
 
 from ffmpeg._run import Error as ffmpeg_error
+from pydantic import BaseModel, Field
 import requests
 
 from talklib.ev import EV
@@ -15,24 +17,23 @@ from talklib.utils import get_timestamp, clear_screen, raise_exception_and_wait,
 from talklib.ffmpeg import FFMPEG
 
 
-class TLShow():
+class TLShow(BaseModel):
     '''TODO write something here'''
-    def __init__(self):
 
-        self.show:str = None
-        self.show_filename: str = None
-        self.url: str = None
-        self.is_permalink: bool = False
-        self.include_date: bool = False
-        self.remove_yesterday: bool = False
-        self.is_local: bool = False
-        self.local_file: str = None
-        self.remove_source: bool = False
-        self.check_if_above: int | float = 0    
-        self.check_if_below: int | float = 0
-        self.notifications = Notify()
-        self.ffmpeg = FFMPEG()
-        self.destinations: list = EV().destinations
+    show:str = Field(min_length=1)
+    show_filename: str = Field(min_length=1)
+    url: str = Field(default=None)
+    is_permalink: bool = False
+    include_date: bool = False
+    remove_yesterday: bool = False
+    is_local: bool = False
+    local_file: str = None
+    remove_source: bool = False
+    check_if_above: int | float = 0    
+    check_if_below: int | float = 0
+    notifications: Type[Notify] = Notify()
+    ffmpeg: Type[FFMPEG] = FFMPEG()
+    destinations: list = EV().destinations
     
     
     def __str__(self) -> str:

@@ -12,13 +12,13 @@ input_file = 'input.mp3'  # name the file we download
 
 @pytest.fixture
 def template():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.local_file = download_test_file()
-    test.is_local = True
-
-    test.destinations = mock.mock_destinations()
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        local_file = download_test_file(),
+        is_local = True,
+        destinations = mock.mock_destinations()
+    )
 
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False

@@ -10,11 +10,12 @@ cwd = os.getcwd()
 
 @pytest.fixture
 def template_local():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.local_file = 'some_file.mp3'
-    test.is_local = True
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        local_file = 'some_file.mp3',
+        is_local = True
+    )
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False
 

@@ -11,12 +11,12 @@ from ..mock import RSS_URL
 
 @pytest.fixture()
 def template():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.url = RSS_URL
-
-    test.destinations = mock.mock_destinations()
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = RSS_URL,
+        destinations = mock.mock_destinations()
+    )
 
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False

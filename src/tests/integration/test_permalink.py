@@ -7,13 +7,13 @@ from ..mock import env_vars, permalink
 
 @pytest.fixture
 def template():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.url = permalink
-    test.is_permalink = True
-
-    test.destinations = mock.mock_destinations()
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = permalink,
+        is_permalink = True,
+        destinations = mock.mock_destinations()
+    )
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False
 

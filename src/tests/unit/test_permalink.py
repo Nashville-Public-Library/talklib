@@ -8,11 +8,12 @@ url = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 
 @pytest.fixture
 def template_permalink():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.url = url
-    test.is_permalink = True
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = url,
+        is_permalink = True
+    )
     # disable notifications for template. Need separate templates for these!
     test.notifications.enable_all = False
 
