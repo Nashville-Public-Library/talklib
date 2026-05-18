@@ -34,7 +34,7 @@ more-itertools==10.2.0
 multidict==6.0.4
 nh3==0.2.15
 packaging==26.2
-paramiko==3.5.0
+paramiko==5.0.0
 pkginfo==1.9.6
 pluggy==1.6.0
 propcache==0.4.1
