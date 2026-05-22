@@ -27,13 +27,19 @@ class Syslog:
 
         The level type and the my_logger.method() function must match!
         '''
-        handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
 
+        acceptable_levels:list = ["info", "debug", "warning", "error", "critical"]
+        if level not in acceptable_levels:
+            level = "info" # fallback to info if invalid value used
+
+        level = LogLevel[level.upper()].value
+
+        handler = SysLogHandler(address=(self.syslog_host, self.syslog_port))
         my_logger = logging.getLogger('MyLogger')
-        my_logger.setLevel(LogLevel[level.upper()].value)
+        my_logger.setLevel(level)
         my_logger.addHandler(handler)
 
-        my_logger.log(level=LogLevel[level.upper()].value, msg=message)
+        my_logger.log(level=level, msg=message)
         my_logger.removeHandler(handler) # don't forget this after you send the message!
 
 class Notify:
