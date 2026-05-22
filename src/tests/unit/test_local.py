@@ -24,9 +24,13 @@ def template_local():
 # ---------- check attributes ----------
 
 def test_check_attributes_are_valid_1(template_local: TLShow):
-    template_local.is_local = None
     with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            local_file = 'some_file.mp3',
+            is_local = None
+            )
 
 def test_attrib_1a(template_local: TLShow):
     template_local.show = None
