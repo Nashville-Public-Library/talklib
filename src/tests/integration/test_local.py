@@ -6,19 +6,20 @@ import os
 from talklib import TLShow
 from .. import mock
 from ..mock import env_vars, download_test_file
+from pydantic_core import ValidationError
 
 
 input_file = 'input.mp3'  # name the file we download
 
 @pytest.fixture
 def template():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.local_file = download_test_file()
-    test.is_local = True
-
-    test.destinations = mock.mock_destinations()
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        local_file = download_test_file(),
+        is_local = True,
+        destinations = mock.mock_destinations()
+    )
 
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False
@@ -28,22 +29,40 @@ def template():
 
 # ---------- full run ---------- # 
 
-def test_run(template: TLShow):
+def test_run():
     '''asserts no exception is raised for normal/correct case'''
-    template.run()
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        local_file = download_test_file(),
+        is_local = True,
+        destinations = mock.mock_destinations()
+    )
+    test.run()
 
-def test_run_no_file(template: TLShow):
+def test_run_no_file():
     '''check exception is raised with incorrect file name/path'''
-    template.local_file = 'nofile'
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        is_local = True,
+        local_file="no_file",
+        destinations = mock.mock_destinations()
+        )
     with pytest.raises(FileNotFoundError):
-        template.run()
+        test.notifications.enable_all = False
+        test.run()
  
-def test_run_no_URL_OR_local(template: TLShow):
+def test_run_no_URL_OR_local():
     '''should raise an exception if neither URL NOR local is declared'''
-    template.url = None
-    template.is_local = None
-    with pytest.raises(Exception):
-        template.run()
+    with pytest.raises(ValidationError):
+            test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = None,
+            is_local = None,
+            destinations = mock.mock_destinations()
+            )
 
 def test_run_remove_source(template: TLShow):
     '''source file should be removed if this attribute is declared'''
@@ -65,11 +84,11 @@ our code is calling for input. It confuses the test, so we need to mock giving t
 when called for it. This is ugly and I'm sorry, but I do not want to lose the input function,
 since it is a needed reminder to the user that something bad has happened!
 '''
-@patch('builtins.input', side_effect=['11', '13', 'Bob'])
-def test_run_none_file(self, template: TLShow):
-    template.local_file = None
-    with pytest.raises(FileNotFoundError):
-        template.run()
+# @patch('builtins.input', side_effect=['11', '13', 'Bob'])
+# def test_run_none_file(self, template: TLShow):
+#     template.local_file = None
+#     with pytest.raises(FileNotFoundError):
+#         template.run()
 
 def teardown():
     mock.remove_destinations()

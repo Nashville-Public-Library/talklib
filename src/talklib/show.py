@@ -4,9 +4,11 @@ import os
 import shutil
 import socket
 import time
+from typing import Type
 import xml.etree.ElementTree as ET
 
 from ffmpeg._run import Error as ffmpeg_error
+from pydantic import BaseModel, Field, model_validator
 import requests
 
 from talklib.ev import EV
@@ -15,25 +17,37 @@ from talklib.utils import get_timestamp, clear_screen, raise_exception_and_wait,
 from talklib.ffmpeg import FFMPEG
 
 
-class TLShow():
+class TLShow(BaseModel):
     '''TODO write something here'''
-    def __init__(self):
 
-        self.show:str = None
-        self.show_filename: str = None
-        self.url: str = None
-        self.is_permalink: bool = False
-        self.include_date: bool = False
-        self.remove_yesterday: bool = False
-        self.is_local: bool = False
-        self.local_file: str = None
-        self.remove_source: bool = False
-        self.check_if_above: int | float = 0    
-        self.check_if_below: int | float = 0
-        self.notifications = Notify()
-        self.ffmpeg = FFMPEG()
-        self.destinations: list = EV().destinations
-    
+    show:str = Field(min_length=1)
+    show_filename: str = Field(min_length=1)
+    url: str = Field(default=None)
+    is_permalink: bool = False
+    include_date: bool = False
+    remove_yesterday: bool = False
+    is_local: bool = False
+    local_file: str = None
+    remove_source: bool = False
+    check_if_above: int | float = 0    
+    check_if_below: int | float = 0
+    notifications: Type[Notify] = Notify()
+    ffmpeg: Type[FFMPEG] = FFMPEG()
+    destinations: list = EV().destinations
+
+    @model_validator(mode='after')
+    def post_update(self):
+        if self.url and (self.local_file or self.is_local):
+            to_send: str = "You cannot specifiy both a URL and a local file. You must specify only one."
+            self.__send_notifications(message=to_send, subject="Error")
+            raise ValueError(to_send)
+        
+        if (not self.url) and (not self.local_file):
+            to_send: str = "Sorry, you need to specify either a URL or a local file"
+            self.__send_notifications(message=to_send, subject="Error")
+            raise ValueError(to_send)
+
+        return self
     
     def __str__(self) -> str:
         return "This is a really cool, useful thing. Calling this should give useful info. I'll come back to it. TODO"
@@ -64,8 +78,9 @@ class TLShow():
             self.__prep_syslog(message='file converted successfully')
             return file
         except ffmpeg_error as e:
-            self.__send_notifications(message=f"FFmpeg error: {e.stderr.decode('utf-8')}. Exiting automation...", subject='Error')
-            raise_exception_and_wait(e)
+            error: str = e.stderr.decode('utf-8')
+            self.__send_notifications(message=f"FFmpeg error: {error}. Exiting automation...", subject='Error')
+            raise_exception_and_wait(message=error)
 
 
     def __copy_then_remove(self, fileToCopy):
@@ -447,7 +462,7 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
         self.__prep_syslog(message=f'Starting script')
         print(f"I'm working on {self.show}. Just a moment...\n")
 
-        self.__check_attributes_are_valid()
+        # self.__check_attributes_are_valid()
         self.check_ffmpeg_installed()
 
         if self.url and self.is_permalink:
@@ -459,7 +474,7 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
             self.__prep_syslog(message='URL show detected')
             self.__run_URL_RSS()
 
-        elif self.is_local:
+        elif self.local_file:
             self.__prep_syslog(message='local show detected')
             self.__run_local()
                    

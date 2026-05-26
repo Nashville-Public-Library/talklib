@@ -11,41 +11,56 @@ from ..mock import RSS_URL
 
 @pytest.fixture()
 def template():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.url = RSS_URL
-
-    test.destinations = mock.mock_destinations()
-
-    # disable notifications for testing. Need separate tests for these!
-    test.notifications.enable_all = False
     
-    yield test
+    yield
 
     mock.remove_destinations()
 
 # ---------- run ----------
         
-def test_run(template: TLShow):
+def test_run(template):
     '''implementation test with real audio. asserts that no exceptions are raised'''
-    template.run()
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = RSS_URL,
+        destinations = mock.mock_destinations()
+    )
+    test.run()
 
-def test_run2(template: TLShow):
-    template.url = 'invalid_URL'
+def test_run2(template):
+    '''assert exception raised with invalid URL'''
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = "invalid_URL",
+        destinations = mock.mock_destinations()
+    )
     with pytest.raises(Exception):
-        template.run()
+        test.notifications.enable_all = False
+        test.run()
 
-def test_run3(template: TLShow):
+def test_run3(template):
     '''assert an exception is raised when the URL is a valid URL but not an rss feed'''
-    template.url = 'https://pnsne.ws/3mVuTax'
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = 'https://pnsne.ws/3mVuTax',
+        destinations = mock.mock_destinations()
+    )
     with pytest.raises(Exception):
-        template.run()
+        test.notifications.enable_all = False
+        test.run()
 
-def test_run_bad_feed(template: TLShow):
+def test_run_bad_feed(template):
     '''asserts an exception is raised for a non-updated feed'''
-    non_updated_feed = 'https://www.pythonpodcast.com/rss' # hasn't been updated in a while.
-    template.url = non_updated_feed
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = 'https://www.pythonpodcast.com/rss',
+        destinations = mock.mock_destinations()
+    )
     with pytest.raises(Exception):
+        test.notifications.enable_all = False
         with patch('builtins.input', return_value='y'):
-            template.run()
+            test.run()

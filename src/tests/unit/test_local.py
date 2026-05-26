@@ -1,6 +1,8 @@
 import pytest
 import os
 
+from pydantic_core import ValidationError
+
 from talklib import TLShow
 from ..mock import env_vars
 
@@ -8,81 +10,85 @@ from ..mock import env_vars
 url = 'http://www.newsservice.org/LatestNC.php?ncd=MzksMzcwLDE='
 cwd = os.getcwd()
 
-@pytest.fixture
-def template_local():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.local_file = 'some_file.mp3'
-    test.is_local = True
-    # disable notifications for testing. Need separate tests for these!
-    test.notifications.enable_all = False
-
-    return test
-
 # ---------- check attributes ----------
 
-def test_check_attributes_are_valid_1(template_local: TLShow):
-    template_local.is_local = None
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_check_attributes_are_valid_1():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            local_file = 'some_file.mp3',
+            is_local = None
+            )
 
-def test_attrib_1a(template_local: TLShow):
-    template_local.show = None
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_1a():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            local_file = None,
+            is_local = None
+            )
 
-def test_attrib_1b(template_local: TLShow):
-    template_local.show = 5
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_1b():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            local_file = 5,
+            is_local = None
+            )
 
-def test_attrib_1c(template_local: TLShow):
-    template_local.show = True
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_1d():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            local_file = "",
+            is_local = None
+            )
 
-def test_attrib_1d(template_local: TLShow):
-    template_local.show = ''
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_2a():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = None,
+            local_file = 'some_file.mp3',
+            is_local = None
+            )
 
-def test_attrib_2a(template_local: TLShow):
-    template_local.show_filename = None
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_2b():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 5,
+            local_file = 'some_file.mp3',
+            is_local = None
+            )
 
-def test_attrib_2b(template_local: TLShow):
-    template_local.show_filename = 5
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_2c():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = True,
+            local_file = 'some_file.mp3',
+            is_local = None
+            )
 
-def test_attrib_2c(template_local: TLShow):
-    template_local.show_filename = True
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_2d():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = "",
+            local_file = 'some_file.mp3',
+            is_local = None
+            )
 
-def test_attrib_2d(template_local: TLShow):
-    template_local.show_filename = ''
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
-
-def test_attrib_3a(template_local: TLShow):
-    template_local.local_file = 5
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
-
-def test_attrib_3b(template_local: TLShow):
-    template_local.local_file = True
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
-
-def test_attrib_4a(template_local: TLShow):
-    template_local.is_local = 5
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
-
-def test_attrib_4b(template_local: TLShow):
-    template_local.is_local = 'break'
-    with pytest.raises(Exception):
-        template_local.__check_attributes_are_valid()
+def test_attrib_4b():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            local_file = 'some_file.mp3',
+            is_local = "hmmmm"
+            )

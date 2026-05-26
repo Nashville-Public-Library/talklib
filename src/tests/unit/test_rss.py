@@ -1,15 +1,18 @@
+from pydantic_core import ValidationError
 import pytest
 
-from talklib import TLShow
+from talklib import TLShow, FFMPEG
+from talklib.notify import Notify
 from ..mock import RSS_URL
 
 
 @pytest.fixture
 def template_rss():
-    test = TLShow()
-    test.show = 'Delete Me'
-    test.show_filename = 'delete_me'
-    test.url = RSS_URL
+    test = TLShow(
+        show = 'Delete Me',
+        show_filename = 'delete_me',
+        url = RSS_URL
+    )
     # disable notifications for testing. Need separate tests for these!
     test.notifications.enable_all = False
 
@@ -43,54 +46,75 @@ def test_gen(template_rss: TLShow):
 
 # now, start deliberately triggering exceptions with invalid attributes.
 
-def test_check_attributes_are_valid_1a(template_rss: TLShow):
-    template_rss.show = 42
-    with pytest.raises(Exception):
-        template_rss.__check_attributes_are_valid()
+def test_check_attributes_are_valid_6():
+    with pytest.raises(ValidationError):
+        ff = FFMPEG()
+        ff.breakaway = True
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL,
+            ffmpeg=ff
+        )
 
-def test_check_attributes_are_valid_2(template_rss: TLShow):
-    template_rss.show_filename = 42
-    with pytest.raises(Exception):
-        template_rss.__check_attributes_are_valid()
+def test_check_attributes_are_valid_7():
+    with pytest.raises(ValidationError):
+        ff = FFMPEG()
+        ff.compression_level = True
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL,
+            ffmpeg=ff
+        )
 
-def test_check_attributes_are_valid_3(template_rss: TLShow):
-    template_rss.url = 42
-    with pytest.raises(Exception):
-        template_rss.__check_attributes_are_valid()
+def test_check_attributes_are_valid_8():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL,
+            check_if_above=[1,2]
+        )
 
-def test_check_attributes_are_valid_6(template_rss: TLShow):
-    template_rss.ffmpeg.breakaway = True
-    with pytest.raises(Exception):
-        template_rss.__check_attributes_are_valid()
+def test_check_attributes_are_valid_9():
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL,
+            check_if_below=[1,2]
+        )
 
-def test_check_attributes_are_valid_7(template_rss: TLShow):
-    template_rss.ffmpeg.compression_level = True
-    with pytest.raises(Exception):
-        template_rss.__check_attributes_are_valid()
+def test_check_attributes_are_valid_10():
+    notif = Notify()
+    notif.email_enable = 5
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL,
+            notifications=notif
+        )
 
-def test_check_attributes_are_valid_8(template_rss: TLShow):
-    template_rss.check_if_above = [1,2]
-    with pytest.raises(Exception):
-        template_rss.run()
-
-def test_check_attributes_are_valid_9(template_rss: TLShow):
-    template_rss.check_if_below = [1,2]
-    with pytest.raises(Exception):
-        template_rss.run()
-
-def test_check_attributes_are_valid_10(template_rss: TLShow):
-    template_rss.notifications.email_enable = 5
-    with pytest.raises(Exception):
-        template_rss.run()
-
-def test_check_attributes_are_valid_11(template_rss: TLShow):
-    template_rss.notifications.syslog_enable = 4.5
-    with pytest.raises(Exception):
-        template_rss.run()
+def test_check_attributes_are_valid_11():
+    notif = Notify()
+    notif.syslog_enable = 4.5
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL,
+            notifications=notif
+        )
  
-def test_check_attributes_are_valid_12(template_rss: TLShow):
+def test_check_attributes_are_valid_12():
     '''exception should be raised if both url & is_local are declared'''
-    template_rss.is_local = True
-    with pytest.raises(Exception):
-        template_rss.run()
+    with pytest.raises(ValidationError):
+        test = TLShow(
+            show = 'Delete Me',
+            show_filename = 'delete_me',
+            url = RSS_URL,
+            is_local=True
+        )
 
