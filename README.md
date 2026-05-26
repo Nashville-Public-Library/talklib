@@ -273,11 +273,11 @@ Here is an example script:
 ````python
 from talklib import TLShow
 
-SD = TLShow()
-
-SD.show = 'Skywalker Daily News'
-SD.show_filename = 'SDN'
-SD.url = 'https://somesite.org/sdn-feed.rss'
+SD = TLShow(
+    show = 'Skywalker Daily News',
+    show_filename = 'SDN',
+    url = 'https://somesite.org/sdn-feed.rss'
+    )
 
 SD.run()
 ````
@@ -293,12 +293,12 @@ Here is an example script:
 ````python
 from talklib import TLShow
 
-MWB = TLShow()
-
-MWB.show = 'Magical World of Bees'
-MWB.show_filename = 'MWB'
-MWB.is_local = True
-MWB.local_file = 'D:Production\path\to\the\file.wav'
+MWB = TLShow(
+    show = 'Magical World of Bees',
+    show_filename = 'MWB',
+    is_local = True,
+    local_file = 'D:Production\path\to\the\file.wav'
+    )
 
 MWB.run()
 ````
@@ -314,12 +314,12 @@ Here is an example script:
 ````python
 from talklib import TLShow
 
-WK = TLShow()
-
-WK.show = 'Who Knows'
-WK.show_filename = 'WhoKnows'
-WK.url = 'https://somesite.org/who-knows-static'
-WK.is_permalink = True
+WK = TLShow(
+    show = 'Who Knows',
+    show_filename = 'WhoKnows',
+    url = 'https://somesite.org/who-knows-static',
+    is_permalink = True
+    )
 
 WK.run()
 ````
@@ -335,11 +335,12 @@ To disable Twilio notifications, simply add a line like this:
 ````python
 from talklib import TLShow
 
-SD = TLShow()
+SD = TLShow(
+    show = 'Skywalker Daily News',
+    show_filename = 'SDN',
+    url = 'https://somesite.org/sdn-feed.rss'
+    )
 
-SD.show = 'Skywalker Daily News'
-SD.show_filename = 'SDN'
-SD.url = 'https://somesite.org/sdn-feed.rss'
 SD.notifications.twilio_enable = False
 
 SD.run()
@@ -354,11 +355,12 @@ To disable ALL notifications, add a line like this:
 ````python
 from talklib import TLShow
 
-SD = TLShow()
+SD = TLShow(
+    show = 'Skywalker Daily News',
+    show_filename = 'SDN',
+    url = 'https://somesite.org/sdn-feed.rss'
+    )
 
-SD.show = 'Skywalker Daily News'
-SD.show_filename = 'SDN'
-SD.url = 'https://somesite.org/sdn-feed.rss'
 SD.notifications.enable_all = False
 
 SD.run()
@@ -371,11 +373,12 @@ To adjust the level of compression applied with FFmppeg, add a line like this:
 ````python
 from talklib import TLShow
 
-SD = TLShow()
+SD = TLShow(
+    show = 'Skywalker Daily News',
+    show_filename = 'SDN',
+    url = 'https://somesite.org/sdn-feed.rss'
+    )
 
-SD.show = 'Skywalker Daily News'
-SD.show_filename = 'SDN'
-SD.url = 'https://somesite.org/sdn-feed.rss'
 SD.ffmpeg.compression_level = 18
 
 SD.run()
@@ -415,10 +418,9 @@ from talklib import TLPod
 nyt = TLPod(
     display_name = "New York Times",
     filename_to_match = "nyt",
-)
+    )
 nyt.run()
 ````
-
 
 
 The default number of episodes allowed in a podcast feed at any given time is 5. To change that:
@@ -430,7 +432,7 @@ nyt = TLPod(
     display_name = "New York Times",
     filename_to_match = "nyt",
     max_episodes_in_feed = 7
-)
+    )
 nyt.run()
 ````
 
@@ -444,7 +446,7 @@ from talklib import TLPod
 nyt = TLPod(
     display_name = "New York Times",
     filename_to_match = "nyt",
-)
+    )
 nyt.notifications.notify.enable_all = False
 nyt.run()
 ````
@@ -458,7 +460,7 @@ nyt = TLPod(
     display_name = "New York Times",
     filename_to_match = "nyt",
     bucket_folder = "newyorktimes"
-)
+    )
 nyt.run()
 ````
 
