@@ -1,5 +1,5 @@
 aiohappyeyeballs==2.6.1
-aiohttp==3.13.5
+aiohttp==3.14.1
 aiohttp-retry==2.8.3
 aiosignal==1.4.0
 annotated-types==0.7.0
@@ -57,6 +57,7 @@ requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.7.0
 six==1.16.0
+-e git+https://github.com/Nashville-Public-Library/talklib.git@a585eea8b76d396c04c4f08f50b59304f6f5111c#egg=talklib
 tomli==2.0.1
 twilio==9.0.2
 twine==4.0.2
