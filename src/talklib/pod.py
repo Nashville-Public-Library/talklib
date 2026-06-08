@@ -389,6 +389,18 @@ class TLPod(BaseModel):
 
         return self
     
+    @model_validator(mode='after')
+    def check_apache_assets_server(self):
+        '''check that the Assets server is reachable via HTTP and notify staff if not. Do not hault automation'''
+        url: str = "https://assets.library.nashville.gov"
+        req_get = requests.get(url=url)
+        req_post = requests.post(url=url)
+        if not (req_get.ok and req_post.ok):
+            to_send: str = "It looks like Apache may not be running on the Assets server. We are unable to make HTTPS requests...automation should be able to continue via SSH."
+            self.notifications.send_notifications(message=to_send, subject="Warning", syslog_level="Warning")
+
+        return self
+    
     # @model_validator(mode='after')
     # def confirm_SSH_connection(self):
     #     # before we carry on, make sure we can successfully connect to the server
