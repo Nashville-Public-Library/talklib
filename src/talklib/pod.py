@@ -191,7 +191,7 @@ class Episode(BaseModel):
         return size_in_bytes
     
     def enclosure(self) -> str:
-        enclosure = f"https://dts.podtrac.com/redirect.mp3/assets.library.nashville.gov/talkinglibrary/shows/{self.bucket_folder}/{self.audio_filename}"
+        enclosure: str = f"https://assets.library.nashville.gov/talkinglibrary/shows/{self.bucket_folder}/{self.audio_filename}"
         self.notifications.prep_syslog(message=f"enclosure will be {enclosure}")
         return enclosure
     
