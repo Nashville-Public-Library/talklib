@@ -375,79 +375,6 @@ There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n{get_timesta
             self.__send_notifications(message=message, subject="Error")
             raise_exception_and_wait(message=message)
 
-    def __check_attributes_are_valid(self):
-        '''
-        Run some checks on the attributes the user has set. I.E. the required
-        attributes have been set, they are the right type, etc.
-        '''
-        self.__prep_syslog(message='checking user defined attributes')
-
-        if not self.show:
-            message = 'Sorry, you need to specify a name for the show.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-        else:
-            self.__check_str_and_bool_type(attrib_to_check=self.show, type_to_check=str, attrib_return='show')
-
-        if not self.show_filename:
-            message = 'Sorry, you need to specify a filename for the show.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-        else:
-            self.__check_str_and_bool_type(attrib_to_check=self.show_filename, type_to_check=str, attrib_return='show_filename')
-
-        if not self.url:
-            if not self.is_local:
-                message = 'Sorry, you need to specify either a URL or a local file'
-                self.__send_notifications(message=message, subject="Error")
-                raise_exception_and_wait('Sorry, you need to specify either a URL or a local file')
-
-        if self.url and self.is_local:
-            message = 'Sorry, you cannot specify both a URL and a local audio file. You must choose only one.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-        
-        if self.url and self.local_file:
-            message = 'Sorry, you cannot specify both a URL and a local audio file. You must choose only one.'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-
-        if self.url:
-            self.__check_str_and_bool_type(attrib_to_check=self.url, type_to_check=str, attrib_return='url')
-        
-        if self.is_local:
-            self.__check_str_and_bool_type(attrib_to_check=self.is_local, type_to_check=bool, attrib_return='is_local')
-
-        if self.local_file:
-            self.__check_str_and_bool_type(attrib_to_check=self.local_file, type_to_check=str, attrib_return='local_file')
-        
-        if self.ffmpeg.breakaway:
-            self.__check_int_and_float_type(attrib_to_check=self.ffmpeg.breakaway, attrib_return='breakaway')
-        
-        if self.ffmpeg.compression_level:
-            self.__check_int_and_float_type(attrib_to_check=self.ffmpeg.compression_level, attrib_return='fflevel')
-
-        if self.is_permalink:
-            self.__check_str_and_bool_type(attrib_to_check=self.is_permalink, type_to_check=bool, attrib_return='is_permalink')
-
-        if not (self.check_if_above and self.check_if_below):
-            print('\n(You did not specify check_if_below and/or check_if_above. These checks will not be run.')
-        
-        if self.check_if_above:
-            self.__check_int_and_float_type(attrib_to_check=self.check_if_above, attrib_return='check_if_above')
-        
-        if self.check_if_below:
-            self.__check_int_and_float_type(attrib_to_check=self.check_if_below, attrib_return='check_if_below')
-        
-        if self.notifications.syslog_enable:
-            self.__check_str_and_bool_type(attrib_to_check=self.notifications.syslog_enable, type_to_check=bool, attrib_return='notifications')
-
-        if self.notifications.twilio_enable:
-            self.__check_str_and_bool_type(attrib_to_check=self.notifications.twilio_enable, type_to_check=bool, attrib_return='twilio_enable')
-        
-        if self.notifications.email_enable:
-            self.__check_str_and_bool_type(attrib_to_check=self.notifications.email_enable, type_to_check=bool, attrib_return='twilio_enable')
-
     def check_ffmpeg_installed(self):
         ffmpeg = shutil.which("ffmpeg")
         if not ffmpeg:
@@ -462,7 +389,6 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
         self.__prep_syslog(message=f'Starting script')
         print(f"I'm working on {self.show}. Just a moment...\n")
 
-        # self.__check_attributes_are_valid()
         self.check_ffmpeg_installed()
 
         if self.url and self.is_permalink:

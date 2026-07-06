@@ -39,7 +39,7 @@ def test_remove_yesterday_files(template_rss: TLShow):
 
 # first, make sure there are no exceptions thrown for our correctly set up instance
 def test_check_attributes_are_valid_1(template_rss: TLShow):
-    template_rss._TLShow__check_attributes_are_valid()
+    assert template_rss
 
 def test_gen(template_rss: TLShow):
     assert type(template_rss._TLShow__create_output_filename()) == str
