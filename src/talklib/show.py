@@ -13,7 +13,7 @@ import requests
 
 from talklib.ev import EV
 from talklib.notify import Notify
-from talklib.utils import get_timestamp, clear_screen, raise_exception_and_wait, today_is_weekday
+from talklib.utils import get_timestamp, clear_screen, today_is_weekday
 from talklib.ffmpeg import FFMPEG
 
 
@@ -79,8 +79,9 @@ class TLShow(BaseModel):
             return file
         except ffmpeg_error as e:
             error: str = e.stderr.decode('utf-8')
-            self.__send_notifications(message=f"FFmpeg error: {error}. Exiting automation...", subject='Error')
-            raise_exception_and_wait(message=error)
+            to_send: str = f"FFmpeg error: {error}. Exiting automation..."
+            self.__send_notifications(message=to_send, subject='Error')
+            raise e (to_send)
 
 
     def __copy_then_remove(self, fileToCopy):
@@ -164,8 +165,9 @@ class TLShow(BaseModel):
         try:
             filesize = os.path.getsize(fileToCheck)
         except FileNotFoundError as error:
-            self.__send_notifications(message=f'It looks like the file does not exist. Here is the error: {error}', subject='Error')
-            raise FileNotFoundError
+            to_send: str = f"It looks like the file does not exist. Here is the error: {error}"
+            self.__send_notifications(message=to_send, subject='Error')
+            raise FileNotFoundError (to_send)
             
         is_not_empty = False
         while how_many_attempts < 3:
@@ -191,6 +193,7 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
     def __prep_syslog(self, message: str, level: str = 'info'):
         '''send message to syslog server'''
         message = f'{self.show}: {message}'
+        print(message)
         self.notifications.send_syslog(message=message, level=level)
 
 
@@ -228,8 +231,8 @@ It looks like the file either wasn't converted or didn't transfer correctly. \
 Please check manually!\n\n\
 {get_timestamp()}")
                 self.__send_notifications(message=toSend, subject='Error')
-                raise_exception_and_wait(message=toSend)
-                break
+                raise FileNotFoundError (toSend)
+            
         if success:
             self.__countdown()
 
@@ -282,7 +285,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
 {get_timestamp()}"
                 )
             self.__send_notifications(subject='Error', message=to_send)
-            raise_exception_and_wait(message=a)
+            raise a (to_send)
 
     def __check_feed_updated(self) -> bool:
         '''
@@ -316,7 +319,7 @@ Is this a permalink show? Did you forget to set the is_permalink attribute?\n\n\
             to_send = f"There's a Problem with {self.show}. \
 There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n{get_timestamp()}"
             self.__send_notifications(message=to_send, subject="error")
-            raise_exception_and_wait(message=to_send, error=AE)
+            raise AE (to_send)
 
     def __check_feed_loop(self) -> str:
         '''
@@ -353,35 +356,13 @@ There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n{get_timesta
             number = number-1
             time.sleep(1)
 
-    def __check_str_and_bool_type(self, attrib_to_check, type_to_check: str | bool, attrib_return: str):
-        '''
-        we are checking whether an attribute is either type str or bool, depending on what is passed in.
-        
-        'attrib_return' is solely for printing the message back out to the screen/log,
-        it is not needed for the actual type check.
-        (I can't figure out how else to get the name of the attribute)
-        '''
-        if  type(attrib_to_check) != type_to_check:
-            message = f"Sorry, '{attrib_return}' attribute must be type: {type_to_check}, but you used {type(attrib_to_check)}."
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-
-    def __check_int_and_float_type(self, attrib_to_check, attrib_return: str):
-        '''
-        Attributes passed here can be either int or float.
-        '''
-        if not (type(attrib_to_check) == int or type(attrib_to_check) == float):
-            message = f'Sorry, the {attrib_return} attribute must be a valid number (without quotes).'
-            self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
-
     def check_ffmpeg_installed(self):
         ffmpeg = shutil.which("ffmpeg")
         if not ffmpeg:
             to_send: str = f"It looks like FFmpeg is either not installed on this computer ({socket.gethostname()}), \
 or it isn't added to the PATH. You cannot use the talklib package without FFmpeg."
             self.__send_notifications(message=to_send, subject="Error")
-            raise_exception_and_wait(message=to_send)
+            raise Exception (to_send)
     
     def run(self):
         '''begins to process the file'''
@@ -407,7 +388,7 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
         else:
             message = "Sorry, something bad happened..."
             self.__send_notifications(message=message, subject="Error")
-            raise_exception_and_wait(message=message)
+            raise Exception (message)
 
     def __run_URL_permalink(self):
         # if url is declared, it's either an RSS or permalink show
@@ -438,7 +419,7 @@ It looks like today's file hasn't yet been posted. Please check and download man
 {get_timestamp()}"
                 )
             self.__send_notifications(message=toSend, subject='Error')
-            raise_exception_and_wait(message=toSend)
+            raise Exception (toSend)
     
     def __run_local(self):
         if self.local_file:
@@ -455,4 +436,4 @@ It looks like the source file doesn't exist. Please check manually! Yesterday's 
 {get_timestamp()}"
                 )
             self.__send_notifications(message=to_send, subject='Error')
-            raise_exception_and_wait(message=to_send, error=FileNotFoundError)
+            raise FileNotFoundError (to_send)
