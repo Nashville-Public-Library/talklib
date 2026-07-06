@@ -150,15 +150,20 @@ class TLShow(BaseModel):
         else:
             download_URL = self.__get_RSS_audio_url()
 
-        self.__prep_syslog(message=f'Attempting to download audio file.')
-        input_file = 'input.mp3'  # name the file we download
-        with open (input_file, mode='wb') as downloaded_file:
-            a = requests.get(download_URL)
-            downloaded_file.write(a.content)
-            downloaded_file.close()
-        
-        self.__prep_syslog(message=f'File downloaded successfully in {os.getcwd()}.')
-        return downloaded_file.name
+        self.__prep_syslog(message=f'Attempting to download audio file from {download_URL}')
+        try:
+            input_file = 'input.mp3'  # name the file we download
+            with open (input_file, mode='wb') as downloaded_file:
+                a = requests.get(download_URL)
+                downloaded_file.write(a.content)
+                downloaded_file.close()
+            
+            self.__prep_syslog(message=f'File downloaded successfully in {os.getcwd()}.')
+            return downloaded_file.name
+        except Exception as e:
+            to_send: str = f"Unable to download the file from: {download_URL}: {e}. Exiting automation!"
+            self.__send_notifications(to_send)
+            raise e (to_send)
 
     def check_downloaded_file(self, fileToCheck, how_many_attempts):
         '''TODO explain'''
