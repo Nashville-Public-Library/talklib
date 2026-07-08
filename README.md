@@ -38,12 +38,12 @@ To repeat, **this package will not work without FFmpeg and FFprobe**.
 
 FFmpeg and FFprobe should be two separate binaries.
 
-The easiest way to install FFmpeg (and FFprobe) on Windows is with WinGet:
+The easiest way to install FFmpeg (and FFprobe) on Windows is with WinGet (you may need to run this in a terminal with Admin privileges):
 ````bash
 winget install Gyan.FFmpeg
 ````
 
-This should install both FFmpeg & FFprobe. After WinGet completes installation, test to ensure FFmpeg is installed:
+This should install both FFmpeg & FFprobe. After WinGet completes installation, restart your terminal and then test to ensure FFmpeg is installed:
 ````bash
 ffmpeg -version
 ````
