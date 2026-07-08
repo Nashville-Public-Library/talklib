@@ -88,7 +88,7 @@ Before we begin, a general note:
 - These are some of the reasons why we do not run `.py` files directly from WR.
 - Instead, we tell WR to run a Batch script (`.bat` file) which in turn will automatically run the Python script (`.py` file).
 - Ensure the Batch & Python scripts are in the same directory.
-- A sample `.bat` file (`Example.bat`) is included in the [misc](https://github.com/Nashville-Public-Library/misc/tree/main/talklib_examples) repo. 
+- A sample `.bat` file (`Example.bat`) is included in the [talking-library-misc](https://github.com/Nashville-Public-Library/talking-library-misc/tree/main/talklib_examples) repo (This is a private repo! Contact Shared Systems team to get access).
     - Download this file and place it in the same folder as your Python file.
     - Right-Click the file > select `Properties` > select `Unblock` so that it can be executed.
     - It is a best practice to give the `.bat` and `.py` files the same name, though it is not necessary.
@@ -177,7 +177,7 @@ required for all RSS or permalink shows
 
 required for "local" shows
 - path to the local file as such: `D:\path\to\the\show.wav`
-- you will probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [MISC](https://github.com/talkinglibrary/misc) repo for some examples.
+- you will probably not have a hardcoded path here. Usually, you will be running a short algorithm to determine the path. Please see the [talking-library-misc](https://github.com/Nashville-Public-Library/talking-library-misc) repo for some examples (This is a private repo! Contact Shared Systems team to get access).
 
 `is_permalink`
 
