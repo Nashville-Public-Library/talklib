@@ -75,7 +75,7 @@ class TLShow(BaseModel):
         self.__prep_syslog(message=f'FFmpeg commands: {ffmpeg_commands}')
         try:
             file = ffmpeg.convert()
-            self.__prep_syslog(message='file converted successfully')
+            self.__prep_syslog(message=f"file converted successfully, named: {file}")
             return file
         except ffmpeg_error as e:
             error: str = e.stderr.decode('utf-8')
@@ -158,7 +158,7 @@ class TLShow(BaseModel):
                 downloaded_file.write(a.content)
                 downloaded_file.close()
             
-            self.__prep_syslog(message=f'File downloaded successfully in {os.getcwd()}.')
+            self.__prep_syslog(message=f'File downloaded: {os.getcwd()}/{input_file}')
             return downloaded_file.name
         except Exception as e:
             to_send: str = f"Unable to download the file from: {download_URL}: {e}. Exiting automation!"
