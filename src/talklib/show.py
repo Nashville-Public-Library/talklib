@@ -363,6 +363,7 @@ There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n{get_timesta
 
     def check_ffmpeg_installed(self):
         ffmpeg = shutil.which("ffmpeg")
+        self.__prep_syslog(message=f"FFmpeg is installed: {ffmpeg}")
         if not ffmpeg:
             to_send: str = f"It looks like FFmpeg is either not installed on this computer ({socket.gethostname()}), \
 or it isn't added to the PATH. You cannot use the talklib package without FFmpeg."
