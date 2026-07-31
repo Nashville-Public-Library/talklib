@@ -224,22 +224,17 @@ It looks like the downloaded file is empty. Please check manually! Yesterday's f
     def __check_file_transferred(self, fileToCheck):
         '''check if file transferred to destination(s)'''
         numberOfDestinations = len(self.destinations) - 1
-        success = False
         while numberOfDestinations >= 0:
             if os.path.isfile(f'{self.destinations[numberOfDestinations]}/{fileToCheck}'):
                 numberOfDestinations = numberOfDestinations-1
                 self.__prep_syslog(message=f'{fileToCheck} arrived at {self.destinations[numberOfDestinations]}')
-                success = True
             else:
                 toSend = (f"There was a problem with {self.show}.\n\n\
-It looks like the file either wasn't converted or didn't transfer correctly. \
+It looks like the file either wasn't converted or didn't transfer correctly to {self.destinations[numberOfDestinations]}. \
 Please check manually!\n\n\
 {get_timestamp()}")
                 self.__send_notifications(message=toSend, subject='Error')
                 raise FileNotFoundError (toSend)
-            
-        if success:
-            self.__countdown()
 
     def __check_length(self, fileToCheck):
         '''
@@ -343,23 +338,8 @@ There is no 'enclosure' tag for the item. Here's the error: {AE}\n\n{get_timesta
                 count = count+1
         return feed_updated
 
-    def __countdown(self):
-        '''
-        the reason for this is to give a visual cue to the user
-        that the script has finished and is about to exit.
-        Otherwise, the user does not know what happened; they
-        just see the screen disappear.
-        '''
-        clear_screen()
-        to_send = 'All Done.'
-        self.__prep_syslog(message=to_send)
-        print(f'{to_send}\n')
-        number = 5
-        i = 0
-        while i < number:
-            print(f'This window will close in {number} seconds...', end='\r')
-            number = number-1
-            time.sleep(1)
+    def __all_done_syslog(self):
+        self.__prep_syslog(message="Automation finished successfully! Exiting...")
 
     def check_ffmpeg_installed(self):
         ffmpeg = shutil.which("ffmpeg")
@@ -407,6 +387,7 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
             self.__remove(fileToDelete=downloaded_file)
             self.__copy_then_remove(fileToCopy=output_file)
             self.__check_file_transferred(fileToCheck=output_file)
+            self.__all_done_syslog()
 
     def __run_URL_RSS(self):
         if self.__check_feed_loop():
@@ -418,6 +399,7 @@ or it isn't added to the PATH. You cannot use the talklib package without FFmpeg
             self.__remove(fileToDelete=downloaded_file)
             self.__copy_then_remove(fileToCopy=output_file)
             self.__check_file_transferred(fileToCheck=output_file)
+            self.__all_done_syslog()
         else:
             toSend = (
 f"There was a problem with {self.show}.\n\n\
@@ -435,6 +417,7 @@ It looks like today's file hasn't yet been posted. Please check and download man
             self.__remove(fileToDelete=self.local_file)
             self.__copy_then_remove(fileToCopy=output_file)
             self.__check_file_transferred(fileToCheck=output_file)
+            self.__all_done_syslog()
         else:
             to_send = (
 f"There was a problem with {self.show}.\n\n\
