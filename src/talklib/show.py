@@ -170,7 +170,11 @@ class TLShow(BaseModel):
         try:
             filesize = os.path.getsize(fileToCheck)
         except FileNotFoundError as error:
-            to_send: str = f"It looks like the file does not exist. Here is the error: {error}"
+            to_send = (
+f"There was a problem with {self.show}.\n\n\
+It looks like the source file doesn't exist. Here is the error: {error}. Please check manually!\n\n\
+{get_timestamp()}" 
+)
             self.__send_notifications(message=to_send, subject='Error')
             raise FileNotFoundError (to_send)
             
