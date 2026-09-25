@@ -29,8 +29,7 @@ def metadata_to_icecast(title):
     notify = Notify()
     user = os.environ['icecast_user']
     password = os.environ['icecast_pass']
-    URLs: tuple = (f'https://npl.streamguys1.com/admin/metadata?mount=/live&mode=updinfo&song={title}', 
-                   f"https://stream.talkinglibrary.nashville.gov/admin/metadata?mount=/live_64_intro.mp3&mode=updinfo&song={title}")
+    URLs: list = [f"https://stream.talkinglibrary.nashville.gov/admin/metadata?mount=/live_64_intro.mp3&mode=updinfo&song={title}"]
     for url in URLs:
         try:
             notify.syslog.send_syslog_message(message=f'attempting to send "{title}" to {url}')
