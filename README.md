@@ -536,3 +536,10 @@ nyt.run()
     - You must be connected to the internet to run the tests.
     - To update the version on PyPI, you must increment the version number in `pyproject.toml`
 
+If you add or upgrade third-party packages, don't forget to update `requirements.txt` from your activated virtual environment:
+
+````bash
+pip freeze --exclude talklib > requirements.txt
+````
+
+The `--exclude talklib` option keeps this project's editable installation out of its own dependency list.
