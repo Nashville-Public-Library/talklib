@@ -27,7 +27,7 @@ This package automates two categories of things:
 ## Requirements<a id="requirements"></a>
 
 ### -[Python](https://www.python.org/downloads/)
-Use Python 3.10 or higher.
+Use Python 3.12 or higher.
 
 Make sure to select "add to PATH" during installation.
 
