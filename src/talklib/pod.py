@@ -341,18 +341,16 @@ class Episode(BaseModel):
 
 class TLPod(BaseModel):
     '''
-    everything should be in lower case!
+    Everything should be in lower case!
 
-    display_name: generic name for the show/program. WIll be displayed as the
-    episode "Title" in the podcast feed. type=string
+    display_name: Generic name for the show/program. Will be displayed as the episode "Title" in the podcast feed.
 
-    filename_to_match: the base name of the show we want to match. do not include the date.
-    for example, to match RollingStone091322, use 'RollingStone'. type=string
+    filename_to_match: The base name of the show we want to match. Do not include the date.
+    For example, to match RollingStone091322, use 'RollingStone'.
 
-    bucket_folder: the name of the folder on S3 where the audio and RSS files are stored.
-    should be lower case. type=string
+    bucket_folder: The name of the folder on the Assets server where the audio and RSS files are stored.
 
-    max_episodes_in_feed: the max number of episodes that should be in the feed after you add the episode.
+    max_episodes_in_feed: The max number of episodes that should be in the feed after you add the episode.
     '''
     display_name: str = Field(min_length=1)
     filename_to_match: str = Field(min_length=1)
@@ -370,7 +368,7 @@ class TLPod(BaseModel):
     @model_validator(mode='after')
     def post_update(self):
         '''
-        the name of the bucket folder should match the base name of the file. If bucket_folder is not explicitly set
+        The name of the bucket folder should match the base name of the file. If bucket_folder is not explicitly set
         by the user, use the filename. However, if filename_override is being used, strip out the digits first.
         '''
         if not self.bucket_folder:
@@ -391,7 +389,7 @@ class TLPod(BaseModel):
     
     @model_validator(mode='after')
     def check_apache_assets_server(self):
-        '''check that the Assets server is reachable via HTTP and notify staff if not. Do not hault automation'''
+        '''Check that the Assets server is reachable via HTTP and notify staff if not. Do not hault automation'''
         url: str = "https://assets.library.nashville.gov"
         req_get = requests.get(url=url)
         req_post = requests.post(url=url)

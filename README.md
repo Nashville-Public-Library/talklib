@@ -168,7 +168,7 @@ required for all RSS or permalink shows
 
 *required* for "local" shows
 - tells the module whether this is a local show
-- must be set to `True` if it is a local show
+- set to `True` if it is a local show (this needs to be deprecated!)
 - default is `False`
 
 `local_file`
@@ -193,7 +193,7 @@ required for "permalink" shows
 
 optional
 - whether or not you want to remove yesterday's files (if any exists)
-- if set to `True`, it will delete any file matching the show_filename attribute you set.
+- if set to `True`, it will delete any file matching the show_filename attribute you set. That is ANY file matching `<show_filename>*.wav`
 - default is `False`. 
 
 `include_date`
@@ -202,7 +202,7 @@ optional
 
 optional
 - whether or not you want to include today's date in the filename
-- if set to `True`, the date will be appended as such: `WP-MMDDYY.wav`
+- if set to `True`, the date will be appended as such: `WPMMDDYY.wav`
 - if not set, or set to `False`, the resulting filename will be: `WP.wav`
 - Generally, for TL programs, if it is a daily show, like the New York Times, etc., you need the date in the filename, as this is what WireReady will match.
 - the default is `False`
@@ -268,6 +268,8 @@ optional
 
 The minimum attributes you must set are `show`, `show_filename`, and `url`.
 
+For RSS shows, the first `<item>` in the feed must have a `<pubDate>` containing today's date in `ddd, DD Mon YYYY` format (for example, `Wed, 07 Oct 2026`), using the date on the computer running the script. `TLShow` checks only the first item and retries the check up to three times. If that item is not dated today, processing stops without downloading audio or removing existing destination files, and an error notification is sent if notifications are enabled. The script does not search later items or fall back to an older episode.
+
 Here is an example script:
 
 ````python
@@ -297,7 +299,7 @@ MWB = TLShow(
     show = 'Magical World of Bees',
     show_filename = 'MWB',
     is_local = True,
-    local_file = 'D:Production\path\to\the\file.wav'
+    local_file = r'D:Production\path\to\the\file.wav'
     )
 
 MWB.run()
@@ -387,6 +389,19 @@ SD.run()
 ## TL Podcasts Usage
 
 ### Prerequisites
+
+Podcast publishing and the podcast-related CLI commands connect to the Assets server over SSH/SFTP using the host alias `assets`. You must configure SSH prior to running any scripts.
+
+Keep the SSH private key in the home directory under `~/.ssh`. In that same directory, create a file named `config` with a host entry like this, replacing the placeholders with your server hostname, username, and key filename:
+
+````text
+Host assets
+    HostName YOUR_ASSETS_SERVER_HOSTNAME
+    User YOUR_SSH_USERNAME
+    IdentityFile ~/.ssh/YOUR_PRIVATE_KEY_FILENAME
+````
+
+The `Host assets` alias must match the host used by `talklib`. Run `ssh assets` from on the PC to verify the connection before scheduling automation. For unattended runs, key authentication must work without an interactive password or passphrase prompt.
 
 Before starting to podcast a new show, you must log in to the server, create a directory, and upload some files. The `talklib` CLI has several functions to help you with this. Run `talklib --help` in your terminal to see a list of these helper functions.
 
